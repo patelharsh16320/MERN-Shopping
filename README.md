@@ -292,7 +292,7 @@ All endpoints prefixed with `/api`. Protected routes require `Authorization: Bea
 Pagination & Filtering
 
 
-<!--! Done -->
+!------ Done -----! 
 Default Category – “General”
 - A new category named “General” must be created in the system.
 - This category should be updatable (its details can be modified if needed).
@@ -330,7 +330,7 @@ Category Paination - per page 10 show
 
 Admin Product: Multiple images show option, also need upload from local brower option
 
-<!--! Working:  -->
+!------ Working-----! 
 
 Columns Feature for Product, Categories, and Users Pages
 - On the Products, Categories, and Users pages, the Columns feature at the top needs to be updated.
@@ -338,8 +338,7 @@ Columns Feature for Product, Categories, and Users Pages
 - If the admin hides any column, that preference should remain saved.When the admin navigates to another page and then returns to the same page, the previously hidden column(s) should still remain hidden (the feature should stay disabled for those columns).
 - When the admin navigates to another page and then returns to the same page, the previously hidden column(s) should still remain hidden (the feature should stay disabled for those columns).
 
-<!--! Reaming: -->
-init
+!------ Reaming-----! 
 
 Product Management
 - Products can be set to Published, Draft, or Trash (items in Trash are automatically deleted after 30 days).
@@ -381,4 +380,3 @@ Contact Page & Admin Dashboard
 Site Analytics
 - Store Site Analytics data in the database.
 - Admin should be able to view both the latest analytics and previously stored data upon login.
-Pagination & Filtering
