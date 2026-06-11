@@ -3,7 +3,7 @@ import AdminLayout from './AdminLayout';
 import { productAPI, categoryAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
 
-const emptyForm = { name: '', description: '', price: '', originalPrice: '', discount: 0, category: '', images: [''], stock: '', totalStock: '', rating: 0, numReviews: 0, isFeatured: false, freshnessDays: 365, weight: '200g', brand: 'Women HubClub', tags: '' };
+const emptyForm = { name: '', description: '', price: '', originalPrice: '', discount: 0, category: '', subcategory: '', images: [''], stock: '', totalStock: '', rating: 0, numReviews: 0, isFeatured: false, freshnessDays: 365, weight: '200g', brand: 'Women HubClub', tags: '' };
 const PROD_COLS = ['Category', 'Price', 'Stock', 'Rating', 'Featured', 'Reviews'];
 
 function SortTh({ label, field, sortField, sortDir, onSort, style }) {
@@ -75,7 +75,7 @@ export default function ManageProducts() {
   const openAdd = () => { setEditing(null); setForm(emptyForm); setModal(true); };
   const openEdit = (p) => {
     setEditing(p._id);
-    setForm({ ...emptyForm, ...p, images: p.images?.length ? p.images : [''], tags: p.tags?.join(', ') || '', totalStock: p.totalStock || p.stock || '' });
+    setForm({ ...emptyForm, ...p, images: p.images?.length ? p.images : [''], tags: p.tags?.join(', ') || '', totalStock: p.totalStock || p.stock || '', subcategory: p.subcategory || '' });
     setModal(true);
   };
 
@@ -83,7 +83,7 @@ export default function ManageProducts() {
     e.preventDefault();
     setSaving(true);
     try {
-      const payload = { ...form, tags: form.tags ? form.tags.split(',').map(t => t.trim()) : [], images: form.images.filter(Boolean) };
+      const payload = { ...form, category: form.category || 'General', tags: form.tags ? form.tags.split(',').map(t => t.trim()) : [], images: form.images.filter(Boolean) };
       if (!payload.totalStock) payload.totalStock = payload.stock;
       if (editing) { await productAPI.update(editing, payload); toast.success('Product updated!'); }
       else { await productAPI.create(payload); toast.success('Product created!'); }
@@ -155,7 +155,12 @@ export default function ManageProducts() {
                 <tr key={p._id}>
                   <td><img src={p.images?.[0]} alt={p.name} style={{ width: 50, height: 50, borderRadius: 10, objectFit: 'cover' }} onError={e => e.target.style.display = 'none'} /></td>
                   <td style={{ fontWeight: 600, maxWidth: 200 }}>{p.name}</td>
-                  {visibleCols['Category'] && <td><span className="badge badge-processing">{p.category}</span></td>}
+                  {visibleCols['Category'] && (
+                    <td>
+                      <span className="badge badge-processing">{p.category}</span>
+                      {p.subcategory && <span style={{ marginLeft: 4, fontSize: 11, background: '#f3e5f5', color: '#6a1b9a', padding: '2px 7px', borderRadius: 10, fontWeight: 600 }}>↳ {p.subcategory}</span>}
+                    </td>
+                  )}
                   {visibleCols['Price'] && <td><span style={{ fontWeight: 700, color: '#6c63ff' }}>₹{p.price}</span>{p.originalPrice > p.price && <span style={{ textDecoration: 'line-through', color: '#636e72', fontSize: 12, marginLeft: 6 }}>₹{p.originalPrice}</span>}</td>}
                   {visibleCols['Stock'] && (
                     <td>
@@ -289,12 +294,21 @@ export default function ManageProducts() {
                   <textarea className="form-input" rows={3} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} required />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Category *</label>
-                  <select className="form-select" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>
-                    <option value="">Select category</option>
-                    {categories.map(c => <option key={c._id} value={c.name}>{c.icon} {c.name}</option>)}
+                  <label className="form-label">Category <span style={{ fontWeight: 400, fontSize: 12, color: '#9e9e9e' }}>(defaults to "General")</span></label>
+                  <select className="form-select" value={form.category} onChange={e => setForm({ ...form, category: e.target.value, subcategory: '' })}>
+                    <option value="">General (default)</option>
+                    {categories.filter(c => !c.parent).map(c => <option key={c._id} value={c.name}>{c.icon} {c.name}</option>)}
                   </select>
                 </div>
+                {form.category && categories.some(c => c.parent?.name === form.category) && (
+                  <div className="form-group">
+                    <label className="form-label">Subcategory <span style={{ fontWeight: 400, fontSize: 12, color: '#9e9e9e' }}>(optional)</span></label>
+                    <select className="form-select" value={form.subcategory} onChange={e => setForm({ ...form, subcategory: e.target.value })}>
+                      <option value="">— None —</option>
+                      {categories.filter(c => c.parent?.name === form.category).map(c => <option key={c._id} value={c.name}>{c.icon} {c.name}</option>)}
+                    </select>
+                  </div>
+                )}
                 <div className="form-group">
                   <label className="form-label">Price (₹) *</label>
                   <input className="form-input" type="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} required />

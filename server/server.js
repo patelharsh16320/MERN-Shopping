@@ -20,7 +20,7 @@ app.use('/api/invoices', require('./routes/invoices'));
 app.use('/api/visits', require('./routes/visits'));
 app.use('/api/categories', require('./routes/categories'));
 
-app.get('/api/health', (req, res) => res.json({ status: 'OK', message: 'Flower Shop API Running' }));
+app.get('/api/health', (req, res) => res.json({ status: 'OK', message: 'women hubclub API Running' }));
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

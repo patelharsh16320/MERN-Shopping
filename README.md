@@ -288,8 +288,18 @@ All endpoints prefixed with `/api`. Protected routes require `Authorization: Bea
 
 
 
+<!-- Working:  -->
+Default Category – “General”
+- A new category named “General” must be created in the system.
+- This category should be updatable (its details can be modified if needed).
+- The “General” category must not be deletable by any admin.
+Categories & Subcategories
+- Both parent categories and subcategories must be displayed and stored in the database.
+- On the product page, after selecting a parent category, the corresponding child categories should be shown.
+- If the admin does not select a parent category, the system should automatically assign the default category “General.”
+- Selecting a child category is optional (not mandatory).
+
 <!-- Reaming:  -->
--- sub categories display
 Contact Page & Admin Dashboard
 - All messages submitted via the Contact Page must be saved into the database.
 - A new panel should be created on the Admin Dashboard to display all Contact Page submissions.

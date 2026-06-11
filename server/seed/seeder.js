@@ -98,6 +98,7 @@ async function seedDB() {
     console.log('Cleared existing data...');
 
     await Category.insertMany([
+      { name: 'General', icon: '🏷️', description: 'Default category for uncategorised products', isDefault: true },
       { name: 'Skincare', icon: '✨', description: 'Serums, moisturizers, cleansers and sunscreen' },
       { name: 'Makeup & Beauty', icon: '💄', description: 'Lipstick, foundation, eyeshadow and more' },
       { name: 'Hair Care', icon: '💇', description: 'Shampoo, conditioner, oils and serums' },

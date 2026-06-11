@@ -15,6 +15,7 @@ const productSchema = new mongoose.Schema({
   originalPrice: { type: Number, default: 0 },
   discount: { type: Number, default: 0 },
   category: { type: String, required: true },
+  subcategory: { type: String, default: '' },
   images: [{ type: String }],
   stock: { type: Number, required: true, default: 0 },
   totalStock: { type: Number, default: 0 },
