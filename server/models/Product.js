@@ -27,8 +27,13 @@ const productSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
   isFeatured: { type: Boolean, default: false },
   weight: { type: String, default: '200g' },
-  freshnessDays: { type: Number, default: 365 }
+  freshnessDays: { type: Number, default: 365 },
+  status: { type: String, enum: ['published', 'draft', 'trash'], default: 'published' },
+  trashedAt: { type: Date, default: null },
 }, { timestamps: true });
+
+// Auto-delete trashed products after 30 days
+productSchema.index({ trashedAt: 1 }, { expireAfterSeconds: 2592000 });
 
 function generateSlug(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');

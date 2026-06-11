@@ -4,9 +4,17 @@ import { productAPI, categoryAPI, uploadAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
 import ImportModal from './ImportModal';
 
-const emptyForm = { name: '', description: '', price: '', originalPrice: '', discount: 0, category: '', subcategory: '', images: [''], stock: '', totalStock: '', rating: 0, numReviews: 0, isFeatured: false, freshnessDays: 365, weight: '200g', brand: 'Women HubClub', tags: '' };
+const emptyForm = { name: '', description: '', price: '', originalPrice: '', discount: 0, category: '', subcategory: '', images: [''], stock: '', totalStock: '', rating: 0, numReviews: 0, isFeatured: false, freshnessDays: 365, weight: '200g', brand: 'Women HubClub', tags: '', status: 'published' };
 const PROD_COLS = ['Category', 'Price', 'Stock', 'Rating', 'Featured', 'Reviews'];
 const PAGE_SIZE = 10;
+const STATUS_TABS = [
+  { key: 'all', label: 'All' },
+  { key: 'published', label: 'Published' },
+  { key: 'draft', label: 'Draft' },
+  { key: 'trash', label: 'Trash' },
+];
+const STATUS_COLORS = { published: '#00b894', draft: '#f39c12', trash: '#d63031' };
+const STATUS_BG = { published: '#f0fdf4', draft: '#fffbf0', trash: '#fff0f0' };
 
 function SortTh({ label, field, sortField, sortDir, onSort, style }) {
   const active = sortField === field;
@@ -49,6 +57,7 @@ export default function ManageProducts() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [page, setPage] = useState(1);
   const [reviewsModal, setReviewsModal] = useState({ open: false, product: null, reviews: [], loading: false });
   const [visibleCols, setVisibleCols] = useState(() => {
@@ -79,14 +88,20 @@ export default function ManageProducts() {
   };
 
   const filteredProducts = useMemo(() => {
-    if (!search.trim()) return products;
-    const q = search.toLowerCase();
-    return products.filter(p =>
-      p.name?.toLowerCase().includes(q) ||
-      p.category?.toLowerCase().includes(q) ||
-      p.brand?.toLowerCase().includes(q)
-    );
-  }, [products, search]);
+    let list = products;
+    if (statusFilter !== 'all') {
+      list = list.filter(p => (p.status || 'published') === statusFilter);
+    }
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(p =>
+        p.name?.toLowerCase().includes(q) ||
+        p.category?.toLowerCase().includes(q) ||
+        p.brand?.toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }, [products, search, statusFilter]);
 
   const sortedProducts = useMemo(() => {
     if (!sortField) return filteredProducts;
@@ -102,6 +117,14 @@ export default function ManageProducts() {
 
   const totalPages = Math.ceil(sortedProducts.length / PAGE_SIZE);
   const paginated = sortedProducts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const tabCounts = useMemo(() => {
+    const counts = { all: products.length };
+    STATUS_TABS.slice(1).forEach(t => {
+      counts[t.key] = products.filter(p => (p.status || 'published') === t.key).length;
+    });
+    return counts;
+  }, [products]);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -136,7 +159,7 @@ export default function ManageProducts() {
   const openAdd = () => { setEditing(null); setForm(emptyForm); setModal(true); };
   const openEdit = (p) => {
     setEditing(p._id);
-    setForm({ ...emptyForm, ...p, images: p.images?.length ? p.images : [''], tags: p.tags?.join(', ') || '', totalStock: p.totalStock || p.stock || '', subcategory: p.subcategory || '' });
+    setForm({ ...emptyForm, ...p, images: p.images?.length ? p.images : [''], tags: p.tags?.join(', ') || '', totalStock: p.totalStock || p.stock || '', subcategory: p.subcategory || '', status: p.status || 'published' });
     setModal(true);
   };
 
@@ -154,9 +177,26 @@ export default function ManageProducts() {
     setSaving(false);
   };
 
-  const handleDelete = async (id, name) => {
-    if (!window.confirm(`Delete "${name}"?`)) return;
-    try { await productAPI.delete(id); toast.success('Deleted!'); fetchProducts(); }
+  const handleTrash = async (id, name) => {
+    if (!window.confirm(`Move "${name}" to Trash? It will be permanently deleted after 30 days.`)) return;
+    try {
+      await productAPI.update(id, { status: 'trash' });
+      toast.success('Moved to Trash');
+      fetchProducts();
+    } catch { toast.error('Failed'); }
+  };
+
+  const handleRestore = async (id) => {
+    try {
+      await productAPI.update(id, { status: 'published' });
+      toast.success('Restored to Published');
+      fetchProducts();
+    } catch { toast.error('Failed'); }
+  };
+
+  const handleDeleteForever = async (id, name) => {
+    if (!window.confirm(`Permanently delete "${name}"? This cannot be undone.`)) return;
+    try { await productAPI.delete(id); toast.success('Permanently deleted!'); fetchProducts(); }
     catch { toast.error('Failed to delete'); }
   };
 
@@ -193,13 +233,26 @@ export default function ManageProducts() {
         <h1 style={{ fontSize: 24, fontWeight: 800 }}>🌸 <span className="gradient-text">Manage Products</span></h1>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <div style={{ background: '#f0f0ff', borderRadius: 12, padding: '8px 20px', fontSize: 14, fontWeight: 600, color: '#6c63ff' }}>
-            {search ? `${sortedProducts.length} / ${products.length}` : products.length} products
+            {search || statusFilter !== 'all' ? `${sortedProducts.length} / ${products.length}` : products.length} products
           </div>
           <button className="btn btn-secondary" onClick={() => handleExport('json')} style={{ fontWeight: 600 }}>📤 JSON</button>
           <button className="btn btn-secondary" onClick={() => handleExport('csv')} style={{ fontWeight: 600 }}>📤 CSV</button>
           <button className="btn btn-secondary" onClick={() => setImportModal(true)} style={{ fontWeight: 600 }}>📥 Import</button>
           <button className="btn btn-primary" onClick={openAdd}>+ Add Product</button>
         </div>
+      </div>
+
+      {/* Status tabs */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
+        {STATUS_TABS.map(tab => (
+          <button key={tab.key} onClick={() => { setStatusFilter(tab.key); setPage(1); }}
+            style={{ padding: '6px 16px', borderRadius: 20, border: `2px solid ${statusFilter === tab.key ? '#6c63ff' : '#e0e0e0'}`, background: statusFilter === tab.key ? '#f0f0ff' : 'white', color: statusFilter === tab.key ? '#6c63ff' : '#636e72', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>
+            {tab.label}
+            <span style={{ marginLeft: 6, padding: '1px 7px', borderRadius: 10, background: statusFilter === tab.key ? '#6c63ff' : '#f0f0f0', color: statusFilter === tab.key ? 'white' : '#9e9e9e', fontSize: 11, fontWeight: 700 }}>
+              {tabCounts[tab.key] ?? 0}
+            </span>
+          </button>
+        ))}
       </div>
 
       <div style={{ marginBottom: 16, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -222,6 +275,7 @@ export default function ManageProducts() {
               <th>#</th>
               <th>Image</th>
               <SortTh label="Name" field="name" {...sortProps} />
+              <th>Status</th>
               {visibleCols['Category'] && <SortTh label="Category" field="category" {...sortProps} />}
               {visibleCols['Price'] && <SortTh label="Price" field="price" {...sortProps} />}
               {visibleCols['Stock'] && <SortTh label="Stock" field="stock" {...sortProps} />}
@@ -233,13 +287,15 @@ export default function ManageProducts() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={10} style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</td></tr>
+              <tr><td colSpan={11} style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</td></tr>
             ) : paginated.length === 0 ? (
-              <tr><td colSpan={10} style={{ textAlign: 'center', padding: 40, color: '#9e9e9e' }}>No products found.</td></tr>
+              <tr><td colSpan={11} style={{ textAlign: 'center', padding: 40, color: '#9e9e9e' }}>No products found.</td></tr>
             ) : paginated.map((p, i) => {
               const reviewCount = p.reviews?.length ?? p.numReviews ?? 0;
+              const status = p.status || 'published';
+              const isTrash = status === 'trash';
               return (
-                <tr key={p._id}>
+                <tr key={p._id} style={isTrash ? { opacity: 0.65, background: '#fff8f8' } : {}}>
                   <td style={{ color: '#636e72' }}>{(page - 1) * PAGE_SIZE + i + 1}</td>
                   <td>
                     <div style={{ position: 'relative', display: 'inline-block' }}>
@@ -252,6 +308,11 @@ export default function ManageProducts() {
                     </div>
                   </td>
                   <td style={{ fontWeight: 600, maxWidth: 200 }}>{p.name}</td>
+                  <td>
+                    <span style={{ display: 'inline-block', padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 700, background: STATUS_BG[status] || '#f5f5f5', color: STATUS_COLORS[status] || '#636e72', textTransform: 'capitalize', border: `1px solid ${STATUS_COLORS[status] || '#e0e0e0'}33` }}>
+                      {status}
+                    </span>
+                  </td>
                   {visibleCols['Category'] && (
                     <td>
                       <span className="badge badge-processing">{p.category}</span>
@@ -282,8 +343,17 @@ export default function ManageProducts() {
                   )}
                   <td>
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <button className="btn btn-sm" style={{ background: '#f0f0ff', color: '#6c63ff', borderRadius: 20 }} onClick={() => openEdit(p)}>Edit</button>
-                      <button className="btn btn-sm btn-danger" onClick={() => handleDelete(p._id, p.name)}>Delete</button>
+                      {isTrash ? (
+                        <>
+                          <button className="btn btn-sm" style={{ background: '#f0fdf4', color: '#00b894', borderRadius: 20, whiteSpace: 'nowrap' }} onClick={() => handleRestore(p._id)}>↩ Restore</button>
+                          <button className="btn btn-sm btn-danger" style={{ whiteSpace: 'nowrap' }} onClick={() => handleDeleteForever(p._id, p.name)}>🗑 Forever</button>
+                        </>
+                      ) : (
+                        <>
+                          <button className="btn btn-sm" style={{ background: '#f0f0ff', color: '#6c63ff', borderRadius: 20 }} onClick={() => openEdit(p)}>Edit</button>
+                          <button className="btn btn-sm" style={{ background: '#fff8f0', color: '#e17055', borderRadius: 20, border: '1px solid #ffd5c2' }} onClick={() => handleTrash(p._id, p.name)}>🗑 Trash</button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -402,6 +472,14 @@ export default function ManageProducts() {
                     </select>
                   </div>
                 )}
+                <div className="form-group">
+                  <label className="form-label">Status</label>
+                  <select className="form-select" value={form.status} onChange={e => setForm({ ...form, status: e.target.value })}>
+                    <option value="published">Published — visible to customers</option>
+                    <option value="draft">Draft — hidden from customers</option>
+                    <option value="trash">Trash — auto-deleted after 30 days</option>
+                  </select>
+                </div>
                 <div className="form-group">
                   <label className="form-label">Price (₹) *</label>
                   <input className="form-input" type="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} required />

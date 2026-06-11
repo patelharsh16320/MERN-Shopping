@@ -102,6 +102,12 @@ A full-stack MERN e-commerce platform for women's lifestyle products — skincar
 - **Manage Users** — view, edit, delete; change role; deactivate/reactivate (auto-logs out user immediately)
 - **Manage Invoices** — view all invoices; update invoice status; sort on all columns
 - **Analytics** — visit tracking: total/today/monthly/yearly bar chart; logged-in vs anonymous; per-user visit table
+- **Category hierarchy** — parent/child support with "General" as default undeletable top-level parent; backend guards block API-level misuse
+- **Admin pagination** — all tables (Products, Orders, Users, Invoices, Categories, Analytics) load full dataset client-side and paginate 10/page so sort/filter always apply to entire data; smart Paginator with ellipsis for large page counts
+- **Import/Export (JSON + CSV)** — Users, Orders, Invoices support full import+export; Analytics export-only; ImportModal with skip/remove-replace duplicate handling
+- **Product multi-image** — multiple image slots with thumbnail preview, URL input, and per-slot local file upload via multer (POST /api/upload; static /uploads)
+- **Column visibility** — Products, Categories, and Users pages persist hidden columns in localStorage so preferences survive navigation
+- **Product status** — products support Published, Draft, or Trash; Trash items auto-deleted after 30 days via MongoDB TTL index; admin can Restore or permanently delete from Trash
 
 ---
 
@@ -283,95 +289,4 @@ All endpoints prefixed with `/api`. Protected routes require `Authorization: Bea
 - **Sorting**: All four admin tables sort client-side via `useMemo` — no backend round-trip needed.
 
 - **Visit tracking**: `VisitTracker` component (in `App.js`) records every customer route change to the `Visit` collection. Admin routes are excluded.
-
-
-
-
-<!--! Done -->
-Default Category – “General”
-- A new category named “General” must be created in the system.
-- This category should be updatable (its details can be modified if needed).
-- The “General” category must not be deletable by any admin.
-Categories & Subcategories
-- Both parent categories and subcategories must be displayed and stored in the database.
-- On the product page, after selecting a parent category, the corresponding child categories should be shown.
-- If the admin does not select a parent category, the system should automatically assign the default category “General.”
-- Selecting a child category is optional (not mandatory).
-
-Import/Export Functionality
-- Provide import/export options for products and categories.
-- If the same products or categories already exist:
-  - Admin should have the option to remove duplicates before import.
-  - Admin should also have the option to ignore duplicates during import.
-  - Import/Export Functionality - need option json or csv file
-
-Default “General” Category Rules
-- The “General” category must be set as the default category in the system.
-- If the admin does not select any category, the product should automatically be assigned to the “General” category.
-- The “General” category itself must always be treated as a parent category.
-- The “General” category should not allow child categories to be created under it.
-- No other category should be allowed to set “General” as its parent.
-- The “General” category must remain as a standalone parent category only.
-
-Category Paination - per page 10 show
-- When using pagination, filters (ascending/descending) must apply to the entire dataset, not just the current page.
-- Example: If there are 100+ pages, filtering should reorder the full dataset before displaying results.
-- This functionality must work consistently across:
-  - Products
-  - Orders
-  - Users
-  - Invoices
-  - Analytics
-
-
-<!--! Working:  -->
-Admin Product: Multiple images show option, also need upload from local brower option
-Columns Feature for Product, Categories, and Users Pages
-- On the Products, Categories, and Users pages, the Columns feature at the top needs to be updated.
-- By default, all columns should be selected and visible.
-- If the admin hides any column, that preference should remain saved.When the admin navigates to another page and then returns to the same page, the previously hidden column(s) should still remain hidden (the feature should stay disabled for those columns).
-- When the admin navigates to another page and then returns to the same page, the previously hidden column(s) should still remain hidden (the feature should stay disabled for those columns).
-<!--! Reaming: -->
-init
-
-Product Management
-- Products can be set to Published, Draft, or Trash (items in Trash are automatically deleted after 30 days).
-- Products can be added to a single category or multiple categories.
-- On the product page, multiple filters can be selected.
-- On the admin product page, multiple dropdowns can be selected.
-
-Review Management
-- Admin can manage all product reviews.
-- Reviews can be set to Approved or Deleted.
-
-Comment Management
-- Admin can manage all blog comments.
-- Comments can be set to Approved or Deleted.
-
-Product Page & URLs
-- Product page URLs should be automatically created by default.
-- Admin should have the option to update product URLs.
-- Admin product page should include a direct link to view the single product page.
-Customer Data
-- Customers can be exported to Excel.
-
-Order Management Features
-- Add private notes to the order
-- Receive email when order is placed
-- Export orders to Excel
-
-Discount & Promotion Management
-- Create and manage discount codes
-- Set codes as “active” or “inactive”
-
-Contact Page & Admin Dashboard
-- All messages submitted via the Contact Page must be saved into the database.
-- A new panel should be created on the Admin Dashboard to display all Contact Page submissions.
-- Admin must be able to view these messages with filtering options (ascending/descending order).
-- If a user is logged in, their name and email should auto‑populate in the Contact Page form.
-- Users should still be able to edit/update these details before submitting.
-
-Site Analytics
-- Store Site Analytics data in the database.
-- Admin should be able to view both the latest analytics and previously stored data upon login.
 Pagination & Filtering

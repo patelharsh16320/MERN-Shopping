@@ -5,7 +5,7 @@ const getProducts = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 12;
     const skip = (page - 1) * limit;
-    let query = { isActive: true };
+    let query = { isActive: true, status: { $ne: 'trash' } };
     if (req.query.category) query.category = req.query.category;
     if (req.query.search) query.$or = [{ name: new RegExp(req.query.search, 'i') }, { description: new RegExp(req.query.search, 'i') }];
     if (req.query.minPrice || req.query.maxPrice) {
@@ -59,7 +59,15 @@ const updateProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
-    Object.assign(product, req.body);
+    const body = { ...req.body };
+    if (body.status === 'trash' && product.status !== 'trash') {
+      body.trashedAt = new Date();
+      body.isActive = false;
+    } else if (body.status && body.status !== 'trash') {
+      body.trashedAt = null;
+      body.isActive = body.status === 'published';
+    }
+    Object.assign(product, body);
     if (!product.totalStock) product.totalStock = product.stock;
     const saved = await product.save();
     res.json(saved);
@@ -129,7 +137,7 @@ const getAdminProducts = async (req, res) => {
 
 const getFeatured = async (req, res) => {
   try {
-    const products = await Product.find({ isFeatured: true, isActive: true }).limit(8);
+    const products = await Product.find({ isFeatured: true, isActive: true, status: { $ne: 'trash' } }).limit(8);
     res.json(products);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -138,7 +146,7 @@ const getFeatured = async (req, res) => {
 
 const getCategories = async (req, res) => {
   try {
-    const categories = await Product.distinct('category', { isActive: true });
+    const categories = await Product.distinct('category', { isActive: true, status: { $ne: 'trash' } });
     res.json(categories);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -150,7 +158,7 @@ const toCSV = (rows, fields) => {
   return [fields.join(','), ...rows.map(r => fields.map(f => esc(r[f])).join(','))].join('\n');
 };
 
-const PRODUCT_CSV_FIELDS = ['name', 'description', 'price', 'originalPrice', 'discount', 'category', 'subcategory', 'images', 'stock', 'totalStock', 'rating', 'numReviews', 'brand', 'tags', 'isActive', 'isFeatured', 'weight', 'freshnessDays'];
+const PRODUCT_CSV_FIELDS = ['name', 'description', 'price', 'originalPrice', 'discount', 'category', 'subcategory', 'images', 'stock', 'totalStock', 'rating', 'numReviews', 'brand', 'tags', 'isActive', 'isFeatured', 'weight', 'freshnessDays', 'status'];
 
 const exportProducts = async (req, res) => {
   try {
@@ -162,13 +170,12 @@ const exportProducts = async (req, res) => {
       images: (p.images || []).join(';'), stock: p.stock, totalStock: p.totalStock,
       rating: p.rating, numReviews: p.numReviews, brand: p.brand,
       tags: (p.tags || []).join(';'), isActive: p.isActive, isFeatured: p.isFeatured,
-      weight: p.weight, freshnessDays: p.freshnessDays,
+      weight: p.weight, freshnessDays: p.freshnessDays, status: p.status || 'published',
     }));
     if (req.query.format === 'csv') {
       res.setHeader('Content-Type', 'text/csv');
       return res.send(toCSV(data, PRODUCT_CSV_FIELDS));
     }
-    // For JSON export, return arrays as-is
     const jsonData = products.map(p => ({
       name: p.name, description: p.description, price: p.price,
       originalPrice: p.originalPrice, discount: p.discount,
@@ -176,7 +183,7 @@ const exportProducts = async (req, res) => {
       images: p.images, stock: p.stock, totalStock: p.totalStock,
       rating: p.rating, numReviews: p.numReviews, brand: p.brand,
       tags: p.tags, isActive: p.isActive, isFeatured: p.isFeatured,
-      weight: p.weight, freshnessDays: p.freshnessDays,
+      weight: p.weight, freshnessDays: p.freshnessDays, status: p.status || 'published',
     }));
     res.json(jsonData);
   } catch (err) {
