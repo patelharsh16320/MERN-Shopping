@@ -290,3 +290,95 @@ All endpoints prefixed with `/api`. Protected routes require `Authorization: Bea
 
 - **Visit tracking**: `VisitTracker` component (in `App.js`) records every customer route change to the `Visit` collection. Admin routes are excluded.
 Pagination & Filtering
+
+
+<!--! Done -->
+Default Category – “General”
+- A new category named “General” must be created in the system.
+- This category should be updatable (its details can be modified if needed).
+- The “General” category must not be deletable by any admin.
+Categories & Subcategories
+- Both parent categories and subcategories must be displayed and stored in the database.
+- On the product page, after selecting a parent category, the corresponding child categories should be shown.
+- If the admin does not select a parent category, the system should automatically assign the default category “General.”
+- Selecting a child category is optional (not mandatory).
+
+Import/Export Functionality
+- Provide import/export options for products and categories.
+- If the same products or categories already exist:
+  - Admin should have the option to remove duplicates before import.
+  - Admin should also have the option to ignore duplicates during import.
+  - Import/Export Functionality - need option json or csv file
+
+Default “General” Category Rules
+- The “General” category must be set as the default category in the system.
+- If the admin does not select any category, the product should automatically be assigned to the “General” category.
+- The “General” category itself must always be treated as a parent category.
+- The “General” category should not allow child categories to be created under it.
+- No other category should be allowed to set “General” as its parent.
+- The “General” category must remain as a standalone parent category only.
+
+Category Paination - per page 10 show
+- When using pagination, filters (ascending/descending) must apply to the entire dataset, not just the current page.
+- Example: If there are 100+ pages, filtering should reorder the full dataset before displaying results.
+- This functionality must work consistently across:
+  - Products
+  - Orders
+  - Users
+  - Invoices
+  - Analytics
+
+Admin Product: Multiple images show option, also need upload from local brower option
+
+<!--! Working:  -->
+
+Columns Feature for Product, Categories, and Users Pages
+- On the Products, Categories, and Users pages, the Columns feature at the top needs to be updated.
+- By default, all columns should be selected and visible.
+- If the admin hides any column, that preference should remain saved.When the admin navigates to another page and then returns to the same page, the previously hidden column(s) should still remain hidden (the feature should stay disabled for those columns).
+- When the admin navigates to another page and then returns to the same page, the previously hidden column(s) should still remain hidden (the feature should stay disabled for those columns).
+
+<!--! Reaming: -->
+init
+
+Product Management
+- Products can be set to Published, Draft, or Trash (items in Trash are automatically deleted after 30 days).
+- Products can be added to a single category or multiple categories.
+- On the product page, multiple filters can be selected.
+- On the admin product page, multiple dropdowns can be selected.
+
+Review Management
+- Admin can manage all product reviews.
+- Reviews can be set to Approved or Deleted.
+
+Comment Management
+- Admin can manage all blog comments.
+- Comments can be set to Approved or Deleted.
+
+Product Page & URLs
+- Product page URLs should be automatically created by default.
+- Admin should have the option to update product URLs.
+- Admin product page should include a direct link to view the single product page.
+Customer Data
+- Customers can be exported to Excel.
+
+Order Management Features
+- Add private notes to the order
+- Receive email when order is placed
+- Export orders to Excel
+
+Discount & Promotion Management
+- Create and manage discount codes
+- Set codes as “active” or “inactive”
+
+Contact Page & Admin Dashboard
+- All messages submitted via the Contact Page must be saved into the database.
+- A new panel should be created on the Admin Dashboard to display all Contact Page submissions.
+- Admin must be able to view these messages with filtering options (ascending/descending order).
+- If a user is logged in, their name and email should auto‑populate in the Contact Page form.
+- Users should still be able to edit/update these details before submitting.
+
+Site Analytics
+- Store Site Analytics data in the database.
+- Admin should be able to view both the latest analytics and previously stored data upon login.
+Pagination & Filtering
