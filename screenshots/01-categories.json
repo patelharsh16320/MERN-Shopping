@@ -1,0 +1,191 @@
+[
+  {
+    "name": "Accessories",
+    "icon": "💍",
+    "description": "Jewellery, scrunchies and hair clips",
+    "isActive": true,
+    "parent": ""
+  },
+  {
+    "name": "Aromatherapy",
+    "icon": "🌿",
+    "description": "Essential oils and diffusers",
+    "isActive": true,
+    "parent": "Wellness"
+  },
+  {
+    "name": "Bags & Wallets",
+    "icon": "👜",
+    "description": "Handbags, totes and wallets",
+    "isActive": true,
+    "parent": "Accessories"
+  },
+  {
+    "name": "Beauty Tools",
+    "icon": "🪞",
+    "description": "Brushes, sponges and beauty kits",
+    "isActive": true,
+    "parent": "Makeup & Beauty"
+  },
+  {
+    "name": "Books & Journals",
+    "icon": "📓",
+    "description": "Gratitude journals and planners",
+    "isActive": true,
+    "parent": ""
+  },
+  {
+    "name": "Ethnic Wear",
+    "icon": "🥻",
+    "description": "Sarees, kurtis and suits",
+    "isActive": true,
+    "parent": "Fashion"
+  },
+  {
+    "name": "Fashion",
+    "icon": "👗",
+    "description": "Kurtis, joggers and loungewear",
+    "isActive": true,
+    "parent": ""
+  },
+  {
+    "name": "Fitness",
+    "icon": "🏋️",
+    "description": "Resistance bands, yoga mats and sports bras",
+    "isActive": true,
+    "parent": "Health & Wellness"
+  },
+  {
+    "name": "Footwear",
+    "icon": "👠",
+    "description": "Heels, flats and sneakers",
+    "isActive": true,
+    "parent": "Fashion"
+  },
+  {
+    "name": "General",
+    "icon": "🏷️",
+    "description": "Default category for uncategorised products",
+    "isActive": true,
+    "parent": ""
+  },
+  {
+    "name": "Hair Care",
+    "icon": "💇",
+    "description": "Shampoo, conditioner, oils and serums",
+    "isActive": true,
+    "parent": ""
+  },
+  {
+    "name": "Hair Styling",
+    "icon": "💁",
+    "description": "Straighteners, curlers and styling tools",
+    "isActive": true,
+    "parent": "Hair Care"
+  },
+  {
+    "name": "Health & Wellness",
+    "icon": "🏷️",
+    "description": "",
+    "isActive": true,
+    "parent": ""
+  },
+  {
+    "name": "Home & Living",
+    "icon": "🕯️",
+    "description": "Candles, cushion covers and mugs",
+    "isActive": true,
+    "parent": ""
+  },
+  {
+    "name": "Home Decor",
+    "icon": "🏠",
+    "description": "Wall art and decorative items",
+    "isActive": true,
+    "parent": "Home & Living"
+  },
+  {
+    "name": "Jewellery",
+    "icon": "💎",
+    "description": "Necklaces, rings and earrings",
+    "isActive": true,
+    "parent": "Accessories"
+  },
+  {
+    "name": "Kitchen Essentials",
+    "icon": "🍽️",
+    "description": "Kitchen tools and accessories",
+    "isActive": true,
+    "parent": "Home & Living"
+  },
+  {
+    "name": "Lip Care",
+    "icon": "💋",
+    "description": "Lip balms and lip masks",
+    "isActive": true,
+    "parent": "Makeup & Beauty"
+  },
+  {
+    "name": "Makeup & Beauty",
+    "icon": "💄",
+    "description": "Lipstick, foundation, eyeshadow and more",
+    "isActive": true,
+    "parent": ""
+  },
+  {
+    "name": "Mental Health",
+    "icon": "🏷️",
+    "description": "",
+    "isActive": true,
+    "parent": "Health & Wellness"
+  },
+  {
+    "name": "Nutrition",
+    "icon": "🥗",
+    "description": "Protein powders and healthy snacks",
+    "isActive": true,
+    "parent": "Health & Wellness"
+  },
+  {
+    "name": "Planners",
+    "icon": "📅",
+    "description": "Daily and weekly planners",
+    "isActive": true,
+    "parent": "Books & Journals"
+  },
+  {
+    "name": "Self Development",
+    "icon": "📚",
+    "description": "Personal growth books",
+    "isActive": true,
+    "parent": "Books & Journals"
+  },
+  {
+    "name": "Skincare",
+    "icon": "✨",
+    "description": "Serums, moisturizers, cleansers and sunscreen",
+    "isActive": true,
+    "parent": "Health & Wellness"
+  },
+  {
+    "name": "Wellness",
+    "icon": "🧘",
+    "description": "Essential oils, vitamins and wellness tools",
+    "isActive": true,
+    "parent": ""
+  },
+  {
+    "name": "Western Wear",
+    "icon": "👚",
+    "description": "Tops, dresses and jeans",
+    "isActive": true,
+    "parent": "Fashion"
+  },
+  {
+    "name": "Yoga & Meditation",
+    "icon": "🏷️",
+    "description": "",
+    "isActive": true,
+    "parent": "Health & Wellness"
+  }
+]

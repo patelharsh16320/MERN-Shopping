@@ -1,0 +1,93 @@
+[
+  {
+    "name": "Harsh",
+    "email": "harsh@gmail.com",
+    "phone": "",
+    "role": "admin",
+    "isActive": true
+  },
+  {
+    "name": "Kavya Nair",
+    "email": "kavya@gmail.com",
+    "phone": "9876543213",
+    "role": "user",
+    "isActive": true
+  },
+  {
+    "name": "Divya Patel",
+    "email": "divya@gmail.com",
+    "phone": "9876543214",
+    "role": "user",
+    "isActive": true
+  },
+  {
+    "name": "Meera Iyer",
+    "email": "meera@gmail.com",
+    "phone": "9876543215",
+    "role": "user",
+    "isActive": true
+  },
+  {
+    "name": "Riya Singh",
+    "email": "riya@gmail.com",
+    "phone": "9876543216",
+    "role": "user",
+    "isActive": true
+  },
+  {
+    "name": "Pooja Verma",
+    "email": "pooja@gmail.com",
+    "phone": "9876543217",
+    "role": "user",
+    "isActive": true
+  },
+  {
+    "name": "Nisha Gupta",
+    "email": "nisha@gmail.com",
+    "phone": "9876543218",
+    "role": "user",
+    "isActive": true
+  },
+  {
+    "name": "Sana Khan",
+    "email": "sana@gmail.com",
+    "phone": "9876543219",
+    "role": "user",
+    "isActive": true
+  },
+  {
+    "name": "Tanya Reddy",
+    "email": "tanya@gmail.com",
+    "phone": "9876543220",
+    "role": "user",
+    "isActive": true
+  },
+  {
+    "name": "Priya Sharma",
+    "email": "priya@gmail.com",
+    "phone": "9876543210",
+    "role": "user",
+    "isActive": true
+  },
+  {
+    "name": "Anjali Mehta",
+    "email": "anjali@gmail.com",
+    "phone": "9876543211",
+    "role": "user",
+    "isActive": true
+  },
+  {
+    "name": "Sneha Kapoor",
+    "email": "sneha@gmail.com",
+    "phone": "9876543212",
+    "role": "user",
+    "isActive": true
+  },
+  {
+    "name": "Admin User",
+    "email": "admin@gmail.com",
+    "phone": "9999999999",
+    "role": "admin",
+    "isActive": true
+  }
+]

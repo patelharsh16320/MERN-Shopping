@@ -1,0 +1,99 @@
+{
+  "daily": [
+    {
+      "total": 257,
+      "date": "2026-06-11",
+      "unique": 1
+    }
+  ],
+  "monthly": [
+    {
+      "total": 257,
+      "month": "2026-06",
+      "unique": 1
+    }
+  ],
+  "yearly": [
+    {
+      "total": 257,
+      "year": 2026,
+      "unique": 1
+    }
+  ],
+  "userVisits": [
+    {
+      "visits": 48,
+      "lastVisit": "2026-06-11T06:56:50.328Z",
+      "pageCount": 11
+    },
+    {
+      "visits": 29,
+      "lastVisit": "2026-06-11T08:50:29.889Z",
+      "pageCount": 9
+    },
+    {
+      "visits": 29,
+      "lastVisit": "2026-06-11T12:05:50.164Z",
+      "name": "Harsh",
+      "email": "harsh@gmail.com",
+      "pageCount": 10
+    },
+    {
+      "visits": 28,
+      "lastVisit": "2026-06-11T08:45:54.027Z",
+      "pageCount": 13
+    },
+    {
+      "visits": 24,
+      "lastVisit": "2026-06-11T06:17:02.751Z",
+      "pageCount": 11
+    },
+    {
+      "visits": 21,
+      "lastVisit": "2026-06-11T07:00:04.391Z",
+      "pageCount": 6
+    },
+    {
+      "visits": 7,
+      "lastVisit": "2026-06-11T07:54:50.435Z",
+      "pageCount": 7
+    },
+    {
+      "visits": 7,
+      "lastVisit": "2026-06-11T11:37:08.577Z",
+      "pageCount": 4
+    },
+    {
+      "visits": 2,
+      "lastVisit": "2026-06-11T06:11:47.022Z",
+      "pageCount": 1
+    },
+    {
+      "visits": 2,
+      "lastVisit": "2026-06-11T06:27:37.212Z",
+      "pageCount": 2
+    },
+    {
+      "visits": 2,
+      "lastVisit": "2026-06-11T11:13:11.746Z",
+      "pageCount": 1
+    },
+    {
+      "visits": 2,
+      "lastVisit": "2026-06-11T11:39:54.572Z",
+      "name": "Admin User",
+      "email": "admin@gmail.com",
+      "pageCount": 1
+    },
+    {
+      "visits": 1,
+      "lastVisit": "2026-06-11T06:11:53.322Z",
+      "pageCount": 1
+    },
+    {
+      "visits": 1,
+      "lastVisit": "2026-06-11T11:06:10.409Z",
+      "pageCount": 1
+    }
+  ]
+}

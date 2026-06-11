@@ -323,9 +323,14 @@ Category Paination - per page 10 show
   - Invoices
   - Analytics
 
-<!--! Working:  -->
 
-  
+<!--! Working:  -->
+Admin Product: Multiple images show option, also need upload from local brower option
+Columns Feature for Product, Categories, and Users Pages
+- On the Products, Categories, and Users pages, the Columns feature at the top needs to be updated.
+- By default, all columns should be selected and visible.
+- If the admin hides any column, that preference should remain saved.When the admin navigates to another page and then returns to the same page, the previously hidden column(s) should still remain hidden (the feature should stay disabled for those columns).
+- When the admin navigates to another page and then returns to the same page, the previously hidden column(s) should still remain hidden (the feature should stay disabled for those columns).
 <!--! Reaming: -->
 init
 
@@ -370,6 +375,3 @@ Site Analytics
 - Store Site Analytics data in the database.
 - Admin should be able to view both the latest analytics and previously stored data upon login.
 Pagination & Filtering
-
-Product
-- Multiple images show option, also need upload from local brower option

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import AdminLayout from './AdminLayout';
-import { productAPI, categoryAPI } from '../../utils/api';
+import { productAPI, categoryAPI, uploadAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
 import ImportModal from './ImportModal';
 
@@ -51,7 +51,12 @@ export default function ManageProducts() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [reviewsModal, setReviewsModal] = useState({ open: false, product: null, reviews: [], loading: false });
-  const [visibleCols, setVisibleCols] = useState(() => Object.fromEntries(PROD_COLS.map(c => [c, true])));
+  const [visibleCols, setVisibleCols] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('admin_cols_products') || '{}');
+      return Object.fromEntries(PROD_COLS.map(c => [c, saved[c] !== undefined ? saved[c] : true]));
+    } catch { return Object.fromEntries(PROD_COLS.map(c => [c, true])); }
+  });
   const [sortField, setSortField] = useState('');
   const [sortDir, setSortDir] = useState('asc');
   const [categories, setCategories] = useState([]);
@@ -61,7 +66,11 @@ export default function ManageProducts() {
     categoryAPI.getAll().then(({ data }) => setCategories(data)).catch(() => {});
   }, []);
 
-  const toggleCol = (col) => setVisibleCols(v => ({ ...v, [col]: !v[col] }));
+  const toggleCol = (col) => setVisibleCols(v => {
+    const next = { ...v, [col]: !v[col] };
+    localStorage.setItem('admin_cols_products', JSON.stringify(next));
+    return next;
+  });
 
   const handleSort = (field) => {
     if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
@@ -151,6 +160,21 @@ export default function ManageProducts() {
     catch { toast.error('Failed to delete'); }
   };
 
+  const handleImageUpload = async (e, idx) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const { data } = await uploadAPI.image(file);
+      setForm(prev => {
+        const imgs = [...prev.images];
+        imgs[idx] = data.url;
+        return { ...prev, images: imgs };
+      });
+      toast.success('Image uploaded!');
+    } catch (err) { toast.error(err.response?.data?.message || 'Upload failed'); }
+    e.target.value = '';
+  };
+
   const openReviews = async (p) => {
     setReviewsModal({ open: true, product: p, reviews: [], loading: true });
     try {
@@ -217,7 +241,16 @@ export default function ManageProducts() {
               return (
                 <tr key={p._id}>
                   <td style={{ color: '#636e72' }}>{(page - 1) * PAGE_SIZE + i + 1}</td>
-                  <td><img src={p.images?.[0]} alt={p.name} style={{ width: 50, height: 50, borderRadius: 10, objectFit: 'cover' }} onError={e => e.target.style.display = 'none'} /></td>
+                  <td>
+                    <div style={{ position: 'relative', display: 'inline-block' }}>
+                      <img src={p.images?.[0]} alt={p.name} style={{ width: 50, height: 50, borderRadius: 10, objectFit: 'cover', display: 'block' }} onError={e => e.target.style.display = 'none'} />
+                      {p.images?.length > 1 && (
+                        <span style={{ position: 'absolute', bottom: 2, right: 2, background: 'rgba(0,0,0,0.65)', color: 'white', fontSize: 10, fontWeight: 700, padding: '1px 4px', borderRadius: 6 }}>
+                          +{p.images.length - 1}
+                        </span>
+                      )}
+                    </div>
+                  </td>
                   <td style={{ fontWeight: 600, maxWidth: 200 }}>{p.name}</td>
                   {visibleCols['Category'] && (
                     <td>
@@ -390,8 +423,45 @@ export default function ManageProducts() {
                   <input className="form-input" type="number" placeholder="Defaults to Current Stock" value={form.totalStock} onChange={e => setForm({ ...form, totalStock: e.target.value })} />
                 </div>
                 <div className="form-group" style={{ gridColumn: 'span 2' }}>
-                  <label className="form-label">Image URL</label>
-                  <input className="form-input" placeholder="https://images.unsplash.com/..." value={form.images[0]} onChange={e => setForm({ ...form, images: [e.target.value] })} />
+                  <label className="form-label">
+                    Images
+                    <span style={{ fontWeight: 400, fontSize: 12, color: '#9e9e9e', marginLeft: 8 }}>paste a URL or upload from your computer</span>
+                  </label>
+                  {form.images.map((img, idx) => (
+                    <div key={idx} style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'center' }}>
+                      <div style={{ width: 52, height: 52, borderRadius: 10, background: '#f5f5f5', flexShrink: 0, overflow: 'hidden', border: '1px solid #e0e0e0' }}>
+                        {img
+                          ? <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none'; e.target.parentNode.style.background = '#fee'; }} />
+                          : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, color: '#bdbdbd' }}>🖼️</div>
+                        }
+                      </div>
+                      <input
+                        className="form-input"
+                        placeholder="https://images.unsplash.com/..."
+                        value={img}
+                        onChange={e => {
+                          const imgs = [...form.images];
+                          imgs[idx] = e.target.value;
+                          setForm({ ...form, images: imgs });
+                        }}
+                        style={{ flex: 1 }}
+                      />
+                      <label style={{ cursor: 'pointer', padding: '9px 14px', background: '#f0f0ff', color: '#6c63ff', borderRadius: 10, fontWeight: 600, fontSize: 13, whiteSpace: 'nowrap', border: '1px solid #d0c9ff', lineHeight: 1.4 }}>
+                        📎 Upload
+                        <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleImageUpload(e, idx)} />
+                      </label>
+                      {form.images.length > 1 && (
+                        <button type="button" onClick={() => setForm({ ...form, images: form.images.filter((_, i) => i !== idx) })}
+                          style={{ padding: '9px 12px', background: '#fff0f0', color: '#d63031', border: '1px solid #ffcdd2', borderRadius: 10, cursor: 'pointer', fontWeight: 700, fontSize: 15, lineHeight: 1 }}>
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button type="button" onClick={() => setForm({ ...form, images: [...form.images, ''] })}
+                    style={{ width: '100%', padding: '8px', background: '#fafafe', color: '#6c63ff', border: '2px dashed #d0c9ff', borderRadius: 10, cursor: 'pointer', fontWeight: 600, fontSize: 13, marginTop: 2 }}>
+                    + Add Another Image
+                  </button>
                 </div>
                 <div className="form-group" style={{ gridColumn: 'span 2' }}>
                   <label className="form-label">Tags (comma separated)</label>

@@ -88,6 +88,14 @@ export const categoryAPI = {
   importAll: (items, duplicateAction) => API.post('/categories/import', { items, duplicateAction }),
 };
 
+export const uploadAPI = {
+  image: (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    return API.post('/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+  },
+};
+
 export const visitAPI = {
   record: (data) => API.post('/visits', data),
   getStats: () => API.get('/visits/stats'),

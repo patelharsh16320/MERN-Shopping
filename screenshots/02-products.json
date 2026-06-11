@@ -1,0 +1,882 @@
+[
+  {
+    "name": "Rose Glow Face Serum",
+    "description": "Luxurious rose-infused vitamin C serum that brightens skin, reduces dark spots and gives a natural glow. Suitable for all skin types.",
+    "price": 799,
+    "originalPrice": 999,
+    "discount": 20,
+    "category": "Skincare",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400"
+    ],
+    "stock": 80,
+    "totalStock": 80,
+    "rating": 4.8,
+    "numReviews": 214,
+    "brand": "Women HubClub",
+    "tags": [
+      "vitamin-c",
+      "brightening",
+      "serum"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "30ml",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Hydrating Vitamin C Moisturizer",
+    "description": "Rich daily moisturizer with vitamin C, hyaluronic acid and niacinamide. Keeps skin soft, plump and radiant all day long.",
+    "price": 649,
+    "originalPrice": 849,
+    "discount": 24,
+    "category": "Skincare",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=400"
+    ],
+    "stock": 70,
+    "totalStock": 70,
+    "rating": 4.7,
+    "numReviews": 189,
+    "brand": "Women HubClub",
+    "tags": [
+      "moisturizer",
+      "hydrating",
+      "daily"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "50ml",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Gentle Foaming Face Wash",
+    "description": "Sulphate-free gentle foam cleanser with salicylic acid and aloe vera. Removes impurities without stripping natural oils.",
+    "price": 349,
+    "originalPrice": 449,
+    "discount": 22,
+    "category": "Skincare",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400"
+    ],
+    "stock": 100,
+    "totalStock": 100,
+    "rating": 4.5,
+    "numReviews": 302,
+    "brand": "Women HubClub",
+    "tags": [
+      "cleanser",
+      "gentle",
+      "acne"
+    ],
+    "isActive": true,
+    "isFeatured": false,
+    "weight": "150ml",
+    "freshnessDays": 365
+  },
+  {
+    "name": "SPF 50 Sunscreen with Niacinamide",
+    "description": "Lightweight, non-greasy sunscreen offering broad spectrum SPF 50 protection. Infused with niacinamide for skin tone correction.",
+    "price": 449,
+    "originalPrice": 549,
+    "discount": 18,
+    "category": "Skincare",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1629198688000-71f23e745b6e?w=400"
+    ],
+    "stock": 90,
+    "totalStock": 90,
+    "rating": 4.6,
+    "numReviews": 278,
+    "brand": "Women HubClub",
+    "tags": [
+      "sunscreen",
+      "spf50",
+      "protection"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "50g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Hyaluronic Acid Toner",
+    "description": "Alcohol-free hydrating toner with 3 molecular weights of hyaluronic acid. Visibly plumps skin and minimises the appearance of pores.",
+    "price": 549,
+    "originalPrice": 699,
+    "discount": 21,
+    "category": "Skincare",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=400"
+    ],
+    "stock": 65,
+    "totalStock": 65,
+    "rating": 4.4,
+    "numReviews": 145,
+    "brand": "Women HubClub",
+    "tags": [
+      "toner",
+      "hyaluronic",
+      "pores"
+    ],
+    "isActive": true,
+    "isFeatured": false,
+    "weight": "150ml",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Velvet Matte Lipstick Set (6 Shades)",
+    "description": "Pigment-rich matte lipsticks in 6 stunning shades — from nudes to bold reds. Long-lasting 10-hour formula with vitamin E.",
+    "price": 1199,
+    "originalPrice": 1599,
+    "discount": 25,
+    "category": "Makeup & Beauty",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1586495777744-4e6232bf2176?w=400"
+    ],
+    "stock": 55,
+    "totalStock": 55,
+    "rating": 4.9,
+    "numReviews": 432,
+    "brand": "Women HubClub",
+    "tags": [
+      "lipstick",
+      "matte",
+      "set"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "6x3.5g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "12-Pan Eyeshadow Palette — Rose Gold",
+    "description": "Stunning rose gold themed eyeshadow palette with 12 highly pigmented shades. Mix of matte, shimmer and glitter finishes.",
+    "price": 1299,
+    "originalPrice": 1799,
+    "discount": 28,
+    "category": "Makeup & Beauty",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=400"
+    ],
+    "stock": 45,
+    "totalStock": 45,
+    "rating": 4.8,
+    "numReviews": 367,
+    "brand": "Women HubClub",
+    "tags": [
+      "eyeshadow",
+      "palette",
+      "rosegold"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "15g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Waterproof Kajal & Eyeliner Duo",
+    "description": "Intense black kajal and precision liquid eyeliner that lasts all day. Smudge-proof, sweat-proof and waterproof formula.",
+    "price": 399,
+    "originalPrice": 499,
+    "discount": 20,
+    "category": "Makeup & Beauty",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1583241800698-e8ab01830a22?w=400"
+    ],
+    "stock": 120,
+    "totalStock": 120,
+    "rating": 4.6,
+    "numReviews": 521,
+    "brand": "Women HubClub",
+    "tags": [
+      "kajal",
+      "eyeliner",
+      "waterproof"
+    ],
+    "isActive": true,
+    "isFeatured": false,
+    "weight": "2x1.2g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Dewy Foundation SPF 15",
+    "description": "Medium-to-full coverage foundation with SPF 15. Gives a natural dewy finish that lasts 16 hours. Available in 10 shades.",
+    "price": 849,
+    "originalPrice": 1099,
+    "discount": 23,
+    "category": "Makeup & Beauty",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=400"
+    ],
+    "stock": 60,
+    "totalStock": 60,
+    "rating": 4.5,
+    "numReviews": 289,
+    "brand": "Women HubClub",
+    "tags": [
+      "foundation",
+      "spf",
+      "coverage"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "30ml",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Argan Oil Hair Serum",
+    "description": "Lightweight argan oil serum that tames frizz, adds shine and protects from heat damage up to 230°C. For all hair types.",
+    "price": 649,
+    "originalPrice": 849,
+    "discount": 24,
+    "category": "Hair Care",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1626120032630-b51c96a544e5?w=400"
+    ],
+    "stock": 75,
+    "totalStock": 75,
+    "rating": 4.7,
+    "numReviews": 198,
+    "brand": "Women HubClub",
+    "tags": [
+      "argan",
+      "frizz",
+      "serum"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "100ml",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Keratin Repair Shampoo & Conditioner Set",
+    "description": "Salon-grade keratin shampoo and conditioner that repairs damaged hair, reduces breakage and adds intense shine.",
+    "price": 999,
+    "originalPrice": 1299,
+    "discount": 23,
+    "category": "Hair Care",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1643185450492-6ba77dea00f6?w=400"
+    ],
+    "stock": 55,
+    "totalStock": 55,
+    "rating": 4.8,
+    "numReviews": 243,
+    "brand": "Women HubClub",
+    "tags": [
+      "keratin",
+      "shampoo",
+      "conditioner"
+    ],
+    "isActive": true,
+    "isFeatured": false,
+    "weight": "2x200ml",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Onion & Bhringraj Hair Growth Oil",
+    "description": "Traditional Ayurvedic hair oil with onion extract, bhringraj and castor oil. Promotes hair growth and reduces hair fall significantly.",
+    "price": 499,
+    "originalPrice": 649,
+    "discount": 23,
+    "category": "Hair Care",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1617791160588-241658ad0d3b?w=400"
+    ],
+    "stock": 90,
+    "totalStock": 90,
+    "rating": 4.6,
+    "numReviews": 387,
+    "brand": "Women HubClub",
+    "tags": [
+      "onion",
+      "growth",
+      "ayurvedic"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "200ml",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Silk Hair Wrap Turban (2 Pack)",
+    "description": "Ultra-soft microfiber hair turbans that dry hair 3x faster and reduce breakage from friction. No tangles or frizz.",
+    "price": 349,
+    "originalPrice": 449,
+    "discount": 22,
+    "category": "Hair Care",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1522204523234-8729aa6e3d5f?w=400"
+    ],
+    "stock": 80,
+    "totalStock": 80,
+    "rating": 4.4,
+    "numReviews": 156,
+    "brand": "Women HubClub",
+    "tags": [
+      "silk",
+      "turban",
+      "microfiber"
+    ],
+    "isActive": true,
+    "isFeatured": false,
+    "weight": "180g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Jade Facial Roller & Gua Sha Set",
+    "description": "Authentic jade facial roller and gua sha stone set. Reduces puffiness, improves circulation and enhances skincare absorption.",
+    "price": 699,
+    "originalPrice": 899,
+    "discount": 22,
+    "category": "Wellness",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=400"
+    ],
+    "stock": 60,
+    "totalStock": 60,
+    "rating": 4.7,
+    "numReviews": 312,
+    "brand": "Women HubClub",
+    "tags": [
+      "jade",
+      "gua-sha",
+      "massage"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "250g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Aromatherapy Essential Oil Set (8 Oils)",
+    "description": "Premium set of 8 therapeutic-grade essential oils including lavender, rose, peppermint, eucalyptus and more.",
+    "price": 1299,
+    "originalPrice": 1699,
+    "discount": 24,
+    "category": "Wellness",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1608571423539-e951a8d56f8e?w=400"
+    ],
+    "stock": 40,
+    "totalStock": 40,
+    "rating": 4.9,
+    "numReviews": 267,
+    "brand": "Women HubClub",
+    "tags": [
+      "aromatherapy",
+      "essential oils",
+      "relaxation"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "8x10ml",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Women's Daily Multivitamin Pack",
+    "description": "Comprehensive women's multivitamin with 25+ nutrients including iron, folic acid, vitamin D3 and B12. 60-day supply.",
+    "price": 899,
+    "originalPrice": 1199,
+    "discount": 25,
+    "category": "Wellness",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400"
+    ],
+    "stock": 70,
+    "totalStock": 70,
+    "rating": 4.6,
+    "numReviews": 189,
+    "brand": "Women HubClub",
+    "tags": [
+      "vitamins",
+      "supplement",
+      "daily"
+    ],
+    "isActive": true,
+    "isFeatured": false,
+    "weight": "60 tablets",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Gold Plated Earring Set (5 Pairs)",
+    "description": "Elegant gold-plated earring set with 5 versatile styles — hoops, studs, drops and more. Hypoallergenic and tarnish-resistant.",
+    "price": 799,
+    "originalPrice": 999,
+    "discount": 20,
+    "category": "Accessories",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400"
+    ],
+    "stock": 65,
+    "totalStock": 65,
+    "rating": 4.7,
+    "numReviews": 445,
+    "brand": "Women HubClub",
+    "tags": [
+      "earrings",
+      "gold",
+      "set"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "50g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Silk Scrunchie Set (12 Pieces)",
+    "description": "Luxurious silk scrunchies in 12 gorgeous colours. Gentle on hair, prevents breakage and creases. Perfect for all hair types.",
+    "price": 349,
+    "originalPrice": 449,
+    "discount": 22,
+    "category": "Accessories",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400"
+    ],
+    "stock": 100,
+    "totalStock": 100,
+    "rating": 4.5,
+    "numReviews": 678,
+    "brand": "Women HubClub",
+    "tags": [
+      "scrunchie",
+      "silk",
+      "hair"
+    ],
+    "isActive": true,
+    "isFeatured": false,
+    "weight": "150g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Crystal Hair Clips Set (8 Pcs)",
+    "description": "Dainty crystal-studded hair clips in assorted styles. Lightweight, strong grip and won't snag your hair. Gift-ready packaging.",
+    "price": 399,
+    "originalPrice": 549,
+    "discount": 27,
+    "category": "Accessories",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1631234764568-8c9a1a55baee?w=400"
+    ],
+    "stock": 85,
+    "totalStock": 85,
+    "rating": 4.4,
+    "numReviews": 234,
+    "brand": "Women HubClub",
+    "tags": [
+      "clips",
+      "crystal",
+      "hair"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "100g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Floral Rayon Kurti (S/M/L/XL)",
+    "description": "Breezy floral printed rayon kurti with a flattering A-line fit. Soft, lightweight fabric perfect for daily wear and festive occasions.",
+    "price": 899,
+    "originalPrice": 1199,
+    "discount": 25,
+    "category": "Fashion",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=400"
+    ],
+    "stock": 50,
+    "totalStock": 50,
+    "rating": 4.6,
+    "numReviews": 321,
+    "brand": "Women HubClub",
+    "tags": [
+      "kurti",
+      "floral",
+      "rayon"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "300g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Women's Athleisure Jogger Set",
+    "description": "Ultra-comfortable athleisure set with moisture-wicking crop top and high-waist joggers. Perfect for gym, yoga or lounging.",
+    "price": 1299,
+    "originalPrice": 1699,
+    "discount": 24,
+    "category": "Fashion",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400"
+    ],
+    "stock": 40,
+    "totalStock": 40,
+    "rating": 4.8,
+    "numReviews": 267,
+    "brand": "Women HubClub",
+    "tags": [
+      "athleisure",
+      "gym",
+      "comfort"
+    ],
+    "isActive": true,
+    "isFeatured": false,
+    "weight": "400g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Cozy Pastel Loungewear Set",
+    "description": "Incredibly soft pastel loungewear set in premium brushed cotton blend. Wide-leg pants and matching oversized top. Perfect for home.",
+    "price": 1099,
+    "originalPrice": 1499,
+    "discount": 27,
+    "category": "Fashion",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1594938298603-c8148c4b4057?w=400"
+    ],
+    "stock": 35,
+    "totalStock": 35,
+    "rating": 4.7,
+    "numReviews": 198,
+    "brand": "Women HubClub",
+    "tags": [
+      "loungewear",
+      "pastel",
+      "comfy"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "500g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Resistance Band Set (5 Levels)",
+    "description": "Professional fabric resistance bands in 5 resistance levels. Non-slip, anti-roll design. Perfect for glutes, legs and full body workouts.",
+    "price": 599,
+    "originalPrice": 799,
+    "discount": 25,
+    "category": "Fitness",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400"
+    ],
+    "stock": 70,
+    "totalStock": 70,
+    "rating": 4.7,
+    "numReviews": 412,
+    "brand": "Women HubClub",
+    "tags": [
+      "resistance",
+      "bands",
+      "workout"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "300g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Yoga Mat Anti-Slip Premium (6mm)",
+    "description": "Professional 6mm thick yoga mat with alignment lines. Eco-friendly TPE material, non-slip on both sides. Includes carry strap.",
+    "price": 1499,
+    "originalPrice": 1999,
+    "discount": 25,
+    "category": "Fitness",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400"
+    ],
+    "stock": 45,
+    "totalStock": 45,
+    "rating": 4.8,
+    "numReviews": 356,
+    "brand": "Women HubClub",
+    "tags": [
+      "yoga",
+      "mat",
+      "non-slip"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "1.2kg",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Women's High-Support Sports Bra",
+    "description": "Seamless high-support sports bra with removable padding. 4-way stretch fabric, breathable mesh panelling and racerback design.",
+    "price": 599,
+    "originalPrice": 799,
+    "discount": 25,
+    "category": "Fitness",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1510771463146-e89e6e86560e?w=400"
+    ],
+    "stock": 60,
+    "totalStock": 60,
+    "rating": 4.6,
+    "numReviews": 289,
+    "brand": "Women HubClub",
+    "tags": [
+      "sports-bra",
+      "support",
+      "workout"
+    ],
+    "isActive": true,
+    "isFeatured": false,
+    "weight": "150g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Guided Gratitude Journal — 90 Days",
+    "description": "Beautiful 90-day guided gratitude journal with daily prompts, affirmations and reflection pages. Premium linen cover with gilded edges.",
+    "price": 399,
+    "originalPrice": 549,
+    "discount": 27,
+    "category": "Books & Journals",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1517971129774-8a2b38fa128e?w=400"
+    ],
+    "stock": 80,
+    "totalStock": 80,
+    "rating": 4.8,
+    "numReviews": 567,
+    "brand": "Women HubClub",
+    "tags": [
+      "journal",
+      "gratitude",
+      "mindfulness"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "400g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Women's Self-Care Planner 2024-25",
+    "description": "Comprehensive wellness planner with monthly, weekly and daily views. Includes habit trackers, mood logs and self-care checklists.",
+    "price": 499,
+    "originalPrice": 699,
+    "discount": 29,
+    "category": "Books & Journals",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400"
+    ],
+    "stock": 65,
+    "totalStock": 65,
+    "rating": 4.7,
+    "numReviews": 389,
+    "brand": "Women HubClub",
+    "tags": [
+      "planner",
+      "organizer",
+      "wellness"
+    ],
+    "isActive": true,
+    "isFeatured": false,
+    "weight": "500g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Luxury Soy Wax Candle Set (3 Pcs)",
+    "description": "Hand-poured soy wax candles in rose, jasmine and sandalwood fragrances. 40-hour burn time each, in beautiful frosted glass jars.",
+    "price": 999,
+    "originalPrice": 1299,
+    "discount": 23,
+    "category": "Home & Living",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1602028915047-37269d1a73f7?w=400"
+    ],
+    "stock": 53,
+    "totalStock": 55,
+    "rating": 4.9,
+    "numReviews": 478,
+    "brand": "Women HubClub",
+    "tags": [
+      "candle",
+      "soy",
+      "fragrance"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "3x200g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Velvet Cushion Cover Set (5 Pcs)",
+    "description": "Sumptuous velvet cushion covers in blush pink, dusty rose and ivory tones. Concealed zip closure, fits 40x40cm inserts.",
+    "price": 699,
+    "originalPrice": 899,
+    "discount": 22,
+    "category": "Health & Wellness",
+    "subcategory": "Fitness",
+    "images": [
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400"
+    ],
+    "stock": 45,
+    "totalStock": 45,
+    "rating": 4.6,
+    "numReviews": 234,
+    "brand": "Women HubClub",
+    "tags": [
+      "cushion",
+      "velvet",
+      "decor"
+    ],
+    "isActive": true,
+    "isFeatured": false,
+    "weight": "800g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Inspirational Ceramic Mug (350ml)",
+    "description": "Handcrafted ceramic mug with gold foil inspirational quote. Dishwasher safe, comes in a beautiful gift box. Perfect for coffee and tea.",
+    "price": 449,
+    "originalPrice": 599,
+    "discount": 25,
+    "category": "Home & Living",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400"
+    ],
+    "stock": 90,
+    "totalStock": 90,
+    "rating": 4.5,
+    "numReviews": 312,
+    "brand": "Women HubClub",
+    "tags": [
+      "mug",
+      "ceramic",
+      "gift"
+    ],
+    "isActive": true,
+    "isFeatured": false,
+    "weight": "350g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Women's Collagen Peptide Supplement",
+    "description": "Hydrolysed marine collagen peptides for skin elasticity, joint health and hair strength. Unflavoured, mixes easily in any drink. 60-day supply.",
+    "price": 1499,
+    "originalPrice": 1999,
+    "discount": 25,
+    "category": "Nutrition",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=400"
+    ],
+    "stock": 50,
+    "totalStock": 50,
+    "rating": 4.8,
+    "numReviews": 312,
+    "brand": "Women HubClub",
+    "tags": [
+      "collagen",
+      "skin",
+      "supplement"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "150g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Iron & Folic Acid Supplement",
+    "description": "Easy-absorb iron bisglycinate with folic acid and vitamin B12. Gentle on the stomach, no constipation. Essential for women's health.",
+    "price": 549,
+    "originalPrice": 699,
+    "discount": 21,
+    "category": "Nutrition",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400"
+    ],
+    "stock": 80,
+    "totalStock": 80,
+    "rating": 4.6,
+    "numReviews": 245,
+    "brand": "Women HubClub",
+    "tags": [
+      "iron",
+      "folic acid",
+      "supplement"
+    ],
+    "isActive": true,
+    "isFeatured": false,
+    "weight": "60 capsules",
+    "freshnessDays": 365
+  },
+  {
+    "name": "Organic Women's Protein Powder (Vanilla)",
+    "description": "Plant-based protein powder with 22g protein per serving, iron, calcium and probiotics. Delicious vanilla flavour, no artificial sweeteners.",
+    "price": 1999,
+    "originalPrice": 2499,
+    "discount": 20,
+    "category": "Nutrition",
+    "subcategory": "",
+    "images": [
+      "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=400"
+    ],
+    "stock": 35,
+    "totalStock": 35,
+    "rating": 4.7,
+    "numReviews": 178,
+    "brand": "Women HubClub",
+    "tags": [
+      "protein",
+      "plant-based",
+      "organic"
+    ],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "500g",
+    "freshnessDays": 365
+  },
+  {
+    "name": "lipstick",
+    "description": "lipstick",
+    "price": 49,
+    "originalPrice": 61,
+    "discount": 10,
+    "category": "Health & Wellness",
+    "subcategory": "Fitness",
+    "images": [
+      "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRgpaE07vv0UNcRg_eeSgMOuDVvetyuR4VluxPLJTRa8L31pGyo36_YbPUa-qIxa309Wez09UFZLb1No7A5Hg07W1lo09EAn26-U_FstJr4vG17dbjq1-pzjQ"
+    ],
+    "stock": 10,
+    "totalStock": 10,
+    "rating": 0,
+    "numReviews": 0,
+    "brand": "Women HubClub",
+    "tags": [],
+    "isActive": true,
+    "isFeatured": true,
+    "weight": "200g",
+    "freshnessDays": 365
+  }
+]

@@ -51,7 +51,12 @@ export default function ManageCategories() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [importModal, setImportModal] = useState(false);
-  const [visibleCols, setVisibleCols] = useState(() => Object.fromEntries(CAT_COLS.map(c => [c, true])));
+  const [visibleCols, setVisibleCols] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('admin_cols_categories') || '{}');
+      return Object.fromEntries(CAT_COLS.map(c => [c, saved[c] !== undefined ? saved[c] : true]));
+    } catch { return Object.fromEntries(CAT_COLS.map(c => [c, true])); }
+  });
   const [sortField, setSortField] = useState('');
   const [sortDir, setSortDir] = useState('asc');
 
@@ -66,7 +71,11 @@ export default function ManageCategories() {
 
   useEffect(() => { fetchCategories(); }, []);
 
-  const toggleCol = (col) => setVisibleCols(v => ({ ...v, [col]: !v[col] }));
+  const toggleCol = (col) => setVisibleCols(v => {
+    const next = { ...v, [col]: !v[col] };
+    localStorage.setItem('admin_cols_categories', JSON.stringify(next));
+    return next;
+  });
 
   const handleSort = (field) => {
     if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
