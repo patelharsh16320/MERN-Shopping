@@ -90,4 +90,53 @@ const getStats = async (req, res) => {
   }
 };
 
-module.exports = { recordVisit, getStats };
+const exportAnalytics = async (req, res) => {
+  try {
+    const now = new Date();
+    const last30 = new Date(now - 30 * 24 * 60 * 60 * 1000);
+    const last12m = new Date(now - 365 * 24 * 60 * 60 * 1000);
+
+    const [daily, monthly, yearly, userVisits] = await Promise.all([
+      Visit.aggregate([
+        { $match: { createdAt: { $gte: last30 } } },
+        { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } }, total: { $sum: 1 }, uniqueIps: { $addToSet: '$ip' } } },
+        { $project: { date: '$_id', total: 1, unique: { $size: '$uniqueIps' }, _id: 0 } },
+        { $sort: { date: 1 } },
+      ]),
+      Visit.aggregate([
+        { $match: { createdAt: { $gte: last12m } } },
+        { $group: { _id: { $dateToString: { format: '%Y-%m', date: '$createdAt' } }, total: { $sum: 1 }, uniqueIps: { $addToSet: '$ip' } } },
+        { $project: { month: '$_id', total: 1, unique: { $size: '$uniqueIps' }, _id: 0 } },
+        { $sort: { month: 1 } },
+      ]),
+      Visit.aggregate([
+        { $group: { _id: { $year: '$createdAt' }, total: { $sum: 1 }, uniqueIps: { $addToSet: '$ip' } } },
+        { $project: { year: '$_id', total: 1, unique: { $size: '$uniqueIps' }, _id: 0 } },
+        { $sort: { year: 1 } },
+      ]),
+      Visit.aggregate([
+        { $match: { userId: { $ne: null } } },
+        { $group: { _id: '$userId', visits: { $sum: 1 }, lastVisit: { $max: '$createdAt' }, pages: { $addToSet: '$page' } } },
+        { $lookup: { from: 'users', localField: '_id', foreignField: '_id', as: 'user' } },
+        { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
+        { $project: { _id: 0, name: '$user.name', email: '$user.email', visits: 1, lastVisit: 1, pageCount: { $size: '$pages' } } },
+        { $sort: { visits: -1 } },
+      ]),
+    ]);
+
+    if (req.query.format === 'csv') {
+      const esc = (v) => { const s = v === null || v === undefined ? '' : String(v).replace(/"/g, '""'); return s.includes(',') || s.includes('\n') || s.includes('"') ? `"${s}"` : s; };
+      const fields = ['name', 'email', 'visits', 'pageCount', 'lastVisit'];
+      const rows = userVisits.map(u => ({ name: u.name || '', email: u.email || '', visits: u.visits, pageCount: u.pageCount, lastVisit: u.lastVisit ? new Date(u.lastVisit).toISOString().slice(0, 10) : '' }));
+      const csv = [fields.join(','), ...rows.map(r => fields.map(f => esc(r[f])).join(','))].join('\n');
+      res.setHeader('Content-Type', 'text/csv');
+      return res.send(csv);
+    }
+
+    res.json({ daily, monthly, yearly, userVisits });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { recordVisit, getStats, exportAnalytics };

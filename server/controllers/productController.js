@@ -145,4 +145,89 @@ const getCategories = async (req, res) => {
   }
 };
 
-module.exports = { getProducts, getAdminProducts, getProductById, createProduct, updateProduct, deleteProduct, addReview, updateReview, getFeatured, getCategories };
+const toCSV = (rows, fields) => {
+  const esc = (v) => { const s = v === null || v === undefined ? '' : String(v).replace(/"/g, '""'); return s.includes(',') || s.includes('\n') || s.includes('"') ? `"${s}"` : s; };
+  return [fields.join(','), ...rows.map(r => fields.map(f => esc(r[f])).join(','))].join('\n');
+};
+
+const PRODUCT_CSV_FIELDS = ['name', 'description', 'price', 'originalPrice', 'discount', 'category', 'subcategory', 'images', 'stock', 'totalStock', 'rating', 'numReviews', 'brand', 'tags', 'isActive', 'isFeatured', 'weight', 'freshnessDays'];
+
+const exportProducts = async (req, res) => {
+  try {
+    const products = await Product.find().lean();
+    const data = products.map(p => ({
+      name: p.name, description: p.description, price: p.price,
+      originalPrice: p.originalPrice, discount: p.discount,
+      category: p.category, subcategory: p.subcategory || '',
+      images: (p.images || []).join(';'), stock: p.stock, totalStock: p.totalStock,
+      rating: p.rating, numReviews: p.numReviews, brand: p.brand,
+      tags: (p.tags || []).join(';'), isActive: p.isActive, isFeatured: p.isFeatured,
+      weight: p.weight, freshnessDays: p.freshnessDays,
+    }));
+    if (req.query.format === 'csv') {
+      res.setHeader('Content-Type', 'text/csv');
+      return res.send(toCSV(data, PRODUCT_CSV_FIELDS));
+    }
+    // For JSON export, return arrays as-is
+    const jsonData = products.map(p => ({
+      name: p.name, description: p.description, price: p.price,
+      originalPrice: p.originalPrice, discount: p.discount,
+      category: p.category, subcategory: p.subcategory || '',
+      images: p.images, stock: p.stock, totalStock: p.totalStock,
+      rating: p.rating, numReviews: p.numReviews, brand: p.brand,
+      tags: p.tags, isActive: p.isActive, isFeatured: p.isFeatured,
+      weight: p.weight, freshnessDays: p.freshnessDays,
+    }));
+    res.json(jsonData);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const importProducts = async (req, res) => {
+  try {
+    const { items, duplicateAction } = req.body;
+    if (!Array.isArray(items) || items.length === 0)
+      return res.status(400).json({ message: 'No items provided' });
+
+    const names = items.map(i => i.name?.trim()).filter(Boolean);
+    const existing = await Product.find({ name: { $in: names.map(n => new RegExp(`^${n}$`, 'i')) } });
+    const existingNamesLower = existing.map(p => p.name.toLowerCase());
+
+    let removed = 0, imported = 0, skipped = 0;
+
+    if (duplicateAction === 'remove') {
+      if (existing.length) {
+        await Product.deleteMany({ _id: { $in: existing.map(p => p._id) } });
+        removed = existing.length;
+      }
+    }
+
+    for (const item of items) {
+      if (!item.name?.trim()) continue;
+      const nameLower = item.name.trim().toLowerCase();
+      if (duplicateAction === 'ignore' && existingNamesLower.includes(nameLower)) { skipped++; continue; }
+      try {
+        const stock = Number(item.stock) || 0;
+        await Product.create({
+          name: item.name.trim(), description: item.description || '',
+          price: Number(item.price) || 0, originalPrice: Number(item.originalPrice) || 0,
+          discount: Number(item.discount) || 0, category: item.category || 'General',
+          subcategory: item.subcategory || '', images: item.images || [],
+          stock, totalStock: Number(item.totalStock) || stock,
+          rating: Number(item.rating) || 0, numReviews: Number(item.numReviews) || 0,
+          brand: item.brand || 'Women HubClub', tags: item.tags || [],
+          isActive: item.isActive !== false, isFeatured: !!item.isFeatured,
+          weight: item.weight || '200g', freshnessDays: Number(item.freshnessDays) || 365,
+        });
+        imported++;
+      } catch { skipped++; }
+    }
+
+    res.json({ imported, skipped, removed, total: items.length });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { getProducts, getAdminProducts, getProductById, createProduct, updateProduct, deleteProduct, addReview, updateReview, getFeatured, getCategories, exportProducts, importProducts };

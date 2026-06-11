@@ -1,6 +1,12 @@
 const Order = require('../models/Order');
 const Invoice = require('../models/Invoice');
 const Product = require('../models/Product');
+const User = require('../models/User');
+
+const toCSV = (rows, fields) => {
+  const esc = (v) => { const s = v === null || v === undefined ? '' : String(v).replace(/"/g, '""'); return s.includes(',') || s.includes('\n') || s.includes('"') ? `"${s}"` : s; };
+  return [fields.join(','), ...rows.map(r => fields.map(f => esc(r[f])).join(','))].join('\n');
+};
 
 const generateInvoiceNumber = () => {
   return 'INV-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
@@ -140,4 +146,87 @@ const getOrderStats = async (req, res) => {
   }
 };
 
-module.exports = { createOrder, getMyOrders, getOrderById, getAllOrders, updateOrderStatus, deleteOrder, getOrderStats };
+const exportOrders = async (req, res) => {
+  try {
+    const orders = await Order.find().populate('user', 'name email').sort({ createdAt: -1 });
+    const data = orders.map(o => ({
+      _id: o._id.toString(),
+      userEmail: o.user?.email || '',
+      userName: o.user?.name || '',
+      orderStatus: o.orderStatus,
+      paymentMethod: o.paymentMethod,
+      itemsPrice: o.itemsPrice,
+      shippingPrice: o.shippingPrice,
+      taxPrice: o.taxPrice,
+      totalPrice: o.totalPrice,
+      isPaid: o.isPaid,
+      address: o.shippingAddress?.address || '',
+      city: o.shippingAddress?.city || '',
+      country: o.shippingAddress?.country || '',
+      items: JSON.stringify(o.orderItems.map(i => ({ name: i.name, qty: i.quantity, price: i.price }))),
+      createdAt: o.createdAt?.toISOString().slice(0, 10),
+    }));
+    if (req.query.format === 'csv') {
+      res.setHeader('Content-Type', 'text/csv');
+      return res.send(toCSV(data, ['_id', 'userEmail', 'userName', 'orderStatus', 'paymentMethod', 'totalPrice', 'isPaid', 'address', 'city', 'items', 'createdAt']));
+    }
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const importOrders = async (req, res) => {
+  try {
+    const { items, duplicateAction } = req.body;
+    if (!Array.isArray(items) || items.length === 0)
+      return res.status(400).json({ message: 'No items provided' });
+
+    const existingIds = items.map(i => i._id).filter(Boolean);
+    const existing = existingIds.length ? await Order.find({ _id: { $in: existingIds } }) : [];
+    const existingIdSet = new Set(existing.map(o => o._id.toString()));
+
+    let removed = 0, imported = 0, skipped = 0;
+
+    if (duplicateAction === 'remove' && existing.length) {
+      await Order.deleteMany({ _id: { $in: existing.map(o => o._id) } });
+      removed = existing.length;
+    }
+
+    for (const item of items) {
+      if (duplicateAction === 'ignore' && item._id && existingIdSet.has(item._id)) { skipped++; continue; }
+      try {
+        let userId = null;
+        if (item.userEmail) {
+          const user = await User.findOne({ email: item.userEmail.trim().toLowerCase() });
+          if (user) userId = user._id;
+        }
+        let orderItems = [];
+        try {
+          orderItems = typeof item.items === 'string' ? JSON.parse(item.items) : (Array.isArray(item.items) ? item.items : []);
+          orderItems = orderItems.map(i => ({ name: i.name || '', quantity: Number(i.qty || i.quantity) || 1, price: Number(i.price) || 0 }));
+        } catch { orderItems = []; }
+        const totalPrice = Number(item.totalPrice) || orderItems.reduce((s, i) => s + i.price * i.quantity, 0);
+        await Order.create({
+          user: userId,
+          orderItems,
+          shippingAddress: { address: item.address || '', city: item.city || '', country: item.country || 'India' },
+          paymentMethod: item.paymentMethod || 'COD',
+          itemsPrice: Number(item.itemsPrice) || totalPrice,
+          shippingPrice: Number(item.shippingPrice) || 0,
+          taxPrice: Number(item.taxPrice) || 0,
+          totalPrice,
+          orderStatus: item.orderStatus || 'Pending',
+          isPaid: item.isPaid === true || item.isPaid === 'true',
+        });
+        imported++;
+      } catch { skipped++; }
+    }
+
+    res.json({ imported, skipped, removed, total: items.length });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { createOrder, getMyOrders, getOrderById, getAllOrders, updateOrderStatus, deleteOrder, getOrderStats, exportOrders, importOrders };

@@ -2,8 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import AdminLayout from './AdminLayout';
 import { userAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
+import ImportModal from './ImportModal';
 
 const USER_COLS = ['Email', 'Phone', 'Role', 'Status', 'Joined'];
+const PAGE_SIZE = 10;
 
 function SortTh({ label, field, sortField, sortDir, onSort }) {
   const active = sortField === field;
@@ -18,15 +20,34 @@ function getVal(obj, path) {
   return path.split('.').reduce((o, k) => o?.[k], obj);
 }
 
+function Paginator({ page, totalPages, onPage }) {
+  if (totalPages <= 1) return null;
+  const pages = [];
+  for (let i = 1; i <= totalPages; i++) {
+    if (i <= 2 || i > totalPages - 2 || Math.abs(i - page) <= 1) pages.push(i);
+    else if (pages[pages.length - 1] !== '...') pages.push('...');
+  }
+  return (
+    <div className="pagination" style={{ marginTop: 16 }}>
+      <button className="page-btn" onClick={() => onPage(page - 1)} disabled={page === 1}>‹</button>
+      {pages.map((p, i) =>
+        p === '...'
+          ? <span key={`e${i}`} style={{ padding: '0 6px', color: '#9e9e9e', alignSelf: 'center' }}>…</span>
+          : <button key={p} className={`page-btn ${page === p ? 'active' : ''}`} onClick={() => onPage(p)}>{p}</button>
+      )}
+      <button className="page-btn" onClick={() => onPage(page + 1)} disabled={page === totalPages}>›</button>
+    </div>
+  );
+}
+
 export default function ManageUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
   const [editUser, setEditUser] = useState(null);
   const [modal, setModal] = useState(false);
+  const [importModal, setImportModal] = useState(false);
   const [visibleCols, setVisibleCols] = useState(() => Object.fromEntries(USER_COLS.map(c => [c, true])));
   const [sortField, setSortField] = useState('');
   const [sortDir, setSortDir] = useState('asc');
@@ -36,11 +57,21 @@ export default function ManageUsers() {
   const handleSort = (field) => {
     if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
     else { setSortField(field); setSortDir('asc'); }
+    setPage(1);
   };
 
+  const filteredUsers = useMemo(() => {
+    if (!search.trim()) return users;
+    const q = search.toLowerCase();
+    return users.filter(u =>
+      u.name?.toLowerCase().includes(q) ||
+      u.email?.toLowerCase().includes(q)
+    );
+  }, [users, search]);
+
   const sortedUsers = useMemo(() => {
-    if (!sortField) return users;
-    return [...users].sort((a, b) => {
+    if (!sortField) return filteredUsers;
+    return [...filteredUsers].sort((a, b) => {
       const aVal = getVal(a, sortField);
       const bVal = getVal(b, sortField);
       if (aVal == null) return 1;
@@ -48,20 +79,40 @@ export default function ManageUsers() {
       const cmp = typeof aVal === 'string' ? aVal.localeCompare(bVal) : aVal - bVal;
       return sortDir === 'asc' ? cmp : -cmp;
     });
-  }, [users, sortField, sortDir]);
+  }, [filteredUsers, sortField, sortDir]);
+
+  const totalPages = Math.ceil(sortedUsers.length / PAGE_SIZE);
+  const paginated = sortedUsers.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const handleExport = async (format) => {
+    try {
+      const { data } = await userAPI.exportAll(format);
+      const isCSV = format === 'csv';
+      const blob = new Blob([isCSV ? data : JSON.stringify(data, null, 2)], { type: isCSV ? 'text/csv' : 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `users-${new Date().toISOString().slice(0, 10)}.${format}`;
+      a.click(); URL.revokeObjectURL(url);
+      toast.success(`Exported ${isCSV ? '' : data.length + ' '}users as ${format.toUpperCase()}`);
+    } catch { toast.error('Export failed'); }
+  };
+
+  const handleImport = async (items, duplicateAction) => {
+    const { data } = await userAPI.importAll(items, duplicateAction);
+    fetchUsers();
+    return data;
+  };
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const { data } = await userAPI.getAll({ page, limit: 10, search });
+      const { data } = await userAPI.getAll({ limit: 10000 });
       setUsers(data.users);
-      setTotalPages(data.pages);
-      setTotal(data.total);
     } catch { }
     setLoading(false);
   };
 
-  useEffect(() => { fetchUsers(); }, [page, search]);
+  useEffect(() => { fetchUsers(); }, []);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -85,7 +136,14 @@ export default function ManageUsers() {
     <AdminLayout>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800 }}>👥 <span className="gradient-text">Manage Users</span></h1>
-        <div style={{ background: '#f0f0ff', borderRadius: 12, padding: '8px 20px', fontSize: 14, fontWeight: 600, color: '#6c63ff' }}>Total: {total}</div>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <div style={{ background: '#f0f0ff', borderRadius: 12, padding: '8px 20px', fontSize: 14, fontWeight: 600, color: '#6c63ff' }}>
+            {search ? `${sortedUsers.length} / ${users.length}` : users.length} users
+          </div>
+          <button className="btn btn-secondary" onClick={() => handleExport('json')} style={{ fontWeight: 600 }}>📤 JSON</button>
+          <button className="btn btn-secondary" onClick={() => handleExport('csv')} style={{ fontWeight: 600 }}>📤 CSV</button>
+          <button className="btn btn-secondary" onClick={() => setImportModal(true)} style={{ fontWeight: 600 }}>📥 Import</button>
+        </div>
       </div>
 
       <div style={{ marginBottom: 16, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
@@ -118,9 +176,11 @@ export default function ManageUsers() {
           <tbody>
             {loading ? (
               <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</td></tr>
-            ) : sortedUsers.map((user, i) => (
+            ) : paginated.length === 0 ? (
+              <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#9e9e9e' }}>No users found.</td></tr>
+            ) : paginated.map((user, i) => (
               <tr key={user._id}>
-                <td style={{ color: '#636e72' }}>{(page - 1) * 10 + i + 1}</td>
+                <td style={{ color: '#636e72' }}>{(page - 1) * PAGE_SIZE + i + 1}</td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,#6c63ff,#fd79a8)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
@@ -146,12 +206,10 @@ export default function ManageUsers() {
         </table>
       </div>
 
-      {totalPages > 1 && (
-        <div className="pagination">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-            <button key={p} className={`page-btn ${page === p ? 'active' : ''}`} onClick={() => setPage(p)}>{p}</button>
-          ))}
-        </div>
+      <Paginator page={page} totalPages={totalPages} onPage={setPage} />
+
+      {importModal && (
+        <ImportModal entityName="Users" onImport={handleImport} onClose={() => setImportModal(false)} />
       )}
 
       {modal && editUser && (

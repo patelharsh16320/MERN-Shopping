@@ -1,8 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from './AdminLayout';
 import { visitAPI } from '../../utils/api';
+import { toast } from 'react-toastify';
 
 const PERIODS = ['Daily', 'Monthly', 'Yearly'];
+const PAGE_SIZE = 10;
+
+function Paginator({ page, totalPages, onPage }) {
+  if (totalPages <= 1) return null;
+  const pages = [];
+  for (let i = 1; i <= totalPages; i++) {
+    if (i <= 2 || i > totalPages - 2 || Math.abs(i - page) <= 1) pages.push(i);
+    else if (pages[pages.length - 1] !== '...') pages.push('...');
+  }
+  return (
+    <div className="pagination" style={{ marginTop: 16 }}>
+      <button className="page-btn" onClick={() => onPage(page - 1)} disabled={page === 1}>‹</button>
+      {pages.map((p, i) =>
+        p === '...'
+          ? <span key={`e${i}`} style={{ padding: '0 6px', color: '#9e9e9e', alignSelf: 'center' }}>…</span>
+          : <button key={p} className={`page-btn ${page === p ? 'active' : ''}`} onClick={() => onPage(p)}>{p}</button>
+      )}
+      <button className="page-btn" onClick={() => onPage(page + 1)} disabled={page === totalPages}>›</button>
+    </div>
+  );
+}
 
 function BarChart({ data, labelKey, totalKey, uniqueKey, color }) {
   const max = Math.max(...data.map(d => d[totalKey]), 1);
@@ -53,6 +75,20 @@ export default function Analytics() {
   const [error, setError] = useState('');
   const [period, setPeriod] = useState('Daily');
   const [userSearch, setUserSearch] = useState('');
+  const [userPage, setUserPage] = useState(1);
+
+  const handleExport = async (format) => {
+    try {
+      const { data } = await visitAPI.exportAll(format);
+      const isCSV = format === 'csv';
+      const blob = new Blob([isCSV ? data : JSON.stringify(data, null, 2)], { type: isCSV ? 'text/csv' : 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `analytics-${new Date().toISOString().slice(0, 10)}.${format}`;
+      a.click(); URL.revokeObjectURL(url);
+      toast.success(`Analytics exported as ${format.toUpperCase()}`);
+    } catch { toast.error('Export failed'); }
+  };
 
   const loadStats = () => {
     setLoading(true);
@@ -86,6 +122,8 @@ export default function Analytics() {
     const q = userSearch.toLowerCase();
     return u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q);
   });
+  const userTotalPages = Math.ceil(filteredUsers.length / PAGE_SIZE);
+  const paginatedUsers = filteredUsers.slice((userPage - 1) * PAGE_SIZE, userPage * PAGE_SIZE);
 
   const data = chartData();
   const tableRows = [...data].reverse().slice(0, 15);
@@ -93,10 +131,18 @@ export default function Analytics() {
   return (
     <AdminLayout>
       <div style={{ marginBottom: 28 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>
-          📈 <span className="gradient-text">Site Analytics</span>
-        </h1>
-        <p style={{ color: '#9e9e9e', fontSize: 14 }}>Track how many visitors come to Women HubClub</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 4 }}>
+              📈 <span className="gradient-text">Site Analytics</span>
+            </h1>
+            <p style={{ color: '#9e9e9e', fontSize: 14 }}>Track how many visitors come to Women HubClub</p>
+          </div>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button className="btn btn-secondary" onClick={() => handleExport('json')} style={{ fontWeight: 600 }}>📤 JSON</button>
+            <button className="btn btn-secondary" onClick={() => handleExport('csv')} style={{ fontWeight: 600 }}>📤 CSV</button>
+          </div>
+        </div>
       </div>
 
       {error && (
@@ -240,7 +286,7 @@ export default function Analytics() {
                 className="form-input"
                 placeholder="Search by name or email..."
                 value={userSearch}
-                onChange={e => setUserSearch(e.target.value)}
+                onChange={e => { setUserSearch(e.target.value); setUserPage(1); }}
                 style={{ maxWidth: 340 }}
               />
             </div>
@@ -267,9 +313,9 @@ export default function Analytics() {
                           : 'No users match your search.'}
                       </td>
                     </tr>
-                  ) : filteredUsers.map((u, i) => (
+                  ) : paginatedUsers.map((u, i) => (
                     <tr key={u.userId || i}>
-                      <td style={{ color: '#9e9e9e' }}>{i + 1}</td>
+                      <td style={{ color: '#9e9e9e' }}>{(userPage - 1) * PAGE_SIZE + i + 1}</td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                           <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'linear-gradient(135deg,#6c63ff,#fd79a8)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 13, flexShrink: 0 }}>
@@ -295,6 +341,7 @@ export default function Analytics() {
                 </tbody>
               </table>
             </div>
+            <Paginator page={userPage} totalPages={userTotalPages} onPage={setUserPage} />
           </div>
         </>
       )}

@@ -2,9 +2,11 @@ import React, { useState, useEffect, useMemo } from 'react';
 import AdminLayout from './AdminLayout';
 import { orderAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
+import ImportModal from './ImportModal';
 
 const statuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
 const statusColors = { Pending: 'pending', Processing: 'processing', Shipped: 'shipped', Delivered: 'delivered', Cancelled: 'cancelled' };
+const PAGE_SIZE = 10;
 
 function SortTh({ label, field, sortField, sortDir, onSort }) {
   const active = sortField === field;
@@ -19,15 +21,34 @@ function getVal(obj, path) {
   return path.split('.').reduce((o, k) => o?.[k], obj);
 }
 
+function Paginator({ page, totalPages, onPage }) {
+  if (totalPages <= 1) return null;
+  const pages = [];
+  for (let i = 1; i <= totalPages; i++) {
+    if (i <= 2 || i > totalPages - 2 || Math.abs(i - page) <= 1) pages.push(i);
+    else if (pages[pages.length - 1] !== '...') pages.push('...');
+  }
+  return (
+    <div className="pagination" style={{ marginTop: 16 }}>
+      <button className="page-btn" onClick={() => onPage(page - 1)} disabled={page === 1}>‹</button>
+      {pages.map((p, i) =>
+        p === '...'
+          ? <span key={`e${i}`} style={{ padding: '0 6px', color: '#9e9e9e', alignSelf: 'center' }}>…</span>
+          : <button key={p} className={`page-btn ${page === p ? 'active' : ''}`} onClick={() => onPage(p)}>{p}</button>
+      )}
+      <button className="page-btn" onClick={() => onPage(page + 1)} disabled={page === totalPages}>›</button>
+    </div>
+  );
+}
+
 export default function ManageOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [total, setTotal] = useState(0);
   const [statusFilter, setStatusFilter] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modal, setModal] = useState(false);
+  const [importModal, setImportModal] = useState(false);
   const [newStatus, setNewStatus] = useState('');
   const [sortField, setSortField] = useState('');
   const [sortDir, setSortDir] = useState('asc');
@@ -35,11 +56,17 @@ export default function ManageOrders() {
   const handleSort = (field) => {
     if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
     else { setSortField(field); setSortDir('asc'); }
+    setPage(1);
   };
 
+  const filteredOrders = useMemo(() => {
+    if (!statusFilter) return orders;
+    return orders.filter(o => o.orderStatus === statusFilter);
+  }, [orders, statusFilter]);
+
   const sortedOrders = useMemo(() => {
-    if (!sortField) return orders;
-    return [...orders].sort((a, b) => {
+    if (!sortField) return filteredOrders;
+    return [...filteredOrders].sort((a, b) => {
       let aVal = getVal(a, sortField);
       let bVal = getVal(b, sortField);
       if (aVal == null) return 1;
@@ -48,22 +75,40 @@ export default function ManageOrders() {
       const cmp = typeof aVal === 'string' ? aVal.localeCompare(bVal) : aVal - bVal;
       return sortDir === 'asc' ? cmp : -cmp;
     });
-  }, [orders, sortField, sortDir]);
+  }, [filteredOrders, sortField, sortDir]);
+
+  const totalPages = Math.ceil(sortedOrders.length / PAGE_SIZE);
+  const paginated = sortedOrders.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const handleExport = async (format) => {
+    try {
+      const { data } = await orderAPI.exportAll(format);
+      const isCSV = format === 'csv';
+      const blob = new Blob([isCSV ? data : JSON.stringify(data, null, 2)], { type: isCSV ? 'text/csv' : 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `orders-${new Date().toISOString().slice(0, 10)}.${format}`;
+      a.click(); URL.revokeObjectURL(url);
+      toast.success(`Exported ${isCSV ? '' : data.length + ' '}orders as ${format.toUpperCase()}`);
+    } catch { toast.error('Export failed'); }
+  };
+
+  const handleImport = async (items, duplicateAction) => {
+    const { data } = await orderAPI.importAll(items, duplicateAction);
+    fetchOrders();
+    return data;
+  };
 
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const params = { page, limit: 10 };
-      if (statusFilter) params.status = statusFilter;
-      const { data } = await orderAPI.getAll(params);
+      const { data } = await orderAPI.getAll({ limit: 10000 });
       setOrders(data.orders);
-      setTotalPages(data.pages);
-      setTotal(data.total);
     } catch { }
     setLoading(false);
   };
 
-  useEffect(() => { fetchOrders(); }, [page, statusFilter]);
+  useEffect(() => { fetchOrders(); }, []);
 
   const handleUpdateStatus = async () => {
     if (!newStatus) return;
@@ -87,12 +132,20 @@ export default function ManageOrders() {
     <AdminLayout>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800 }}>📦 <span className="gradient-text">Manage Orders</span></h1>
-        <div style={{ background: '#f0f0ff', borderRadius: 12, padding: '8px 20px', fontSize: 14, fontWeight: 600, color: '#6c63ff' }}>Total: {total}</div>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <div style={{ background: '#f0f0ff', borderRadius: 12, padding: '8px 20px', fontSize: 14, fontWeight: 600, color: '#6c63ff' }}>
+            {statusFilter ? `${sortedOrders.length} / ${orders.length}` : orders.length} orders
+          </div>
+          <button className="btn btn-secondary" onClick={() => handleExport('json')} style={{ fontWeight: 600 }}>📤 JSON</button>
+          <button className="btn btn-secondary" onClick={() => handleExport('csv')} style={{ fontWeight: 600 }}>📤 CSV</button>
+          <button className="btn btn-secondary" onClick={() => setImportModal(true)} style={{ fontWeight: 600 }}>📥 Import</button>
+        </div>
       </div>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
         {['', ...statuses].map(s => (
-          <button key={s} className={`btn btn-sm ${statusFilter === s ? 'btn-primary' : 'btn-secondary'}`} onClick={() => { setStatusFilter(s); setPage(1); }}>
+          <button key={s} className={`btn btn-sm ${statusFilter === s ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => { setStatusFilter(s); setPage(1); }}>
             {s || 'All'}
           </button>
         ))}
@@ -102,6 +155,7 @@ export default function ManageOrders() {
         <table>
           <thead>
             <tr>
+              <th>#</th>
               <th>Order ID</th>
               <SortTh label="Customer" field="user.name" {...sortProps} />
               <SortTh label="Items" field="orderItems" {...sortProps} />
@@ -114,9 +168,12 @@ export default function ManageOrders() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</td></tr>
-            ) : sortedOrders.map(order => (
+              <tr><td colSpan={9} style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</td></tr>
+            ) : paginated.length === 0 ? (
+              <tr><td colSpan={9} style={{ textAlign: 'center', padding: 40, color: '#9e9e9e' }}>No orders found.</td></tr>
+            ) : paginated.map((order, i) => (
               <tr key={order._id}>
+                <td style={{ color: '#636e72' }}>{(page - 1) * PAGE_SIZE + i + 1}</td>
                 <td><span style={{ fontFamily: 'monospace', color: '#6c63ff', fontWeight: 600 }}>#{order._id.slice(-8).toUpperCase()}</span></td>
                 <td>
                   <div style={{ fontWeight: 600, fontSize: 14 }}>{order.user?.name || 'N/A'}</div>
@@ -143,12 +200,10 @@ export default function ManageOrders() {
         </table>
       </div>
 
-      {totalPages > 1 && (
-        <div className="pagination">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-            <button key={p} className={`page-btn ${page === p ? 'active' : ''}`} onClick={() => setPage(p)}>{p}</button>
-          ))}
-        </div>
+      <Paginator page={page} totalPages={totalPages} onPage={setPage} />
+
+      {importModal && (
+        <ImportModal entityName="Orders" onImport={handleImport} onClose={() => setImportModal(false)} />
       )}
 
       {modal && selectedOrder && (

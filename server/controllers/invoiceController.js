@@ -1,4 +1,12 @@
 const Invoice = require('../models/Invoice');
+const User = require('../models/User');
+
+const toCSV = (rows, fields) => {
+  const esc = (v) => { const s = v === null || v === undefined ? '' : String(v).replace(/"/g, '""'); return s.includes(',') || s.includes('\n') || s.includes('"') ? `"${s}"` : s; };
+  return [fields.join(','), ...rows.map(r => fields.map(f => esc(r[f])).join(','))].join('\n');
+};
+
+const genInvoiceNum = () => 'INV-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
 
 const getMyInvoices = async (req, res) => {
   try {
@@ -67,4 +75,84 @@ const deleteInvoice = async (req, res) => {
   }
 };
 
-module.exports = { getMyInvoices, getInvoiceById, getInvoiceByOrder, getAllInvoices, updateInvoice, deleteInvoice };
+const exportInvoices = async (req, res) => {
+  try {
+    const invoices = await Invoice.find().populate('user', 'name email').sort({ createdAt: -1 });
+    const data = invoices.map(inv => ({
+      invoiceNumber: inv.invoiceNumber,
+      userEmail: inv.user?.email || '',
+      userName: inv.user?.name || '',
+      status: inv.status,
+      subtotal: inv.subtotal,
+      tax: inv.tax,
+      shipping: inv.shipping,
+      total: inv.total,
+      paymentMethod: inv.paymentMethod,
+      items: JSON.stringify(inv.items?.map(i => ({ name: i.name, qty: i.quantity, price: i.price })) || []),
+      createdAt: inv.createdAt?.toISOString().slice(0, 10),
+    }));
+    if (req.query.format === 'csv') {
+      res.setHeader('Content-Type', 'text/csv');
+      return res.send(toCSV(data, ['invoiceNumber', 'userEmail', 'userName', 'status', 'total', 'paymentMethod', 'items', 'createdAt']));
+    }
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const importInvoices = async (req, res) => {
+  try {
+    const { items, duplicateAction } = req.body;
+    if (!Array.isArray(items) || items.length === 0)
+      return res.status(400).json({ message: 'No items provided' });
+
+    const numbers = items.map(i => i.invoiceNumber?.trim()).filter(Boolean);
+    const existing = numbers.length ? await Invoice.find({ invoiceNumber: { $in: numbers } }) : [];
+    const existingNums = new Set(existing.map(inv => inv.invoiceNumber));
+
+    let removed = 0, imported = 0, skipped = 0;
+
+    if (duplicateAction === 'remove' && existing.length) {
+      await Invoice.deleteMany({ _id: { $in: existing.map(inv => inv._id) } });
+      removed = existing.length;
+    }
+
+    for (const item of items) {
+      const invNum = item.invoiceNumber?.trim();
+      if (duplicateAction === 'ignore' && invNum && existingNums.has(invNum)) { skipped++; continue; }
+      try {
+        let userId = null;
+        if (item.userEmail) {
+          const user = await User.findOne({ email: item.userEmail.trim().toLowerCase() });
+          if (user) userId = user._id;
+        }
+        let invItems = [];
+        try {
+          invItems = typeof item.items === 'string' ? JSON.parse(item.items) : (Array.isArray(item.items) ? item.items : []);
+          invItems = invItems.map(i => ({ name: i.name || '', quantity: Number(i.qty || i.quantity) || 1, price: Number(i.price) || 0, total: Number(i.price) * (Number(i.qty || i.quantity) || 1) }));
+        } catch { invItems = []; }
+        await Invoice.create({
+          invoiceNumber: invNum || genInvoiceNum(),
+          user: userId,
+          status: item.status || 'Draft',
+          subtotal: Number(item.subtotal) || 0,
+          tax: Number(item.tax) || 0,
+          shipping: Number(item.shipping) || 0,
+          total: Number(item.total) || 0,
+          paymentMethod: item.paymentMethod || 'COD',
+          items: invItems,
+          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          billingAddress: { name: item.userName || '', email: item.userEmail || '' },
+        });
+        imported++;
+      } catch { skipped++; }
+    }
+
+    res.json({ imported, skipped, removed, total: items.length });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { getMyInvoices, getInvoiceById, getInvoiceByOrder, getAllInvoices, updateInvoice, deleteInvoice, exportInvoices, importInvoices };

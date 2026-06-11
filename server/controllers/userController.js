@@ -1,5 +1,10 @@
 const User = require('../models/User');
 
+const toCSV = (rows, fields) => {
+  const esc = (v) => { const s = v === null || v === undefined ? '' : String(v).replace(/"/g, '""'); return s.includes(',') || s.includes('\n') || s.includes('"') ? `"${s}"` : s; };
+  return [fields.join(','), ...rows.map(r => fields.map(f => esc(r[f])).join(','))].join('\n');
+};
+
 const getAllUsers = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -61,4 +66,64 @@ const getStats = async (req, res) => {
   }
 };
 
-module.exports = { getAllUsers, getUserById, updateUser, deleteUser, getStats };
+const exportUsers = async (req, res) => {
+  try {
+    const users = await User.find().select('-password').sort({ createdAt: -1 });
+    const data = users.map(u => ({
+      name: u.name, email: u.email, phone: u.phone || '',
+      role: u.role, isActive: u.isActive,
+    }));
+    if (req.query.format === 'csv') {
+      res.setHeader('Content-Type', 'text/csv');
+      return res.send(toCSV(data, ['name', 'email', 'phone', 'role', 'isActive']));
+    }
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const importUsers = async (req, res) => {
+  try {
+    const { items, duplicateAction } = req.body;
+    if (!Array.isArray(items) || items.length === 0)
+      return res.status(400).json({ message: 'No items provided' });
+
+    const emails = items.map(i => i.email?.trim().toLowerCase()).filter(Boolean);
+    const existing = await User.find({ email: { $in: emails } });
+    const existingEmails = existing.map(u => u.email.toLowerCase());
+
+    let removed = 0, imported = 0, skipped = 0;
+
+    if (duplicateAction === 'remove') {
+      const deletable = existing.filter(u => u.role !== 'admin');
+      if (deletable.length) {
+        await User.deleteMany({ _id: { $in: deletable.map(u => u._id) } });
+        removed = deletable.length;
+      }
+    }
+
+    for (const item of items) {
+      if (!item.email?.trim() || !item.name?.trim()) continue;
+      const emailLower = item.email.trim().toLowerCase();
+      if (duplicateAction === 'ignore' && existingEmails.includes(emailLower)) { skipped++; continue; }
+      try {
+        await User.create({
+          name: item.name.trim(),
+          email: emailLower,
+          password: item.email.trim(),
+          phone: item.phone || '',
+          role: item.role === 'admin' ? 'user' : (item.role || 'user'),
+          isActive: item.isActive !== false && item.isActive !== 'false',
+        });
+        imported++;
+      } catch { skipped++; }
+    }
+
+    res.json({ imported, skipped, removed, total: items.length });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { getAllUsers, getUserById, updateUser, deleteUser, getStats, exportUsers, importUsers };

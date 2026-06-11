@@ -2,16 +2,58 @@ import React, { useState, useEffect, useMemo } from 'react';
 import AdminLayout from './AdminLayout';
 import { categoryAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
+import ImportModal from './ImportModal';
 
+const CAT_COLS = ['Description', 'Type', 'Products', 'Status', 'Added'];
+const PAGE_SIZE = 10;
 const emptyForm = { name: '', description: '', icon: '🏷️', parent: '' };
+
+function SortTh({ label, field, sortField, sortDir, onSort, style }) {
+  const active = sortField === field;
+  return (
+    <th onClick={() => onSort(field)} style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', ...style }}>
+      {label}&nbsp;<span style={{ fontSize: 9, opacity: active ? 1 : 0.25 }}>{active && sortDir === 'desc' ? '▼' : '▲'}</span>
+    </th>
+  );
+}
+
+function getVal(obj, path) {
+  return path.split('.').reduce((o, k) => o?.[k], obj);
+}
+
+function Paginator({ page, totalPages, onPage }) {
+  if (totalPages <= 1) return null;
+  const pages = [];
+  for (let i = 1; i <= totalPages; i++) {
+    if (i <= 2 || i > totalPages - 2 || Math.abs(i - page) <= 1) pages.push(i);
+    else if (pages[pages.length - 1] !== '...') pages.push('...');
+  }
+  return (
+    <div className="pagination" style={{ marginTop: 16 }}>
+      <button className="page-btn" onClick={() => onPage(page - 1)} disabled={page === 1}>‹</button>
+      {pages.map((p, i) =>
+        p === '...'
+          ? <span key={`e${i}`} style={{ padding: '0 6px', color: '#9e9e9e', alignSelf: 'center' }}>…</span>
+          : <button key={p} className={`page-btn ${page === p ? 'active' : ''}`} onClick={() => onPage(p)}>{p}</button>
+      )}
+      <button className="page-btn" onClick={() => onPage(page + 1)} disabled={page === totalPages}>›</button>
+    </div>
+  );
+}
 
 export default function ManageCategories() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
   const [modal, setModal] = useState(false);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [importModal, setImportModal] = useState(false);
+  const [visibleCols, setVisibleCols] = useState(() => Object.fromEntries(CAT_COLS.map(c => [c, true])));
+  const [sortField, setSortField] = useState('');
+  const [sortDir, setSortDir] = useState('asc');
 
   const fetchCategories = async () => {
     setLoading(true);
@@ -24,8 +66,60 @@ export default function ManageCategories() {
 
   useEffect(() => { fetchCategories(); }, []);
 
+  const toggleCol = (col) => setVisibleCols(v => ({ ...v, [col]: !v[col] }));
+
+  const handleSort = (field) => {
+    if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    else { setSortField(field); setSortDir('asc'); }
+    setPage(1);
+  };
+
   const topLevel = useMemo(() => categories.filter(c => !c.parent), [categories]);
-  const parentOptions = useMemo(() => topLevel.filter(c => c._id !== editing), [topLevel, editing]);
+  const parentOptions = useMemo(() => topLevel.filter(c => c._id !== editing && !c.isDefault), [topLevel, editing]);
+
+  const filtered = useMemo(() => {
+    if (!search.trim()) return categories;
+    const q = search.toLowerCase();
+    return categories.filter(c =>
+      c.name.toLowerCase().includes(q) ||
+      (c.description || '').toLowerCase().includes(q) ||
+      (c.parent?.name || '').toLowerCase().includes(q)
+    );
+  }, [categories, search]);
+
+  const sorted = useMemo(() => {
+    if (!sortField) return filtered;
+    return [...filtered].sort((a, b) => {
+      const aVal = getVal(a, sortField);
+      const bVal = getVal(b, sortField);
+      if (aVal == null) return 1;
+      if (bVal == null) return -1;
+      const cmp = typeof aVal === 'string' ? aVal.localeCompare(bVal) : aVal - bVal;
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+  }, [filtered, sortField, sortDir]);
+
+  const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
+  const paginated = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  const handleExport = async (format) => {
+    try {
+      const { data } = await categoryAPI.exportAll(format);
+      const isCSV = format === 'csv';
+      const blob = new Blob([isCSV ? data : JSON.stringify(data, null, 2)], { type: isCSV ? 'text/csv' : 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `categories-${new Date().toISOString().slice(0, 10)}.${format}`;
+      a.click(); URL.revokeObjectURL(url);
+      toast.success(`Exported ${isCSV ? '' : data.length + ' '}categories as ${format.toUpperCase()}`);
+    } catch { toast.error('Export failed'); }
+  };
+
+  const handleImport = async (items, duplicateAction) => {
+    const { data } = await categoryAPI.importAll(items, duplicateAction);
+    fetchCategories();
+    return data;
+  };
 
   const openAdd = () => { setEditing(null); setForm(emptyForm); setModal(true); };
   const openEdit = (cat) => {
@@ -65,78 +159,107 @@ export default function ManageCategories() {
     } catch { toast.error('Update failed'); }
   };
 
-  // Group: parent categories first, then subcategories grouped under their parent
-  const grouped = useMemo(() => {
-    const parents = categories.filter(c => !c.parent);
-    const result = [];
-    parents.forEach(p => {
-      result.push({ ...p, _isParent: true });
-      categories.filter(c => c.parent?._id === p._id || c.parent === p._id).forEach(child => {
-        result.push({ ...child, _isParent: false });
-      });
-    });
-    return result;
-  }, [categories]);
+  const sortProps = { sortField, sortDir, onSort: handleSort };
 
   return (
     <AdminLayout>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800 }}>🏷️ <span className="gradient-text">Manage Categories</span></h1>
-        <button className="btn btn-primary" onClick={openAdd}>+ Add Category</button>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <div style={{ background: '#f0f0ff', borderRadius: 12, padding: '8px 20px', fontSize: 14, fontWeight: 600, color: '#6c63ff' }}>Total: {categories.length}</div>
+          <button className="btn btn-secondary" onClick={() => handleExport('json')} style={{ fontWeight: 600 }}>📤 JSON</button>
+          <button className="btn btn-secondary" onClick={() => handleExport('csv')} style={{ fontWeight: 600 }}>📤 CSV</button>
+          <button className="btn btn-secondary" onClick={() => setImportModal(true)} style={{ fontWeight: 600 }}>📥 Import</button>
+          <button className="btn btn-primary" onClick={openAdd}>+ Add Category</button>
+        </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
-        {loading ? (
-          <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: 60, color: '#9e9e9e' }}>Loading...</div>
-        ) : grouped.length === 0 ? (
-          <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: 60 }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>🏷️</div>
-            <p style={{ color: '#9e9e9e' }}>No categories yet. Add your first one!</p>
-          </div>
-        ) : grouped.map(cat => (
-          <div key={cat._id} style={{
-            background: 'white', borderRadius: 20, padding: 24,
-            boxShadow: '0 2px 12px rgba(0,0,0,0.07)',
-            border: `2px solid ${cat.isDefault ? '#e3f2fd' : cat.isActive ? '#e8f5e9' : '#f5f5f5'}`,
-            opacity: cat.isActive ? 1 : 0.6,
-            marginLeft: cat._isParent ? 0 : 16,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 12 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ fontSize: 32 }}>{cat.icon}</span>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: 16 }}>{cat.name}</div>
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 3 }}>
-                    {!cat.isActive && <span style={{ fontSize: 11, color: '#d63031', fontWeight: 600 }}>Inactive</span>}
-                    {cat.isDefault && <span style={{ fontSize: 11, background: '#e3f2fd', color: '#1565c0', fontWeight: 700, padding: '1px 7px', borderRadius: 10 }}>🔒 Default</span>}
-                    {!cat._isParent && cat.parent && <span style={{ fontSize: 11, background: '#f3e5f5', color: '#6a1b9a', fontWeight: 600, padding: '1px 7px', borderRadius: 10 }}>↳ {cat.parent.name}</span>}
-                    {cat._isParent && !cat.parent && categories.some(c => c.parent?._id === cat._id || c.parent === cat._id) && (
-                      <span style={{ fontSize: 11, background: '#e8f5e9', color: '#2e7d32', fontWeight: 600, padding: '1px 7px', borderRadius: 10 }}>Parent</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: 6 }}>
-                <button className="btn btn-sm" style={{ background: '#f0f0ff', color: '#6c63ff', borderRadius: 20 }} onClick={() => openEdit(cat)}>✏️</button>
-                {!cat.isDefault && (
-                  <button className="btn btn-sm btn-danger" onClick={() => handleDelete(cat._id, cat.name)}>🗑</button>
-                )}
-              </div>
-            </div>
-            {cat.description && <p style={{ fontSize: 13, color: '#636e72', marginBottom: 16, lineHeight: 1.5 }}>{cat.description}</p>}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 12, color: '#9e9e9e' }}>
-                {cat.productCount > 0 ? `${cat.productCount} product${cat.productCount !== 1 ? 's' : ''}` : 'No products'}
-                {' · '}Added {new Date(cat.createdAt).toLocaleDateString('en-IN')}
-              </span>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', fontSize: 13, fontWeight: 600, color: cat.isActive ? '#2d3436' : '#9e9e9e' }}>
-                <input type="checkbox" checked={cat.isActive} onChange={() => toggleActive(cat)} />
-                Active
-              </label>
-            </div>
-          </div>
-        ))}
+      <div style={{ marginBottom: 16, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+        <input className="form-input" placeholder="Search categories..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} style={{ maxWidth: 320 }} />
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <span style={{ fontSize: 13, color: '#9e9e9e', fontWeight: 600 }}>Columns:</span>
+          {CAT_COLS.map(col => (
+            <button key={col} onClick={() => toggleCol(col)}
+              style={{ padding: '4px 12px', borderRadius: 20, border: `2px solid ${visibleCols[col] ? '#6c63ff' : '#e0e0e0'}`, background: visibleCols[col] ? '#f0f0ff' : 'white', color: visibleCols[col] ? '#6c63ff' : '#9e9e9e', fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>
+              {visibleCols[col] ? '✓ ' : ''}{col}
+            </button>
+          ))}
+        </div>
       </div>
+
+      <div className="table-container animate-fade">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <SortTh label="Name" field="name" {...sortProps} />
+              {visibleCols['Description'] && <th>Description</th>}
+              {visibleCols['Type'] && <SortTh label="Type" field="parent" {...sortProps} />}
+              {visibleCols['Products'] && <SortTh label="Products" field="productCount" {...sortProps} />}
+              {visibleCols['Status'] && <SortTh label="Status" field="isActive" {...sortProps} />}
+              {visibleCols['Added'] && <SortTh label="Added" field="createdAt" {...sortProps} />}
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
+              <tr><td colSpan={9} style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</td></tr>
+            ) : paginated.length === 0 ? (
+              <tr><td colSpan={9} style={{ textAlign: 'center', padding: 40, color: '#9e9e9e' }}>No categories found.</td></tr>
+            ) : paginated.map((cat, i) => (
+              <tr key={cat._id} style={{ opacity: cat.isActive ? 1 : 0.55 }}>
+                <td style={{ color: '#636e72' }}>{(page - 1) * PAGE_SIZE + i + 1}</td>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ fontSize: 24, lineHeight: 1 }}>{cat.icon}</span>
+                    <div>
+                      <div style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
+                        {cat.name}
+                        {cat.isDefault && <span style={{ fontSize: 10, background: '#e3f2fd', color: '#1565c0', fontWeight: 700, padding: '1px 7px', borderRadius: 10 }}>🔒 Default</span>}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                {visibleCols['Description'] && <td style={{ color: '#636e72', fontSize: 13, maxWidth: 220 }}>{cat.description || <span style={{ color: '#bdbdbd' }}>—</span>}</td>}
+                {visibleCols['Type'] && (
+                  <td>
+                    {cat.parent
+                      ? <span style={{ background: '#f3e5f5', color: '#6a1b9a', fontWeight: 600, fontSize: 12, padding: '3px 10px', borderRadius: 20 }}>↳ {cat.parent.name}</span>
+                      : <span style={{ background: '#e8f5e9', color: '#2e7d32', fontWeight: 600, fontSize: 12, padding: '3px 10px', borderRadius: 20 }}>Parent</span>
+                    }
+                  </td>
+                )}
+                {visibleCols['Products'] && (
+                  <td>
+                    <span style={{ fontWeight: 700, color: cat.productCount > 0 ? '#6c63ff' : '#9e9e9e' }}>{cat.productCount}</span>
+                  </td>
+                )}
+                {visibleCols['Status'] && (
+                  <td>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                      <input type="checkbox" checked={cat.isActive} onChange={() => toggleActive(cat)} />
+                      <span style={{ fontSize: 13, fontWeight: 600, color: cat.isActive ? '#2d3436' : '#9e9e9e' }}>{cat.isActive ? 'Active' : 'Inactive'}</span>
+                    </label>
+                  </td>
+                )}
+                {visibleCols['Added'] && <td style={{ color: '#636e72', fontSize: 13 }}>{new Date(cat.createdAt).toLocaleDateString('en-IN')}</td>}
+                <td>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button className="btn btn-sm" style={{ background: '#f0f0ff', color: '#6c63ff', borderRadius: 20 }} onClick={() => openEdit(cat)}>Edit</button>
+                    {!cat.isDefault && <button className="btn btn-sm btn-danger" onClick={() => handleDelete(cat._id, cat.name)}>Delete</button>}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <Paginator page={page} totalPages={totalPages} onPage={setPage} />
+
+      {importModal && (
+        <ImportModal entityName="Categories" onImport={handleImport} onClose={() => setImportModal(false)} />
+      )}
 
       {modal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000, padding: 24 }}>

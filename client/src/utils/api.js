@@ -42,6 +42,8 @@ export const productAPI = {
   delete: (id) => API.delete(`/products/${id}`),
   addReview: (id, data) => API.post(`/products/${id}/reviews`, data),
   updateReview: (id, data) => API.put(`/products/${id}/reviews`, data),
+  exportAll: (format = 'json') => API.get('/products/admin/export', { params: { format }, responseType: format === 'csv' ? 'text' : 'json' }),
+  importAll: (items, duplicateAction) => API.post('/products/admin/import', { items, duplicateAction }),
 };
 
 export const orderAPI = {
@@ -52,6 +54,8 @@ export const orderAPI = {
   updateStatus: (id, data) => API.put(`/orders/${id}`, data),
   delete: (id) => API.delete(`/orders/${id}`),
   getStats: () => API.get('/orders/stats'),
+  exportAll: (format = 'json') => API.get('/orders/export', { params: { format }, responseType: format === 'csv' ? 'text' : 'json' }),
+  importAll: (items, duplicateAction) => API.post('/orders/import', { items, duplicateAction }),
 };
 
 export const invoiceAPI = {
@@ -61,6 +65,8 @@ export const invoiceAPI = {
   getAll: (params) => API.get('/invoices', { params }),
   update: (id, data) => API.put(`/invoices/${id}`, data),
   delete: (id) => API.delete(`/invoices/${id}`),
+  exportAll: (format = 'json') => API.get('/invoices/export', { params: { format }, responseType: format === 'csv' ? 'text' : 'json' }),
+  importAll: (items, duplicateAction) => API.post('/invoices/import', { items, duplicateAction }),
 };
 
 export const userAPI = {
@@ -69,6 +75,8 @@ export const userAPI = {
   update: (id, data) => API.put(`/users/${id}`, data),
   delete: (id) => API.delete(`/users/${id}`),
   getStats: () => API.get('/users/stats'),
+  exportAll: (format = 'json') => API.get('/users/export', { params: { format }, responseType: format === 'csv' ? 'text' : 'json' }),
+  importAll: (items, duplicateAction) => API.post('/users/import', { items, duplicateAction }),
 };
 
 export const categoryAPI = {
@@ -76,11 +84,14 @@ export const categoryAPI = {
   create: (data) => API.post('/categories', data),
   update: (id, data) => API.put(`/categories/${id}`, data),
   delete: (id) => API.delete(`/categories/${id}`),
+  exportAll: (format = 'json') => API.get('/categories/export', { params: { format }, responseType: format === 'csv' ? 'text' : 'json' }),
+  importAll: (items, duplicateAction) => API.post('/categories/import', { items, duplicateAction }),
 };
 
 export const visitAPI = {
   record: (data) => API.post('/visits', data),
   getStats: () => API.get('/visits/stats'),
+  exportAll: (format = 'json') => API.get('/visits/export', { params: { format }, responseType: format === 'csv' ? 'text' : 'json' }),
 };
 
 export default API;
