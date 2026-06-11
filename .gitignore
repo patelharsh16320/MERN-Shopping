@@ -1,0 +1,17 @@
+# Dependencies
+**/node_modules/
+
+# Claude / tooling
+.claude/
+.playwright-mcp/
+CLAUDE.md
+start.bat
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
