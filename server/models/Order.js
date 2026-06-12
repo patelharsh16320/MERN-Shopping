@@ -43,7 +43,14 @@ const orderSchema = new mongoose.Schema({
   isDelivered: { type: Boolean, default: false },
   deliveredAt: { type: Date },
   trackingNumber: { type: String, default: '' },
-  notes: { type: String, default: '' }
+  notes: { type: String, default: '' },
+  privateNotes: [{
+    text: { type: String, required: true },
+    addedBy: { type: String, default: 'Admin' },
+    createdAt: { type: Date, default: Date.now },
+  }],
+  discountPrice: { type: Number, default: 0 },
+  couponCode: { type: String, default: '' },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);

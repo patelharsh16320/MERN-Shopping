@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import AdminLayout from './AdminLayout';
 import { visitAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
@@ -76,8 +76,12 @@ export default function Analytics() {
   const [period, setPeriod] = useState('Daily');
   const [userSearch, setUserSearch] = useState('');
   const [userPage, setUserPage] = useState(1);
+  const [snapshots, setSnapshots] = useState([]);
+  const [snapshotLabel, setSnapshotLabel] = useState('');
+  const [savingSnap, setSavingSnap] = useState(false);
+  const [viewSnap, setViewSnap] = useState(null);
 
-  const loadStats = () => {
+  const loadStats = useCallback(() => {
     setLoading(true);
     setError('');
     visitAPI.getStats()
@@ -86,9 +90,39 @@ export default function Analytics() {
         setError(err.response?.data?.message || 'Could not connect to server. Make sure the backend is running and has been restarted after the last update.');
         setLoading(false);
       });
+  }, []);
+
+  const loadSnapshots = useCallback(() => {
+    visitAPI.getSnapshots().then(r => setSnapshots(r.data)).catch(() => {});
+  }, []);
+
+  useEffect(() => { loadStats(); loadSnapshots(); }, [loadStats, loadSnapshots]);
+
+  const handleSaveSnapshot = async () => {
+    if (!stats) return;
+    setSavingSnap(true);
+    try {
+      await visitAPI.saveSnapshot({
+        label: snapshotLabel || new Date().toLocaleDateString('en-IN', { dateStyle: 'medium' }),
+        summary: stats.summary,
+        daily: stats.daily,
+        monthly: stats.monthly,
+        yearly: stats.yearly,
+      });
+      toast.success('Snapshot saved!');
+      setSnapshotLabel('');
+      loadSnapshots();
+    } catch { toast.error('Failed to save snapshot'); }
+    setSavingSnap(false);
   };
 
-  useEffect(() => { loadStats(); }, []);
+  const handleDeleteSnapshot = async (id) => {
+    try {
+      await visitAPI.deleteSnapshot(id);
+      setSnapshots(prev => prev.filter(s => s._id !== id));
+      if (viewSnap?._id === id) setViewSnap(null);
+    } catch { toast.error('Failed to delete'); }
+  };
 
   const chartData = () => {
     if (!stats) return [];
@@ -327,6 +361,77 @@ export default function Analytics() {
             <Paginator page={userPage} totalPages={userTotalPages} onPage={setUserPage} />
           </div>
         </>
+      )}
+
+      {/* ── Analytics Snapshots ── */}
+      {!error && (
+        <div style={{ background: 'white', borderRadius: 20, padding: 28, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #f0f0f0', marginTop: 28 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
+            <div>
+              <h2 style={{ fontWeight: 700, fontSize: 18 }}>💾 Saved Snapshots</h2>
+              <p style={{ color: '#9e9e9e', fontSize: 13, marginTop: 4 }}>Save a point-in-time copy of current analytics to compare later.</p>
+            </div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+              <input className="form-input" placeholder="Snapshot label (optional)"
+                value={snapshotLabel} onChange={e => setSnapshotLabel(e.target.value)}
+                style={{ maxWidth: 220, fontSize: 13 }} />
+              <button className="btn btn-primary" onClick={handleSaveSnapshot} disabled={savingSnap || !stats}>
+                {savingSnap ? '⏳ Saving...' : '📸 Save Now'}
+              </button>
+            </div>
+          </div>
+
+          {snapshots.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '32px 0', color: '#9e9e9e', fontSize: 14 }}>
+              No snapshots yet. Click "Save Now" to capture current analytics.
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {snapshots.map(snap => (
+                <div key={snap._id} style={{ border: `1.5px solid ${viewSnap?._id === snap._id ? '#6c63ff' : '#f0f0f0'}`, borderRadius: 14, overflow: 'hidden', transition: 'border-color 0.2s' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 18px', background: viewSnap?._id === snap._id ? '#f8f7ff' : 'white', cursor: 'pointer' }}
+                    onClick={() => setViewSnap(viewSnap?._id === snap._id ? null : snap)}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 600, fontSize: 14 }}>{snap.label}</div>
+                      <div style={{ fontSize: 12, color: '#9e9e9e', marginTop: 2 }}>
+                        {new Date(snap.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
+                        {snap.savedBy?.name && ` · by ${snap.savedBy.name}`}
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 16, fontSize: 13, color: '#636e72' }}>
+                      <span title="Total visits"><strong style={{ color: '#6c63ff' }}>{snap.summary?.total ?? 0}</strong> total</span>
+                      <span title="This month"><strong style={{ color: '#00b894' }}>{snap.summary?.thisMonth ?? 0}</strong> month</span>
+                    </div>
+                    <button onClick={e => { e.stopPropagation(); handleDeleteSnapshot(snap._id); }}
+                      style={{ background: 'none', border: 'none', color: '#d63031', cursor: 'pointer', fontSize: 16, padding: '2px 6px' }}>🗑</button>
+                    <span style={{ fontSize: 16, color: '#9e9e9e', transition: 'transform 0.2s', transform: viewSnap?._id === snap._id ? 'rotate(180deg)' : 'none' }}>▾</span>
+                  </div>
+
+                  {viewSnap?._id === snap._id && (
+                    <div style={{ padding: '16px 18px', borderTop: '1px solid #f0f0f0', background: '#fafafe' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 10, marginBottom: 16 }}>
+                        {[
+                          { label: 'Total', value: snap.summary?.total, color: '#6c63ff' },
+                          { label: 'Today (at save)', value: snap.summary?.today, color: '#00b894' },
+                          { label: 'This Month', value: snap.summary?.thisMonth, color: '#fd79a8' },
+                          { label: 'Logged In', value: snap.summary?.loggedIn, color: '#e17055' },
+                        ].map(c => (
+                          <div key={c.label} style={{ background: 'white', borderRadius: 10, padding: '10px 14px', border: '1px solid #f0f0f0', textAlign: 'center' }}>
+                            <div style={{ fontSize: 20, fontWeight: 800, color: c.color }}>{c.value ?? 0}</div>
+                            <div style={{ fontSize: 11, color: '#9e9e9e' }}>{c.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ fontSize: 12, color: '#9e9e9e' }}>
+                        Daily data points: {snap.daily?.length ?? 0} · Monthly: {snap.monthly?.length ?? 0} · Yearly: {snap.yearly?.length ?? 0}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       )}
     </AdminLayout>
   );

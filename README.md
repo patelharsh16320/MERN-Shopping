@@ -143,13 +143,6 @@ Admin Messaging System
 - A dedicated Messages page should be shown inside the user’s Profile panel.
 - The profile panel should display a notification count (e.g., “You have X messages”) to indicate unread messages.
 
-<!-- !------ Checking-----!  -->
-
-- contact support button show where admin and user can contaact with each other, like support system    
-
-
-<!-- !------ Working-----!  -->
-
 Product Page & URLs
 - Product page URLs should be automatically created by default.
 - Admin should have the option to update product URLs.
@@ -157,7 +150,26 @@ Product Page & URLs
 
 Make a new page for admin, where admin can see all new features, before and after., also admin need to update URL/slug option for product too
 
-<!-- !------ Reaming-----!  -->
+Discount & Promotion Management
+- Create and manage discount codes
+- Set codes as “active” or “inactive”
+
+<!-- !------ Checking-----!  -->
+
+- contact support button show where admin and user can contaact with each other, like support system    
+
+
+<!-- !------ Working-----!  -->
+
+Order Management Features
+- Add private notes to the order
+- Receive email when order is placed
+- Export orders to Excel
+
+Site Analytics
+- Store Site Analytics data in the database.
+- Admin should be able to view both the latest analytics and previously stored data upon login.
+
 init 
 
 Comment Management
@@ -165,18 +177,9 @@ Comment Management
 - Comments can be set to Approved or Deleted.
 
 
-Order Management Features
-- Add private notes to the order
-- Receive email when order is placed
-- Export orders to Excel
+<!-- !------ Reaming-----!  -->
 
-Discount & Promotion Management
-- Create and manage discount codes
-- Set codes as “active” or “inactive”
 
-Site Analytics
-- Store Site Analytics data in the database.
-- Admin should be able to view both the latest analytics and previously stored data upon login.
 
 <!-- !------ ignore-----!  -->
 

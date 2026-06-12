@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import AdminLayout from './AdminLayout';
 import { orderAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
+
 const statuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
 const statusColors = { Pending: 'pending', Processing: 'processing', Shipped: 'shipped', Delivered: 'delivered', Cancelled: 'cancelled' };
 const PAGE_SIZE = 10;
@@ -50,6 +51,12 @@ export default function ManageOrders() {
   const [sortField, setSortField] = useState('');
   const [sortDir, setSortDir] = useState('asc');
   const [selectedIds, setSelectedIds] = useState(new Set());
+  const [exportingXlsx, setExportingXlsx] = useState(false);
+
+  // Notes state
+  const [notes, setNotes] = useState([]);
+  const [noteText, setNoteText] = useState('');
+  const [savingNote, setSavingNote] = useState(false);
 
   const handleSort = (field) => {
     if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
@@ -89,6 +96,14 @@ export default function ManageOrders() {
 
   useEffect(() => { fetchOrders(); }, []);
 
+  const openModal = (order) => {
+    setSelectedOrder(order);
+    setNewStatus(order.orderStatus);
+    setNotes(order.privateNotes || []);
+    setNoteText('');
+    setModal(true);
+  };
+
   const handleUpdateStatus = async () => {
     if (!newStatus) return;
     try {
@@ -99,10 +114,48 @@ export default function ManageOrders() {
     } catch { toast.error('Update failed'); }
   };
 
+  const handleAddNote = async () => {
+    if (!noteText.trim()) return;
+    setSavingNote(true);
+    try {
+      const { data } = await orderAPI.addNote(selectedOrder._id, noteText.trim());
+      setNotes(data);
+      setNoteText('');
+      // update in local orders list too
+      setOrders(prev => prev.map(o => o._id === selectedOrder._id ? { ...o, privateNotes: data } : o));
+      toast.success('Note added');
+    } catch { toast.error('Failed to add note'); }
+    setSavingNote(false);
+  };
+
+  const handleDeleteNote = async (noteId) => {
+    try {
+      const { data } = await orderAPI.deleteNote(selectedOrder._id, noteId);
+      setNotes(data);
+      setOrders(prev => prev.map(o => o._id === selectedOrder._id ? { ...o, privateNotes: data } : o));
+    } catch { toast.error('Failed to delete note'); }
+  };
+
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this order?')) return;
     try { await orderAPI.delete(id); toast.success('Order deleted!'); fetchOrders(); }
     catch { toast.error('Delete failed'); }
+  };
+
+  const handleExportXlsx = async () => {
+    setExportingXlsx(true);
+    try {
+      const response = await orderAPI.exportXlsx();
+      const blob = new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `orders-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success('Excel file downloaded!');
+    } catch { toast.error('Export failed'); }
+    setExportingXlsx(false);
   };
 
   const toggleSelect = id => setSelectedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -126,10 +179,14 @@ export default function ManageOrders() {
     <AdminLayout>
       <div className="admin-header">
         <h1>📦 <span className="gradient-text">Manage Orders</span></h1>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ background: '#f0f0ff', borderRadius: 12, padding: '8px 20px', fontSize: 14, fontWeight: 600, color: '#6c63ff' }}>
             {statusFilter ? `${sortedOrders.length} / ${orders.length}` : orders.length} orders
           </div>
+          <button className="btn btn-sm" style={{ background: '#e8f5e9', color: '#2e7d32', border: 'none', borderRadius: 20, fontWeight: 600 }}
+            onClick={handleExportXlsx} disabled={exportingXlsx}>
+            {exportingXlsx ? '⏳...' : '📊 Export Excel'}
+          </button>
         </div>
       </div>
 
@@ -180,7 +237,14 @@ export default function ManageOrders() {
                 <td><input type="checkbox" style={{ width: 16, height: 16, accentColor: '#6c63ff', cursor: 'pointer' }}
                   checked={selectedIds.has(order._id)} onChange={() => toggleSelect(order._id)} /></td>
                 <td style={{ color: '#636e72' }}>{(page - 1) * PAGE_SIZE + i + 1}</td>
-                <td><span style={{ fontFamily: 'monospace', color: '#6c63ff', fontWeight: 600 }}>#{order._id.slice(-8).toUpperCase()}</span></td>
+                <td>
+                  <span style={{ fontFamily: 'monospace', color: '#6c63ff', fontWeight: 600 }}>#{order._id.slice(-8).toUpperCase()}</span>
+                  {order.privateNotes?.length > 0 && (
+                    <span title={`${order.privateNotes.length} private note(s)`} style={{ marginLeft: 6, fontSize: 11, background: '#fff8e1', color: '#e65100', padding: '1px 6px', borderRadius: 8, fontWeight: 700 }}>
+                      📝 {order.privateNotes.length}
+                    </span>
+                  )}
+                </td>
                 <td>
                   <div style={{ fontWeight: 600, fontSize: 14 }}>{order.user?.name || 'N/A'}</div>
                   <div style={{ fontSize: 12, color: '#636e72' }}>{order.user?.email}</div>
@@ -196,7 +260,7 @@ export default function ManageOrders() {
                 <td>
                   <div style={{ display: 'flex', gap: 6 }}>
                     <button className="btn btn-sm" style={{ background: '#f0f0ff', color: '#6c63ff', borderRadius: 20 }}
-                      onClick={() => { setSelectedOrder(order); setNewStatus(order.orderStatus); setModal(true); }}>Update</button>
+                      onClick={() => openModal(order)}>Update</button>
                     <button className="btn btn-sm btn-danger" onClick={() => handleDelete(order._id)}>Del</button>
                   </div>
                 </td>
@@ -209,26 +273,70 @@ export default function ManageOrders() {
       <Paginator page={page} totalPages={totalPages} onPage={setPage} />
 
       {modal && selectedOrder && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000, padding: 24 }}>
-          <div style={{ background: 'white', borderRadius: 24, padding: 32, width: '100%', maxWidth: 500, animation: 'zoomIn 0.3s ease' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-              <h2 style={{ fontWeight: 700 }}>📦 Update Order</h2>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000, padding: 24, overflowY: 'auto' }}>
+          <div style={{ background: 'white', borderRadius: 24, padding: 32, width: '100%', maxWidth: 580, animation: 'zoomIn 0.3s ease' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h2 style={{ fontWeight: 700 }}>📦 Order #{selectedOrder._id.slice(-8).toUpperCase()}</h2>
               <button onClick={() => setModal(false)} style={{ background: 'none', border: 'none', fontSize: 24, cursor: 'pointer' }}>✕</button>
             </div>
-            <div style={{ padding: '16px', background: '#f8f7ff', borderRadius: 16, marginBottom: 20, fontSize: 14 }}>
-              <div style={{ fontWeight: 600 }}>Order #{selectedOrder._id.slice(-8).toUpperCase()}</div>
-              <div style={{ color: '#636e72' }}>Customer: {selectedOrder.user?.name}</div>
-              <div style={{ color: '#636e72' }}>Total: ₹{selectedOrder.totalPrice?.toLocaleString()}</div>
+
+            {/* Order summary */}
+            <div style={{ padding: '14px 16px', background: '#f8f7ff', borderRadius: 14, marginBottom: 20, fontSize: 14, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              <div><span style={{ color: '#9e9e9e' }}>Customer:</span> <strong>{selectedOrder.user?.name}</strong></div>
+              <div><span style={{ color: '#9e9e9e' }}>Email:</span> {selectedOrder.user?.email}</div>
+              <div><span style={{ color: '#9e9e9e' }}>Total:</span> <strong style={{ color: '#6c63ff' }}>₹{selectedOrder.totalPrice?.toLocaleString()}</strong></div>
+              <div><span style={{ color: '#9e9e9e' }}>Payment:</span> {selectedOrder.paymentMethod}</div>
             </div>
+
+            {/* Status update */}
             <div className="form-group">
               <label className="form-label">Order Status</label>
               <select className="form-select" value={newStatus} onChange={e => setNewStatus(e.target.value)}>
                 {statuses.map(s => <option key={s}>{s}</option>)}
               </select>
             </div>
-            <div style={{ display: 'flex', gap: 12 }}>
-              <button className="btn btn-secondary" onClick={() => setModal(false)}>Cancel</button>
-              <button className="btn btn-primary" onClick={handleUpdateStatus}>💾 Update Status</button>
+            <button className="btn btn-primary" onClick={handleUpdateStatus} style={{ marginBottom: 24 }}>💾 Update Status</button>
+
+            {/* Private Notes */}
+            <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: 20 }}>
+              <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+                📝 Private Notes
+                <span style={{ fontSize: 12, fontWeight: 400, color: '#9e9e9e' }}>visible to admin only</span>
+              </div>
+
+              {notes.length === 0 && (
+                <div style={{ color: '#9e9e9e', fontSize: 13, marginBottom: 14, fontStyle: 'italic' }}>No notes yet.</div>
+              )}
+
+              {notes.map(note => (
+                <div key={note._id} style={{ background: '#fffbf0', border: '1px solid #ffe0b2', borderRadius: 12, padding: '10px 14px', marginBottom: 8, display: 'flex', alignItems: 'flex-start', gap: 10 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 14, color: '#424242', lineHeight: 1.5 }}>{note.text}</div>
+                    <div style={{ fontSize: 11, color: '#9e9e9e', marginTop: 4 }}>
+                      {note.addedBy} · {new Date(note.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
+                    </div>
+                  </div>
+                  <button onClick={() => handleDeleteNote(note._id)}
+                    style={{ background: 'none', border: 'none', color: '#d63031', cursor: 'pointer', fontSize: 16, padding: '2px 4px', flexShrink: 0 }}>
+                    ✕
+                  </button>
+                </div>
+              ))}
+
+              <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+                <input className="form-input" placeholder="Add a private note..."
+                  value={noteText}
+                  onChange={e => setNoteText(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleAddNote()}
+                  style={{ flex: 1, fontSize: 14 }} />
+                <button className="btn btn-primary" onClick={handleAddNote} disabled={savingNote || !noteText.trim()} style={{ whiteSpace: 'nowrap' }}>
+                  {savingNote ? '⏳' : '+ Add'}
+                </button>
+              </div>
+            </div>
+
+            <div style={{ marginTop: 20, display: 'flex', justifyContent: 'flex-end' }}>
+              <button className="btn btn-secondary" onClick={() => setModal(false)}>Close</button>
             </div>
           </div>
         </div>

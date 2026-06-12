@@ -1,4 +1,5 @@
 const Visit = require('../models/Visit');
+const AnalyticsSnapshot = require('../models/AnalyticsSnapshot');
 
 const recordVisit = async (req, res) => {
   try {
@@ -139,4 +140,42 @@ const exportAnalytics = async (req, res) => {
   }
 };
 
-module.exports = { recordVisit, getStats, exportAnalytics };
+const saveSnapshot = async (req, res) => {
+  try {
+    const { label, summary, daily, monthly, yearly } = req.body;
+    const snap = await AnalyticsSnapshot.create({
+      label: label || new Date().toLocaleDateString('en-IN', { dateStyle: 'medium' }),
+      savedBy: req.user._id,
+      summary: summary || {},
+      daily: daily || [],
+      monthly: monthly || [],
+      yearly: yearly || [],
+    });
+    res.status(201).json(snap);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const getSnapshots = async (req, res) => {
+  try {
+    const snaps = await AnalyticsSnapshot.find()
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .populate('savedBy', 'name');
+    res.json(snaps);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const deleteSnapshot = async (req, res) => {
+  try {
+    await AnalyticsSnapshot.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Snapshot deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { recordVisit, getStats, exportAnalytics, saveSnapshot, getSnapshots, deleteSnapshot };

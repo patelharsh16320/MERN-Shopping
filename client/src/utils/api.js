@@ -55,7 +55,10 @@ export const orderAPI = {
   delete: (id) => API.delete(`/orders/${id}`),
   getStats: () => API.get('/orders/stats'),
   exportAll: (format = 'json') => API.get('/orders/export', { params: { format }, responseType: format === 'csv' ? 'text' : 'json' }),
+  exportXlsx: () => API.get('/orders/export', { params: { format: 'xlsx' }, responseType: 'arraybuffer' }),
   importAll: (items, duplicateAction) => API.post('/orders/import', { items, duplicateAction }),
+  addNote: (id, text) => API.post(`/orders/${id}/notes`, { text }),
+  deleteNote: (id, noteId) => API.delete(`/orders/${id}/notes/${noteId}`),
 };
 
 export const invoiceAPI = {
@@ -154,6 +157,9 @@ export const visitAPI = {
   record: (data) => API.post('/visits', data),
   getStats: () => API.get('/visits/stats'),
   exportAll: (format = 'json') => API.get('/visits/export', { params: { format }, responseType: format === 'csv' ? 'text' : 'json' }),
+  getSnapshots: () => API.get('/visits/snapshots'),
+  saveSnapshot: (data) => API.post('/visits/snapshots', data),
+  deleteSnapshot: (id) => API.delete(`/visits/snapshots/${id}`),
 };
 
 export default API;

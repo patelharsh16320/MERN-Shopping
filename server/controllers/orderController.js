@@ -2,6 +2,8 @@ const Order = require('../models/Order');
 const Invoice = require('../models/Invoice');
 const Product = require('../models/Product');
 const User = require('../models/User');
+const XLSX = require('xlsx');
+const emailService = require('../utils/emailService');
 
 const toCSV = (rows, fields) => {
   const esc = (v) => { const s = v === null || v === undefined ? '' : String(v).replace(/"/g, '""'); return s.includes(',') || s.includes('\n') || s.includes('"') ? `"${s}"` : s; };
@@ -56,6 +58,23 @@ const createOrder = async (req, res) => {
       }
     });
     await invoice.save();
+
+    // Send confirmation emails (non-blocking)
+    const customer = await User.findById(req.user._id).lean();
+    if (customer) {
+      emailService.send({
+        to: customer.email,
+        subject: `Order Confirmed — #${String(savedOrder._id).slice(-8).toUpperCase()}`,
+        html: emailService.orderConfirmationHtml(savedOrder, customer),
+      });
+      if (process.env.ADMIN_EMAIL) {
+        emailService.send({
+          to: process.env.ADMIN_EMAIL,
+          subject: `New Order from ${customer.name} — ₹${savedOrder.totalPrice}`,
+          html: emailService.adminNewOrderHtml(savedOrder, customer),
+        });
+      }
+    }
 
     res.status(201).json(savedOrder);
   } catch (err) {
@@ -159,18 +178,74 @@ const exportOrders = async (req, res) => {
       shippingPrice: o.shippingPrice,
       taxPrice: o.taxPrice,
       totalPrice: o.totalPrice,
-      isPaid: o.isPaid,
-      address: o.shippingAddress?.address || '',
+      isPaid: o.isPaid ? 'Yes' : 'No',
       city: o.shippingAddress?.city || '',
+      state: o.shippingAddress?.state || '',
       country: o.shippingAddress?.country || '',
-      items: JSON.stringify(o.orderItems.map(i => ({ name: i.name, qty: i.quantity, price: i.price }))),
+      couponCode: o.couponCode || '',
+      discountPrice: o.discountPrice || 0,
+      items: o.orderItems.map(i => `${i.name} x${i.quantity}`).join('; '),
       createdAt: o.createdAt?.toISOString().slice(0, 10),
     }));
+
+    const fields = ['_id', 'userEmail', 'userName', 'orderStatus', 'paymentMethod', 'totalPrice', 'discountPrice', 'couponCode', 'isPaid', 'city', 'state', 'items', 'createdAt'];
+
     if (req.query.format === 'csv') {
       res.setHeader('Content-Type', 'text/csv');
-      return res.send(toCSV(data, ['_id', 'userEmail', 'userName', 'orderStatus', 'paymentMethod', 'totalPrice', 'isPaid', 'address', 'city', 'items', 'createdAt']));
+      return res.send(toCSV(data, fields));
     }
+
+    if (req.query.format === 'xlsx') {
+      const ws = XLSX.utils.json_to_sheet(data.map(r => ({
+        'Order ID': r._id,
+        'Customer Email': r.userEmail,
+        'Customer Name': r.userName,
+        'Status': r.orderStatus,
+        'Payment Method': r.paymentMethod,
+        'Total (₹)': r.totalPrice,
+        'Discount (₹)': r.discountPrice,
+        'Coupon': r.couponCode,
+        'Paid': r.isPaid,
+        'City': r.city,
+        'State': r.state,
+        'Items': r.items,
+        'Date': r.createdAt,
+      })));
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Orders');
+      const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename=orders-${new Date().toISOString().slice(0, 10)}.xlsx`);
+      return res.send(buf);
+    }
+
     res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const addNote = async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text?.trim()) return res.status(400).json({ message: 'Note text is required' });
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    order.privateNotes.push({ text: text.trim(), addedBy: req.user.name || 'Admin', createdAt: new Date() });
+    await order.save();
+    res.json(order.privateNotes);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const deleteNote = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    order.privateNotes = order.privateNotes.filter(n => n._id.toString() !== req.params.noteId);
+    await order.save();
+    res.json(order.privateNotes);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -229,4 +304,4 @@ const importOrders = async (req, res) => {
   }
 };
 
-module.exports = { createOrder, getMyOrders, getOrderById, getAllOrders, updateOrderStatus, deleteOrder, getOrderStats, exportOrders, importOrders };
+module.exports = { createOrder, getMyOrders, getOrderById, getAllOrders, updateOrderStatus, deleteOrder, getOrderStats, exportOrders, importOrders, addNote, deleteNote };
