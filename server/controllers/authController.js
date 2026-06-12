@@ -119,4 +119,86 @@ const deleteCard = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getProfile, updateProfile, toggleWishlist, getCards, saveCard, deleteCard };
+// ── Daily login streak ──
+const Coupon = require('../models/Coupon');
+
+// milestone day → { percent off, coupon validity in days }
+const STREAK_REWARDS = { 7: { value: 10, validDays: 14 }, 30: { value: 25, validDays: 30 } };
+
+const dayStart = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
+const dayDiff = (a, b) => Math.round((dayStart(a) - dayStart(b)) / 86400000);
+
+const streakPayload = (user, reward = null) => {
+  const checkedToday = user.streak.lastCheckIn && dayDiff(new Date(), user.streak.lastCheckIn) === 0;
+  return {
+    current: user.streak.current,
+    longest: user.streak.longest,
+    lastCheckIn: user.streak.lastCheckIn,
+    checkedToday: !!checkedToday,
+    rewardsClaimed: user.streak.rewardsClaimed,
+    milestones: Object.keys(STREAK_REWARDS).map(Number),
+    reward,
+  };
+};
+
+const getStreak = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    // streak broken if more than 1 day since last check-in
+    if (user.streak.lastCheckIn && dayDiff(new Date(), user.streak.lastCheckIn) > 1 && user.streak.current > 0) {
+      user.streak.current = 0;
+      user.streak.rewardsClaimed = [];
+      await user.save();
+    }
+    res.json(streakPayload(user));
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const checkIn = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const now = new Date();
+    const diff = user.streak.lastCheckIn ? dayDiff(now, user.streak.lastCheckIn) : null;
+
+    if (diff === 0) return res.json(streakPayload(user));
+
+    if (diff === 1) {
+      user.streak.current += 1;
+    } else {
+      user.streak.current = 1;
+      user.streak.rewardsClaimed = [];
+    }
+    user.streak.lastCheckIn = now;
+    user.streak.longest = Math.max(user.streak.longest, user.streak.current);
+
+    let reward = null;
+    const milestone = STREAK_REWARDS[user.streak.current];
+    if (milestone && !user.streak.rewardsClaimed.includes(user.streak.current)) {
+      let code, exists = true;
+      while (exists) {
+        code = `STREAK${user.streak.current}-${Math.random().toString(36).slice(2, 7).toUpperCase()}`;
+        exists = await Coupon.findOne({ code });
+      }
+      const coupon = await Coupon.create({
+        code,
+        discountType: 'percentage',
+        discountValue: milestone.value,
+        minOrderAmount: 0,
+        maxUsage: 1,
+        expiresAt: new Date(Date.now() + milestone.validDays * 86400000),
+        isActive: true,
+      });
+      user.streak.rewardsClaimed.push(user.streak.current);
+      reward = { code: coupon.code, discountValue: coupon.discountValue, expiresAt: coupon.expiresAt };
+    }
+
+    await user.save();
+    res.json(streakPayload(user, reward));
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { register, login, getProfile, updateProfile, toggleWishlist, getCards, saveCard, deleteCard, getStreak, checkIn };

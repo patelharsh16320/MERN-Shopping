@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { productAPI } from '../utils/api';
 import ProductCard from '../components/ProductCard';
 import { SkeletonCard } from '../components/Loader';
+import DailyStreak from '../components/DailyStreak';
 import { toast } from 'react-toastify';
 
 const categories = [
@@ -166,6 +167,9 @@ export default function Home() {
           ))}
         </div>
       </div>
+
+      {/* ── Daily Login Streak (logged-in users) ── */}
+      <DailyStreak />
 
       {/* ── Flash Deals Countdown ── */}
       <div ref={dealRef} style={{ background: 'linear-gradient(135deg, #880e4f 0%, #c2185b 50%, #e91e63 100%)', padding: '52px 24px', overflow: 'hidden', position: 'relative' }}>

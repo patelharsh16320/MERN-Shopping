@@ -28,6 +28,8 @@ export const authAPI = {
   getCards: () => API.get('/auth/cards'),
   saveCard: (data) => API.post('/auth/cards', data),
   deleteCard: (id) => API.delete(`/auth/cards/${id}`),
+  getStreak: () => API.get('/auth/streak'),
+  checkIn: () => API.post('/auth/streak/checkin'),
 };
 
 export const productAPI = {

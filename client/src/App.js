@@ -29,6 +29,7 @@ import ContactUs from './pages/ContactUs';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import RefundPolicy from './pages/RefundPolicy';
 import { InvoiceList, InvoiceDetail, InvoiceByOrder } from './pages/Invoices';
+import BeautyQuiz from './pages/BeautyQuiz';
 
 import Dashboard from './pages/admin/Dashboard';
 import ManageProducts from './pages/admin/ManageProducts';
@@ -108,6 +109,7 @@ function App() {
             <Route path="/contact" element={<MainLayout><ContactUs /></MainLayout>} />
             <Route path="/privacy" element={<MainLayout><PrivacyPolicy /></MainLayout>} />
             <Route path="/refund" element={<MainLayout><RefundPolicy /></MainLayout>} />
+            <Route path="/quiz" element={<MainLayout><BeautyQuiz /></MainLayout>} />
           </Routes>
 
           <ToastContainer

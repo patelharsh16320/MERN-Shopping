@@ -38,7 +38,13 @@ const userSchema = new mongoose.Schema({
   addresses: [addressSchema],
   isActive: { type: Boolean, default: true },
   wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
-  savedCards: [savedCardSchema]
+  savedCards: [savedCardSchema],
+  streak: {
+    current: { type: Number, default: 0 },
+    longest: { type: Number, default: 0 },
+    lastCheckIn: { type: Date, default: null },
+    rewardsClaimed: [{ type: Number }]
+  }
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {

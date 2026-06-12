@@ -45,6 +45,7 @@ export default function Navbar() {
             <li><Link to="/products" className={`nav-link ${isActive('/products')}`}>Shop</Link></li>
             <li><Link to="/about" className={`nav-link ${isActive('/about')}`}>About</Link></li>
             <li><Link to="/contact" className={`nav-link ${isActive('/contact')}`}>Contact</Link></li>
+            <li><Link to="/quiz" className={`nav-link ${isActive('/quiz')}`}>✨ Quiz</Link></li>
             <li>
               <Link to="/cart" className="nav-link" style={{ position: 'relative', padding: '7px 13px' }}>
                 <span className="cart-badge">
@@ -113,6 +114,7 @@ export default function Navbar() {
         <Link to="/products" className="nav-link" onClick={close}>🛍️ Shop</Link>
         <Link to="/about" className="nav-link" onClick={close}>💫 About</Link>
         <Link to="/contact" className="nav-link" onClick={close}>📞 Contact</Link>
+        <Link to="/quiz" className="nav-link" onClick={close}>✨ Beauty Quiz</Link>
         {user ? (
           <>
             <Link to="/wishlist" className="nav-link" onClick={close}>🤍 Wishlist</Link>

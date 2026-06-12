@@ -25,7 +25,7 @@ export default function Footer() {
 
         <div>
           <h4 style={{ color: 'white', marginBottom: '14px', fontSize: '15px', fontWeight: 700 }}>Quick Links</h4>
-          {[['Home', '/'], ['Shop', '/products'], ['Cart', '/cart'], ['Wishlist', '/wishlist'], ['My Orders', '/orders']].map(([label, path]) => (
+          {[['Home', '/'], ['Shop', '/products'], ['Beauty Quiz', '/quiz'], ['Cart', '/cart'], ['Wishlist', '/wishlist'], ['My Orders', '/orders']].map(([label, path]) => (
             <Link key={path} to={path} className="footer-link">{label}</Link>
           ))}
         </div>

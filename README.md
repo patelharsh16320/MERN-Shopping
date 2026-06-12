@@ -173,9 +173,28 @@ Comment Management
 - Admin can manage all blog comments.
 - Comments can be set to Approved or Deleted.
 
+init 
+
 <!-- !------ Reaming-----!  -->
 
-init 
+Personalized Beauty Quiz
+- A multi-step interactive quiz available at /quiz (no login required).
+- Asks 5 questions: Skin Type, Main Concern, Routine Style, Lifestyle, Budget.
+- Generates a personalized "Beauty Profile" name (e.g., "The Glow Seeker", "The Wellness Warrior", "The Radiance Ritualist") based on answers.
+- Recommends real products from the catalog by filtering the existing product API using the quiz answers (category + search term + price range).
+- Results page shows the profile card with characteristic tags + up to 6 recommended products with "Add to Cart" buttons.
+- "Retake Quiz" and "Shop All" options on the results page.
+- No backend changes needed — uses existing GET /api/products endpoint.
+- Add a "✨ Quiz" link in the Navbar and Footer Quick Links.
+
+Daily Login Streak & Rewards
+- Logged-in users see a streak bar on the Home page with a "🔥 Check In Today" button.
+- Checking in on consecutive days grows the streak; missing a day resets it to 0.
+- Milestone rewards: 7-day streak = auto-generated 10% OFF coupon (valid 14 days), 30-day streak = 25% OFF coupon (valid 30 days).
+- Reward coupons are real single-use Coupon records, usable at checkout like any other code; the code is shown with a copy button + toast.
+- Week-dot progress view (7 circles), progress bar to the next milestone, and longest-streak record.
+- Backend: streak fields on the User model + GET /api/auth/streak and POST /api/auth/streak/checkin endpoints.
+
 
 <!-- !------ ignore-----!  -->
 

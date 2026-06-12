@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-06-12T04:46:14.768Z",
+  "exportedAt": "2026-06-12T13:09:24.648Z",
   "version": "1.0",
   "products": [
     {
@@ -553,7 +553,7 @@
       "images": [
         "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400"
       ],
-      "stock": 40,
+      "stock": 39,
       "totalStock": 40,
       "rating": 4.8,
       "numReviews": 267,
@@ -688,7 +688,7 @@
       "images": [
         "https://images.unsplash.com/photo-1517971129774-8a2b38fa128e?w=400"
       ],
-      "stock": 80,
+      "stock": 78,
       "totalStock": 80,
       "rating": 4.8,
       "numReviews": 567,
@@ -783,7 +783,7 @@
       "isFeatured": false,
       "weight": "800g",
       "freshnessDays": 365,
-      "status": "draft"
+      "status": "trash"
     },
     {
       "name": "Inspirational Ceramic Mug (350ml)",
@@ -823,7 +823,7 @@
       "images": [
         "https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=400"
       ],
-      "stock": 49,
+      "stock": 48,
       "totalStock": 50,
       "rating": 4.8,
       "numReviews": 312,
@@ -903,7 +903,8 @@
       "subcategory": "Fitness",
       "images": [
         "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRgpaE07vv0UNcRg_eeSgMOuDVvetyuR4VluxPLJTRa8L31pGyo36_YbPUa-qIxa309Wez09UFZLb1No7A5Hg07W1lo09EAn26-U_FstJr4vG17dbjq1-pzjQ",
-        "http://localhost:5000/uploads/1781180198743-n6sn44bsab.png"
+        "http://localhost:5000/uploads/1781180198743-n6sn44bsab.png",
+        "http://localhost:5000/uploads/1781247249525-3lvavyyd7k8.jpg"
       ],
       "stock": 10,
       "totalStock": 10,
@@ -911,18 +912,18 @@
       "numReviews": 0,
       "brand": "Women HubClub",
       "tags": [],
-      "isActive": false,
+      "isActive": true,
       "isFeatured": true,
       "weight": "200g",
       "freshnessDays": 365,
-      "status": "trash"
+      "status": "published"
     }
   ],
   "categories": [
     {
       "name": "General",
       "icon": "🏷️",
-      "description": "Default category for uncategorised products",
+      "description": "Default category for uncategorized products",
       "isActive": true,
       "isDefault": true,
       "parent": ""
@@ -1256,6 +1257,166 @@
       "role": "user",
       "isActive": true,
       "createdAt": "2026-06-12T04:20:53.682Z"
+    },
+    {
+      "name": "Izuku Midoriya",
+      "email": "izuku.midoriya@gmail.com",
+      "phone": "9876543301",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2026-06-12T05:18:09.899Z"
+    },
+    {
+      "name": "Katsuki Bakugo",
+      "email": "katsuki.bakugo@gmail.com",
+      "phone": "9876543302",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2026-06-12T05:18:10.468Z"
+    },
+    {
+      "name": "Shoto Todoroki",
+      "email": "shoto.todoroki@gmail.com",
+      "phone": "9876543303",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2026-06-12T05:18:11.030Z"
+    },
+    {
+      "name": "Ochaco Uraraka",
+      "email": "ochaco.uraraka@gmail.com",
+      "phone": "9876543304",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2026-06-12T05:18:11.622Z"
+    },
+    {
+      "name": "Tenya Iida",
+      "email": "tenya.iida@gmail.com",
+      "phone": "9876543305",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2026-06-12T05:18:12.175Z"
+    },
+    {
+      "name": "Tsuyu Asui",
+      "email": "tsuyu.asui@gmail.com",
+      "phone": "9876543306",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2026-06-12T05:18:12.754Z"
+    },
+    {
+      "name": "Momo Yaoyorozu",
+      "email": "momo.yaoyorozu@gmail.com",
+      "phone": "9876543307",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2026-06-12T05:18:13.318Z"
+    },
+    {
+      "name": "Eijiro Kirishima",
+      "email": "eijiro.kirishima@gmail.com",
+      "phone": "9876543308",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2026-06-12T05:18:13.896Z"
+    },
+    {
+      "name": "Denki Kaminari",
+      "email": "denki.kaminari@gmail.com",
+      "phone": "9876543309",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2026-06-12T05:18:14.522Z"
+    },
+    {
+      "name": "Kyoka Jiro",
+      "email": "kyoka.jiro@gmail.com",
+      "phone": "9876543310",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2026-06-12T05:18:15.208Z"
+    },
+    {
+      "name": "Mina Ashido",
+      "email": "mina.ashido@gmail.com",
+      "phone": "9876543311",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2026-06-12T05:19:20.844Z"
+    },
+    {
+      "name": "Fumikage Tokoyami",
+      "email": "fumikage.tokoyami@gmail.com",
+      "phone": "9876543312",
+      "role": "user",
+      "isActive": false,
+      "createdAt": "2026-06-12T05:19:21.285Z"
+    },
+    {
+      "name": "Yuga Aoyama",
+      "email": "yuga.aoyama@gmail.com",
+      "phone": "9876543313",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2026-06-12T05:19:21.718Z"
+    },
+    {
+      "name": "Mashirao Ojiro",
+      "email": "mashirao.ojiro@gmail.com",
+      "phone": "9876543314",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2026-06-12T05:19:22.141Z"
+    },
+    {
+      "name": "Rikido Sato",
+      "email": "rikido.sato@gmail.com",
+      "phone": "9876543315",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2026-06-12T05:19:22.571Z"
+    },
+    {
+      "name": "Koji Koda",
+      "email": "koji.koda@gmail.com",
+      "phone": "9876543316",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2026-06-12T05:19:23.001Z"
+    },
+    {
+      "name": "Hanta Sero",
+      "email": "hanta.sero@gmail.com",
+      "phone": "9876543317",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2026-06-12T05:19:23.426Z"
+    },
+    {
+      "name": "Mezo Shoji",
+      "email": "mezo.shoji@gmail.com",
+      "phone": "9876543318",
+      "role": "user",
+      "isActive": false,
+      "createdAt": "2026-06-12T05:19:23.849Z"
+    },
+    {
+      "name": "Toru Hagakure",
+      "email": "toru.hagakure@gmail.com",
+      "phone": "9876543319",
+      "role": "user",
+      "isActive": false,
+      "createdAt": "2026-06-12T05:19:24.275Z"
+    },
+    {
+      "name": "Minoru Mineta",
+      "email": "minoru.mineta@gmail.com",
+      "phone": "9876543320",
+      "role": "user",
+      "isActive": true,
+      "createdAt": "2026-06-12T05:19:24.709Z"
     }
   ],
   "orders": [
@@ -1766,6 +1927,66 @@
         }
       ],
       "createdAt": "2026-06-12T04:33:22.631Z"
+    },
+    {
+      "_id": "6a2ba72a3a3c4657c11a6345",
+      "userEmail": "izuku.midoriya@gmail.com",
+      "totalPrice": 1469.2,
+      "orderStatus": "Shipped",
+      "paymentMethod": "COD",
+      "isPaid": false,
+      "trackingNumber": "",
+      "items": [
+        {
+          "product": "6a2a97ee84d1631c6e82e711",
+          "name": "Women's Collagen Peptide Supplement",
+          "image": "https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=400",
+          "price": 1499,
+          "quantity": 1,
+          "_id": "6a2ba72a3a3c4657c11a6346"
+        }
+      ],
+      "createdAt": "2026-06-12T06:28:58.684Z"
+    },
+    {
+      "_id": "6a2ba8809d227ce4f99951e1",
+      "userEmail": "izuku.midoriya@gmail.com",
+      "totalPrice": 1273.2,
+      "orderStatus": "Pending",
+      "paymentMethod": "Net Banking",
+      "isPaid": true,
+      "trackingNumber": "",
+      "items": [
+        {
+          "product": "6a2a97ee84d1631c6e82e707",
+          "name": "Women's Athleisure Jogger Set",
+          "image": "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400",
+          "price": 1299,
+          "quantity": 1,
+          "_id": "6a2ba8809d227ce4f99951e2"
+        }
+      ],
+      "createdAt": "2026-06-12T06:34:40.286Z"
+    },
+    {
+      "_id": "6a2baccdde84811657340113",
+      "userEmail": "izuku.midoriya@gmail.com",
+      "totalPrice": 831.4,
+      "orderStatus": "Pending",
+      "paymentMethod": "COD",
+      "isPaid": false,
+      "trackingNumber": "",
+      "items": [
+        {
+          "product": "6a2a97ee84d1631c6e82e70c",
+          "name": "Guided Gratitude Journal — 90 Days",
+          "image": "https://images.unsplash.com/photo-1517971129774-8a2b38fa128e?w=400",
+          "price": 399,
+          "quantity": 2,
+          "_id": "6a2baccdde84811657340114"
+        }
+      ],
+      "createdAt": "2026-06-12T06:53:01.996Z"
     }
   ],
   "invoices": [
@@ -1958,19 +2179,49 @@
       "shipping": 0,
       "paymentMethod": "COD",
       "createdAt": "2026-06-12T04:33:22.669Z"
+    },
+    {
+      "invoiceNumber": "INV-1781245738718-464",
+      "status": "Sent",
+      "total": 1469.2,
+      "subtotal": 1499,
+      "tax": 270,
+      "shipping": 0,
+      "paymentMethod": "COD",
+      "createdAt": "2026-06-12T06:28:58.743Z"
+    },
+    {
+      "invoiceNumber": "INV-1781246080298-960",
+      "status": "Sent",
+      "total": 1273.2,
+      "subtotal": 1299,
+      "tax": 234,
+      "shipping": 0,
+      "paymentMethod": "Net Banking",
+      "createdAt": "2026-06-12T06:34:40.300Z"
+    },
+    {
+      "invoiceNumber": "INV-1781247182002-433",
+      "status": "Sent",
+      "total": 831.4,
+      "subtotal": 798,
+      "tax": 144,
+      "shipping": 49,
+      "paymentMethod": "COD",
+      "createdAt": "2026-06-12T06:53:02.003Z"
     }
   ],
   "analytics": {
-    "total": 330,
+    "total": 509,
     "daily": {
       "2026-06-11": 269,
-      "2026-06-12": 61
+      "2026-06-12": 240
     },
     "monthly": {
-      "2026-06": 330
+      "2026-06": 509
     },
     "yearly": {
-      "2026": 330
+      "2026": 509
     }
   },
   "contacts": [
@@ -1981,6 +2232,22 @@
       "message": "Where is my order...?",
       "isRead": true,
       "createdAt": "2026-06-12T04:33:43.984Z"
+    },
+    {
+      "name": "Helly",
+      "email": "helly@gmail.com",
+      "subject": "Product Advice",
+      "message": "Need Discount?",
+      "isRead": true,
+      "createdAt": "2026-06-12T04:48:56.044Z"
+    },
+    {
+      "name": "Izuku Midoriya",
+      "email": "izuku.midoriya@gmail.com",
+      "subject": "Other",
+      "message": "Need coupen code",
+      "isRead": true,
+      "createdAt": "2026-06-12T06:33:28.292Z"
     }
   ],
   "reviews": [
@@ -1999,6 +2266,41 @@
       "comment": "Good quality",
       "isApproved": true,
       "createdAt": "2026-06-12T04:25:50.827Z"
+    }
+  ],
+  "coupons": [
+    {
+      "code": "5TV953J5",
+      "discountType": "percentage",
+      "discountValue": 20,
+      "minOrderAmount": 499,
+      "maxUsage": 2,
+      "usageCount": 2,
+      "expiresAt": "2026-06-30T00:00:00.000Z",
+      "isActive": true,
+      "createdAt": "2026-06-12T06:16:40.043Z"
+    },
+    {
+      "code": "QOI9DFXZ",
+      "discountType": "percentage",
+      "discountValue": 10,
+      "minOrderAmount": 599,
+      "maxUsage": 8,
+      "usageCount": 0,
+      "expiresAt": "2026-07-08T00:00:00.000Z",
+      "isActive": false,
+      "createdAt": "2026-06-12T06:27:40.913Z"
+    },
+    {
+      "code": "B6GE55TQ",
+      "discountType": "fixed",
+      "discountValue": 99,
+      "minOrderAmount": 999,
+      "maxUsage": 25,
+      "usageCount": 0,
+      "expiresAt": "2026-06-13T00:00:00.000Z",
+      "isActive": true,
+      "createdAt": "2026-06-12T06:27:57.273Z"
     }
   ]
 }
