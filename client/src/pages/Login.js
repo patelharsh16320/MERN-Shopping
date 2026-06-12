@@ -76,13 +76,6 @@ export default function Login() {
         <div style={{ textAlign: 'center', fontSize: 14, color: '#636e72' }}>
           Don't have an account? <Link to="/register" style={{ color: '#6c63ff', fontWeight: 600, textDecoration: 'none' }}>Register here</Link>
         </div>
-
-        <div style={{ marginTop: 20, padding: '12px 16px', background: '#f8f7ff', borderRadius: 12, fontSize: 12, color: '#636e72' }}>
-          <strong>Demo Credentials:</strong><br />
-          Admin: harsh@gmail.com / harsh@gmail.com<br />
-          User: helly@gmail.com / helly@gmail.com<br />
-          <em>(email and password are the same for all users)</em>
-        </div>
       </div>
     </div>
   );

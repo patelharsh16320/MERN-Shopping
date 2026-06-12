@@ -28,7 +28,6 @@ import AboutUs from './pages/AboutUs';
 import ContactUs from './pages/ContactUs';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import RefundPolicy from './pages/RefundPolicy';
-import { BlogList, BlogPost } from './pages/Blog';
 import { InvoiceList, InvoiceDetail, InvoiceByOrder } from './pages/Invoices';
 
 import Dashboard from './pages/admin/Dashboard';
@@ -44,7 +43,6 @@ import ManageCoupons from './pages/admin/ManageCoupons';
 import SecureUserData from './pages/admin/SecureUserData';
 import ImportExport from './pages/admin/ImportExport';
 import WhatsNew from './pages/admin/WhatsNew';
-import ManageBlogComments from './pages/admin/ManageBlogComments';
 
 function VisitTracker() {
   const location = useLocation();
@@ -88,7 +86,6 @@ function App() {
             <Route path="/admin/secure-users" element={<SecureUserData />} />
             <Route path="/admin/import-export" element={<ImportExport />} />
             <Route path="/admin/whats-new" element={<WhatsNew />} />
-            <Route path="/admin/blog-comments" element={<ManageBlogComments />} />
 
             {/* Auth routes */}
             <Route path="/login" element={<Login />} />
@@ -111,8 +108,6 @@ function App() {
             <Route path="/contact" element={<MainLayout><ContactUs /></MainLayout>} />
             <Route path="/privacy" element={<MainLayout><PrivacyPolicy /></MainLayout>} />
             <Route path="/refund" element={<MainLayout><RefundPolicy /></MainLayout>} />
-            <Route path="/blog" element={<MainLayout><BlogList /></MainLayout>} />
-            <Route path="/blog/:slug" element={<MainLayout><BlogPost /></MainLayout>} />
           </Routes>
 
           <ToastContainer

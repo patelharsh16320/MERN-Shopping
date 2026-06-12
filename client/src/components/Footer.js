@@ -25,7 +25,7 @@ export default function Footer() {
 
         <div>
           <h4 style={{ color: 'white', marginBottom: '14px', fontSize: '15px', fontWeight: 700 }}>Quick Links</h4>
-          {[['Home', '/'], ['Shop', '/products'], ['Cart', '/cart'], ['Wishlist', '/wishlist'], ['My Orders', '/orders'], ['Blog', '/blog']].map(([label, path]) => (
+          {[['Home', '/'], ['Shop', '/products'], ['Cart', '/cart'], ['Wishlist', '/wishlist'], ['My Orders', '/orders']].map(([label, path]) => (
             <Link key={path} to={path} className="footer-link">{label}</Link>
           ))}
         </div>
@@ -41,7 +41,6 @@ export default function Footer() {
           <h4 style={{ color: 'white', marginBottom: '14px', fontSize: '15px', fontWeight: 700 }}>Company & Support</h4>
           <Link to="/about" className="footer-link">About Us</Link>
           <Link to="/contact" className="footer-link">Contact Us</Link>
-          <Link to="/blog" className="footer-link">Beauty Blog</Link>
           <Link to="/refund" className="footer-link">Refund & Returns</Link>
           <Link to="/privacy" className="footer-link">Privacy Policy</Link>
           <div style={{ marginTop: 16 }}>
