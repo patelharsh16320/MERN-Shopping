@@ -145,6 +145,17 @@ export const couponAPI = {
   recordUsage: (id) => API.post(`/coupons/${id}/use`),
 };
 
+export const blogCommentAPI = {
+  submit: (data) => API.post('/blog-comments', data),
+  getForPost: (slug) => API.get(`/blog-comments/post/${slug}`),
+  getAll: (params) => API.get('/blog-comments', { params }),
+  getStats: () => API.get('/blog-comments/stats'),
+  updateStatus: (id, status) => API.put(`/blog-comments/${id}`, { status }),
+  delete: (id) => API.delete(`/blog-comments/${id}`),
+  bulkUpdate: (ids, status) => API.put('/blog-comments/bulk-status', { ids, status }),
+  bulkDelete: (ids) => API.delete('/blog-comments/bulk-delete', { data: { ids } }),
+};
+
 export const uploadAPI = {
   image: (file) => {
     const formData = new FormData();

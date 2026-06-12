@@ -24,9 +24,10 @@ app.use('/api/categories', require('./routes/categories'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/contacts', require('./routes/contacts'));
 app.use('/api/support', require('./routes/support'));
-app.use('/api/coupons',   require('./routes/coupons'));
-app.use('/api/changelog', require('./routes/changelog'));
-app.use('/api/data',      require('./routes/data'));
+app.use('/api/coupons',       require('./routes/coupons'));
+app.use('/api/changelog',     require('./routes/changelog'));
+app.use('/api/blog-comments', require('./routes/blogComments'));
+app.use('/api/data',          require('./routes/data'));
 
 app.get('/api/health', (req, res) => res.json({ status: 'OK', message: 'women hubclub API Running' }));
 

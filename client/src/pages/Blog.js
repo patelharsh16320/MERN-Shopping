@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { blogCommentAPI } from '../utils/api';
+import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 function useInView(threshold = 0.12) {
   const ref = useRef(null);
@@ -296,6 +299,39 @@ export function BlogPost() {
   const post = blogPosts.find(p => p.slug === slug);
   const related = blogPosts.filter(p => p.slug !== slug && p.category === post?.category).slice(0, 2);
   const [contentRef, contentVisible] = useInView(0.05);
+  const { user } = useAuth();
+
+  const [comments, setComments] = useState([]);
+  const [commentName, setCommentName] = useState('');
+  const [commentEmail, setCommentEmail] = useState('');
+  const [commentBody, setCommentBody] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!slug) return;
+    blogCommentAPI.getForPost(slug).then(r => setComments(r.data)).catch(() => {});
+  }, [slug]);
+
+  useEffect(() => {
+    if (user) {
+      setCommentName(user.name || '');
+      setCommentEmail(user.email || '');
+    }
+  }, [user]);
+
+  const handleSubmitComment = async (e) => {
+    e.preventDefault();
+    if (!commentBody.trim()) return;
+    setSubmitting(true);
+    try {
+      await blogCommentAPI.submit({ postSlug: slug, postTitle: post?.title || '', name: commentName, email: commentEmail, body: commentBody });
+      toast.success('Comment submitted — it will appear after review.');
+      setCommentBody('');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to submit comment');
+    }
+    setSubmitting(false);
+  };
 
   if (!post) {
     return (
@@ -384,6 +420,67 @@ export function BlogPost() {
             </div>
           </div>
         )}
+
+        {/* Comments */}
+        <div style={{ marginTop: 56, borderTop: '1px solid var(--border)', paddingTop: 40 }}>
+          <h3 style={{ fontWeight: 800, fontSize: 20, marginBottom: 24, color: '#212121' }}>
+            💬 Comments {comments.length > 0 && <span style={{ fontSize: 14, fontWeight: 600, color: '#9e9e9e' }}>({comments.length})</span>}
+          </h3>
+
+          {comments.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: 40 }}>
+              {comments.map(c => (
+                <div key={c._id} style={{ background: '#fafafa', borderRadius: 16, padding: '20px 24px', border: '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                    <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'linear-gradient(135deg,#c2185b,#f06292)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: 15, flexShrink: 0 }}>
+                      {c.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: 14 }}>{c.name}</div>
+                      <div style={{ fontSize: 11, color: '#9e9e9e' }}>{new Date(c.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                    </div>
+                  </div>
+                  <p style={{ color: '#424242', fontSize: 14, lineHeight: 1.75, margin: 0 }}>{c.body}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p style={{ color: '#9e9e9e', fontSize: 14, marginBottom: 32 }}>No approved comments yet. Be the first to share your thoughts!</p>
+          )}
+
+          {user ? (
+            <form onSubmit={handleSubmitComment} style={{ background: '#fff8fb', borderRadius: 20, padding: 28, border: '1px solid #fce4ec' }}>
+              <h4 style={{ fontWeight: 700, fontSize: 16, marginBottom: 20, color: '#212121' }}>Leave a Comment</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: '#757575', display: 'block', marginBottom: 6 }}>Name</label>
+                  <input value={commentName} onChange={e => setCommentName(e.target.value)} required
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1px solid var(--border)', fontSize: 14, boxSizing: 'border-box' }} />
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, fontWeight: 600, color: '#757575', display: 'block', marginBottom: 6 }}>Email (optional)</label>
+                  <input type="email" value={commentEmail} onChange={e => setCommentEmail(e.target.value)}
+                    style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1px solid var(--border)', fontSize: 14, boxSizing: 'border-box' }} />
+                </div>
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: '#757575', display: 'block', marginBottom: 6 }}>Your Comment</label>
+                <textarea value={commentBody} onChange={e => setCommentBody(e.target.value)} required rows={4}
+                  placeholder="Share your thoughts..."
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1px solid var(--border)', fontSize: 14, resize: 'vertical', boxSizing: 'border-box', fontFamily: 'inherit' }} />
+              </div>
+              <button type="submit" className="btn btn-primary" disabled={submitting}>
+                {submitting ? 'Submitting...' : 'Submit Comment'}
+              </button>
+              <p style={{ fontSize: 12, color: '#9e9e9e', marginTop: 10, marginBottom: 0 }}>Comments are reviewed before publishing.</p>
+            </form>
+          ) : (
+            <div style={{ background: '#fff8fb', borderRadius: 16, padding: '24px 28px', border: '1px solid #fce4ec', textAlign: 'center' }}>
+              <p style={{ color: '#757575', marginBottom: 14 }}>Please log in to leave a comment.</p>
+              <Link to="/login" className="btn btn-primary btn-sm">Log In</Link>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
