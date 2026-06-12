@@ -15,6 +15,7 @@ const hashPwd = async (pwd) => await bcrypt.hash(pwd, 12);
 
 const usersData = [
   { name: 'Admin User', email: 'admin@gmail.com', password: 'admin@gmail.com', role: 'admin', phone: '9999999999' },
+  { name: 'Harsh', email: 'harsh@gmail.com', password: 'harsh@gmail.com', role: 'admin', phone: '1234567980' },
   { name: 'Priya Sharma', email: 'priya@gmail.com', password: 'priya@gmail.com', phone: '9876543210' },
   { name: 'Anjali Mehta', email: 'anjali@gmail.com', password: 'anjali@gmail.com', phone: '9876543211' },
   { name: 'Sneha Kapoor', email: 'sneha@gmail.com', password: 'sneha@gmail.com', phone: '9876543212' },

@@ -113,7 +113,6 @@ export default function Navbar() {
         <Link to="/products" className="nav-link" onClick={close}>🛍️ Shop</Link>
         <Link to="/about" className="nav-link" onClick={close}>💫 About</Link>
         <Link to="/contact" className="nav-link" onClick={close}>📞 Contact</Link>
-        <Link to="/cart" className="nav-link" onClick={close}>🛒 Cart {totalItems > 0 && `(${totalItems})`}</Link>
         {user ? (
           <>
             <Link to="/wishlist" className="nav-link" onClick={close}>🤍 Wishlist</Link>

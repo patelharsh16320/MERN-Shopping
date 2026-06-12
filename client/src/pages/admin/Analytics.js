@@ -77,19 +77,6 @@ export default function Analytics() {
   const [userSearch, setUserSearch] = useState('');
   const [userPage, setUserPage] = useState(1);
 
-  const handleExport = async (format) => {
-    try {
-      const { data } = await visitAPI.exportAll(format);
-      const isCSV = format === 'csv';
-      const blob = new Blob([isCSV ? data : JSON.stringify(data, null, 2)], { type: isCSV ? 'text/csv' : 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `analytics-${new Date().toISOString().slice(0, 10)}.${format}`;
-      a.click(); URL.revokeObjectURL(url);
-      toast.success(`Analytics exported as ${format.toUpperCase()}`);
-    } catch { toast.error('Export failed'); }
-  };
-
   const loadStats = () => {
     setLoading(true);
     setError('');
@@ -137,10 +124,6 @@ export default function Analytics() {
               📈 <span className="gradient-text">Site Analytics</span>
             </h1>
             <p style={{ color: '#9e9e9e', fontSize: 14 }}>Track how many visitors come to Women HubClub</p>
-          </div>
-          <div style={{ display: 'flex', gap: 10 }}>
-            <button className="btn btn-secondary" onClick={() => handleExport('json')} style={{ fontWeight: 600 }}>📤 JSON</button>
-            <button className="btn btn-secondary" onClick={() => handleExport('csv')} style={{ fontWeight: 600 }}>📤 CSV</button>
           </div>
         </div>
       </div>

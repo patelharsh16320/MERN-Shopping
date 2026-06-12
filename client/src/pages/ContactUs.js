@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import { useAuth } from '../context/AuthContext';
+import { contactAPI } from '../utils/api';
 
 const contactInfo = [
   { icon: '📍', title: 'Visit Us', lines: ['123 Pink Street, Bandra', 'Mumbai - 400050, India'] },
@@ -17,16 +19,27 @@ const faqs = [
 ];
 
 export default function ContactUs() {
+  const { user } = useAuth();
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
   const [sending, setSending] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
 
+  useEffect(() => {
+    if (user) {
+      setForm(prev => ({ ...prev, name: prev.name || user.name || '', email: prev.email || user.email || '' }));
+    }
+  }, [user]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSending(true);
-    await new Promise(r => setTimeout(r, 1100));
-    toast.success('Message sent! We\'ll reply within 24 hours. 💗');
-    setForm({ name: '', email: '', subject: '', message: '' });
+    try {
+      await contactAPI.submit(form);
+      toast.success("Message sent! We'll reply within 24 hours. 💗");
+      setForm({ name: user?.name || '', email: user?.email || '', subject: '', message: '' });
+    } catch {
+      toast.error('Failed to send message. Please try again.');
+    }
     setSending(false);
   };
 

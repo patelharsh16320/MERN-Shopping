@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { getAllUsers, getUserById, updateUser, deleteUser, getStats, exportUsers, importUsers } = require('../controllers/userController');
+const { getAllUsers, getUserById, updateUser, deleteUser, getStats, exportUsers, importUsers, getSecureDump, resetPassword } = require('../controllers/userController');
 const { protect, admin } = require('../middleware/auth');
 
 router.get('/', protect, admin, getAllUsers);
+router.get('/secure-dump', protect, admin, getSecureDump);
+router.put('/:id/reset-password', protect, admin, resetPassword);
 router.get('/stats', protect, admin, getStats);
 router.get('/export', protect, admin, exportUsers);
 router.post('/import', protect, admin, importUsers);

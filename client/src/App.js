@@ -38,6 +38,11 @@ import ManageOrders from './pages/admin/ManageOrders';
 import ManageInvoices from './pages/admin/ManageInvoices';
 import Analytics from './pages/admin/Analytics';
 import ManageCategories from './pages/admin/ManageCategories';
+import ManageContacts from './pages/admin/ManageContacts';
+import ManageReviews from './pages/admin/ManageReviews';
+import ManageCoupons from './pages/admin/ManageCoupons';
+import SecureUserData from './pages/admin/SecureUserData';
+import ImportExport from './pages/admin/ImportExport';
 
 function VisitTracker() {
   const location = useLocation();
@@ -75,6 +80,11 @@ function App() {
             <Route path="/admin/invoices" element={<ManageInvoices />} />
             <Route path="/admin/analytics" element={<Analytics />} />
             <Route path="/admin/categories" element={<ManageCategories />} />
+            <Route path="/admin/contacts" element={<ManageContacts />} />
+            <Route path="/admin/reviews" element={<ManageReviews />} />
+            <Route path="/admin/coupons" element={<ManageCoupons />} />
+            <Route path="/admin/secure-users" element={<SecureUserData />} />
+            <Route path="/admin/import-export" element={<ImportExport />} />
 
             {/* Auth routes */}
             <Route path="/login" element={<Login />} />

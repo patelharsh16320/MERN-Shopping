@@ -3,8 +3,6 @@ import AdminLayout from './AdminLayout';
 import { invoiceAPI } from '../../utils/api';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import ImportModal from './ImportModal';
-
 const statusColors = { Paid: 'paid', Sent: 'sent', Overdue: 'overdue', Cancelled: 'cancelled', Draft: 'draft' };
 const statuses = ['Paid', 'Sent', 'Overdue', 'Cancelled', 'Draft'];
 const PAGE_SIZE = 10;
@@ -47,9 +45,9 @@ export default function ManageInvoices() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('');
-  const [importModal, setImportModal] = useState(false);
   const [sortField, setSortField] = useState('');
   const [sortDir, setSortDir] = useState('asc');
+  const [selectedIds, setSelectedIds] = useState(new Set());
 
   const handleSort = (field) => {
     if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
@@ -78,25 +76,6 @@ export default function ManageInvoices() {
   const totalPages = Math.ceil(sortedInvoices.length / PAGE_SIZE);
   const paginated = sortedInvoices.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const handleExport = async (format) => {
-    try {
-      const { data } = await invoiceAPI.exportAll(format);
-      const isCSV = format === 'csv';
-      const blob = new Blob([isCSV ? data : JSON.stringify(data, null, 2)], { type: isCSV ? 'text/csv' : 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `invoices-${new Date().toISOString().slice(0, 10)}.${format}`;
-      a.click(); URL.revokeObjectURL(url);
-      toast.success(`Exported ${isCSV ? '' : data.length + ' '}invoices as ${format.toUpperCase()}`);
-    } catch { toast.error('Export failed'); }
-  };
-
-  const handleImport = async (items, duplicateAction) => {
-    const { data } = await invoiceAPI.importAll(items, duplicateAction);
-    fetchInvoices();
-    return data;
-  };
-
   const fetchInvoices = async () => {
     setLoading(true);
     try {
@@ -119,19 +98,31 @@ export default function ManageInvoices() {
     catch { toast.error('Delete failed'); }
   };
 
+  const toggleSelect = id => setSelectedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const toggleSelectAll = () => {
+    const ids = paginated.map(inv => inv._id);
+    const allOn = ids.length > 0 && ids.every(id => selectedIds.has(id));
+    setSelectedIds(prev => { const n = new Set(prev); ids.forEach(id => allOn ? n.delete(id) : n.add(id)); return n; });
+  };
+  const handleBulkDelete = async () => {
+    if (!window.confirm(`Permanently delete ${selectedIds.size} invoice(s)? This cannot be undone.`)) return;
+    try {
+      await Promise.all([...selectedIds].map(id => invoiceAPI.delete(id)));
+      toast.success(`${selectedIds.size} invoice(s) deleted`);
+      setSelectedIds(new Set()); fetchInvoices();
+    } catch { toast.error('Some deletions failed'); }
+  };
+
   const sortProps = { sortField, sortDir, onSort: handleSort };
 
   return (
     <AdminLayout>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800 }}>🧾 <span className="gradient-text">Manage Invoices</span></h1>
+      <div className="admin-header">
+        <h1>🧾 <span className="gradient-text">Manage Invoices</span></h1>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <div style={{ background: '#f0f0ff', borderRadius: 12, padding: '8px 20px', fontSize: 14, fontWeight: 600, color: '#6c63ff' }}>
             {statusFilter ? `${sortedInvoices.length} / ${invoices.length}` : invoices.length} invoices
           </div>
-          <button className="btn btn-secondary" onClick={() => handleExport('json')} style={{ fontWeight: 600 }}>📤 JSON</button>
-          <button className="btn btn-secondary" onClick={() => handleExport('csv')} style={{ fontWeight: 600 }}>📤 CSV</button>
-          <button className="btn btn-secondary" onClick={() => setImportModal(true)} style={{ fontWeight: 600 }}>📥 Import</button>
         </div>
       </div>
 
@@ -144,10 +135,23 @@ export default function ManageInvoices() {
         ))}
       </div>
 
+      {selectedIds.size > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', background: '#fff0f0', borderRadius: 12, marginBottom: 14, border: '2px solid #ffcccc', flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: 700, fontSize: 14, color: '#c62828' }}>{selectedIds.size} selected</span>
+          <button className="btn btn-sm btn-danger" onClick={handleBulkDelete}>🗑 Delete Selected</button>
+          <button className="btn btn-sm" style={{ background: '#f5f5f5', color: '#636e72' }} onClick={() => setSelectedIds(new Set())}>✕ Deselect All</button>
+        </div>
+      )}
+
       <div className="table-container animate-fade">
         <table>
           <thead>
             <tr>
+              <th style={{ width: 44 }}>
+                <input type="checkbox" style={{ width: 16, height: 16, accentColor: '#6c63ff', cursor: 'pointer' }}
+                  checked={paginated.length > 0 && paginated.every(inv => selectedIds.has(inv._id))}
+                  onChange={toggleSelectAll} />
+              </th>
               <th>#</th>
               <th>Invoice #</th>
               <SortTh label="Customer" field="user.name" {...sortProps} />
@@ -161,11 +165,13 @@ export default function ManageInvoices() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={9} style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</td></tr>
+              <tr><td colSpan={10} style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</td></tr>
             ) : paginated.length === 0 ? (
-              <tr><td colSpan={9} style={{ textAlign: 'center', padding: 40, color: '#9e9e9e' }}>No invoices found.</td></tr>
+              <tr><td colSpan={10} style={{ textAlign: 'center', padding: 40, color: '#9e9e9e' }}>No invoices found.</td></tr>
             ) : paginated.map((inv, i) => (
               <tr key={inv._id}>
+                <td><input type="checkbox" style={{ width: 16, height: 16, accentColor: '#6c63ff', cursor: 'pointer' }}
+                  checked={selectedIds.has(inv._id)} onChange={() => toggleSelect(inv._id)} /></td>
                 <td style={{ color: '#636e72' }}>{(page - 1) * PAGE_SIZE + i + 1}</td>
                 <td><span style={{ fontFamily: 'monospace', fontWeight: 600, color: '#6c63ff', fontSize: 12 }}>{inv.invoiceNumber}</span></td>
                 <td>
@@ -196,9 +202,6 @@ export default function ManageInvoices() {
 
       <Paginator page={page} totalPages={totalPages} onPage={setPage} />
 
-      {importModal && (
-        <ImportModal entityName="Invoices" onImport={handleImport} onClose={() => setImportModal(false)} />
-      )}
     </AdminLayout>
   );
 }

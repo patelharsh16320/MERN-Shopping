@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import AdminLayout from './AdminLayout';
 import { userAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
-import ImportModal from './ImportModal';
 
 const USER_COLS = ['Email', 'Phone', 'Role', 'Status', 'Joined'];
 const PAGE_SIZE = 10;
@@ -47,7 +46,7 @@ export default function ManageUsers() {
   const [page, setPage] = useState(1);
   const [editUser, setEditUser] = useState(null);
   const [modal, setModal] = useState(false);
-  const [importModal, setImportModal] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
   const [visibleCols, setVisibleCols] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem('admin_cols_users') || '{}');
@@ -93,25 +92,6 @@ export default function ManageUsers() {
   const totalPages = Math.ceil(sortedUsers.length / PAGE_SIZE);
   const paginated = sortedUsers.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const handleExport = async (format) => {
-    try {
-      const { data } = await userAPI.exportAll(format);
-      const isCSV = format === 'csv';
-      const blob = new Blob([isCSV ? data : JSON.stringify(data, null, 2)], { type: isCSV ? 'text/csv' : 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `users-${new Date().toISOString().slice(0, 10)}.${format}`;
-      a.click(); URL.revokeObjectURL(url);
-      toast.success(`Exported ${isCSV ? '' : data.length + ' '}users as ${format.toUpperCase()}`);
-    } catch { toast.error('Export failed'); }
-  };
-
-  const handleImport = async (items, duplicateAction) => {
-    const { data } = await userAPI.importAll(items, duplicateAction);
-    fetchUsers();
-    return data;
-  };
-
   const fetchUsers = async () => {
     setLoading(true);
     try {
@@ -139,24 +119,47 @@ export default function ManageUsers() {
     catch { toast.error('Delete failed'); }
   };
 
+  const toggleSelect = id => setSelectedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const toggleSelectAll = () => {
+    const ids = paginated.filter(u => u.role !== 'admin').map(u => u._id);
+    const allOn = ids.length > 0 && ids.every(id => selectedIds.has(id));
+    setSelectedIds(prev => { const n = new Set(prev); ids.forEach(id => allOn ? n.delete(id) : n.add(id)); return n; });
+  };
+  const handleBulkDelete = async () => {
+    const deletable = [...selectedIds].filter(id => !users.find(u => u._id === id && u.role === 'admin'));
+    if (deletable.length === 0) { toast.warning('Cannot delete admin users'); return; }
+    if (!window.confirm(`Permanently delete ${deletable.length} user(s)? This cannot be undone.`)) return;
+    try {
+      await Promise.all(deletable.map(id => userAPI.delete(id)));
+      toast.success(`${deletable.length} user(s) deleted`);
+      setSelectedIds(new Set());
+      fetchUsers();
+    } catch { toast.error('Some deletions failed'); }
+  };
+
   const sortProps = { sortField, sortDir, onSort: handleSort };
 
   return (
     <AdminLayout>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800 }}>👥 <span className="gradient-text">Manage Users</span></h1>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+      <div className="admin-header">
+        <h1>👥 <span className="gradient-text">Manage Users</span></h1>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ background: '#f0f0ff', borderRadius: 12, padding: '8px 20px', fontSize: 14, fontWeight: 600, color: '#6c63ff' }}>
             {search ? `${sortedUsers.length} / ${users.length}` : users.length} users
           </div>
-          <button className="btn btn-secondary" onClick={() => handleExport('json')} style={{ fontWeight: 600 }}>📤 JSON</button>
-          <button className="btn btn-secondary" onClick={() => handleExport('csv')} style={{ fontWeight: 600 }}>📤 CSV</button>
-          <button className="btn btn-secondary" onClick={() => setImportModal(true)} style={{ fontWeight: 600 }}>📥 Import</button>
         </div>
       </div>
 
+      {selectedIds.size > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', background: '#fff0f0', borderRadius: 12, marginBottom: 14, border: '2px solid #ffcccc', flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: 700, fontSize: 14, color: '#c62828' }}>{selectedIds.size} selected</span>
+          <button className="btn btn-sm btn-danger" onClick={handleBulkDelete}>🗑 Delete Selected</button>
+          <button className="btn btn-sm" style={{ background: '#f5f5f5', color: '#636e72' }} onClick={() => setSelectedIds(new Set())}>✕ Deselect All</button>
+        </div>
+      )}
+
       <div style={{ marginBottom: 16, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-        <input className="form-input" placeholder="Search by name or email..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} style={{ maxWidth: 320 }} />
+        <input className="form-input" placeholder="Search by name or email..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); setSelectedIds(new Set()); }} style={{ maxWidth: 320 }} />
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
           <span style={{ fontSize: 13, color: '#9e9e9e', fontWeight: 600 }}>Columns:</span>
           {USER_COLS.map(col => (
@@ -172,6 +175,11 @@ export default function ManageUsers() {
         <table>
           <thead>
             <tr>
+              <th style={{ width: 44 }}>
+                <input type="checkbox" style={{ width: 16, height: 16, accentColor: '#6c63ff', cursor: 'pointer' }}
+                  checked={paginated.filter(u => u.role !== 'admin').length > 0 && paginated.filter(u => u.role !== 'admin').every(u => selectedIds.has(u._id))}
+                  onChange={toggleSelectAll} />
+              </th>
               <th>#</th>
               <SortTh label="Name" field="name" {...sortProps} />
               {visibleCols['Email'] && <SortTh label="Email" field="email" {...sortProps} />}
@@ -184,11 +192,13 @@ export default function ManageUsers() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</td></tr>
+              <tr><td colSpan={4 + Object.values(visibleCols).filter(Boolean).length} style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</td></tr>
             ) : paginated.length === 0 ? (
-              <tr><td colSpan={8} style={{ textAlign: 'center', padding: 40, color: '#9e9e9e' }}>No users found.</td></tr>
+              <tr><td colSpan={4 + Object.values(visibleCols).filter(Boolean).length} style={{ textAlign: 'center', padding: 40, color: '#9e9e9e' }}>No users found.</td></tr>
             ) : paginated.map((user, i) => (
               <tr key={user._id}>
+                <td>{user.role !== 'admin' && <input type="checkbox" style={{ width: 16, height: 16, accentColor: '#6c63ff', cursor: 'pointer' }}
+                  checked={selectedIds.has(user._id)} onChange={() => toggleSelect(user._id)} />}</td>
                 <td style={{ color: '#636e72' }}>{(page - 1) * PAGE_SIZE + i + 1}</td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -216,10 +226,6 @@ export default function ManageUsers() {
       </div>
 
       <Paginator page={page} totalPages={totalPages} onPage={setPage} />
-
-      {importModal && (
-        <ImportModal entityName="Users" onImport={handleImport} onClose={() => setImportModal(false)} />
-      )}
 
       {modal && editUser && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000, padding: 24 }}>

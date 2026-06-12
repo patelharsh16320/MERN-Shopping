@@ -2,8 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import AdminLayout from './AdminLayout';
 import { categoryAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
-import ImportModal from './ImportModal';
-
 const CAT_COLS = ['Description', 'Type', 'Products', 'Status', 'Added'];
 const PAGE_SIZE = 10;
 const emptyForm = { name: '', description: '', icon: '🏷️', parent: '' };
@@ -50,7 +48,6 @@ export default function ManageCategories() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
-  const [importModal, setImportModal] = useState(false);
   const [visibleCols, setVisibleCols] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem('admin_cols_categories') || '{}');
@@ -111,24 +108,6 @@ export default function ManageCategories() {
   const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
   const paginated = sorted.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const handleExport = async (format) => {
-    try {
-      const { data } = await categoryAPI.exportAll(format);
-      const isCSV = format === 'csv';
-      const blob = new Blob([isCSV ? data : JSON.stringify(data, null, 2)], { type: isCSV ? 'text/csv' : 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `categories-${new Date().toISOString().slice(0, 10)}.${format}`;
-      a.click(); URL.revokeObjectURL(url);
-      toast.success(`Exported ${isCSV ? '' : data.length + ' '}categories as ${format.toUpperCase()}`);
-    } catch { toast.error('Export failed'); }
-  };
-
-  const handleImport = async (items, duplicateAction) => {
-    const { data } = await categoryAPI.importAll(items, duplicateAction);
-    fetchCategories();
-    return data;
-  };
 
   const openAdd = () => { setEditing(null); setForm(emptyForm); setModal(true); };
   const openEdit = (cat) => {
@@ -172,13 +151,10 @@ export default function ManageCategories() {
 
   return (
     <AdminLayout>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800 }}>🏷️ <span className="gradient-text">Manage Categories</span></h1>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+      <div className="admin-header">
+        <h1>🏷️ <span className="gradient-text">Manage Categories</span></h1>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ background: '#f0f0ff', borderRadius: 12, padding: '8px 20px', fontSize: 14, fontWeight: 600, color: '#6c63ff' }}>Total: {categories.length}</div>
-          <button className="btn btn-secondary" onClick={() => handleExport('json')} style={{ fontWeight: 600 }}>📤 JSON</button>
-          <button className="btn btn-secondary" onClick={() => handleExport('csv')} style={{ fontWeight: 600 }}>📤 CSV</button>
-          <button className="btn btn-secondary" onClick={() => setImportModal(true)} style={{ fontWeight: 600 }}>📥 Import</button>
           <button className="btn btn-primary" onClick={openAdd}>+ Add Category</button>
         </div>
       </div>
@@ -266,9 +242,7 @@ export default function ManageCategories() {
 
       <Paginator page={page} totalPages={totalPages} onPage={setPage} />
 
-      {importModal && (
-        <ImportModal entityName="Categories" onImport={handleImport} onClose={() => setImportModal(false)} />
-      )}
+
 
       {modal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000, padding: 24 }}>

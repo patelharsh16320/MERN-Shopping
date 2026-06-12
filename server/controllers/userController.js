@@ -126,4 +126,27 @@ const importUsers = async (req, res) => {
   }
 };
 
-module.exports = { getAllUsers, getUserById, updateUser, deleteUser, getStats, exportUsers, importUsers };
+const getSecureDump = async (req, res) => {
+  try {
+    const users = await User.find().select('name email password role isActive createdAt').sort({ createdAt: -1 });
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { password } = req.body;
+    if (!password || password.length < 4) return res.status(400).json({ message: 'Password must be at least 4 characters' });
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    user.password = password;
+    await user.save();
+    res.json({ message: 'Password updated successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { getAllUsers, getUserById, updateUser, deleteUser, getStats, exportUsers, importUsers, getSecureDump, resetPassword };

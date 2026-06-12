@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { authAPI } from '../utils/api';
+import { authAPI, contactAPI } from '../utils/api';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,6 +21,18 @@ export default function Profile() {
   const [newAddr, setNewAddr] = useState(emptyAddress);
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState('profile');
+  const [myMessages, setMyMessages] = useState([]);
+  const [msgsLoading, setMsgsLoading] = useState(false);
+  const [expandedMsg, setExpandedMsg] = useState(null);
+
+  useEffect(() => {
+    if (tab !== 'messages') return;
+    setMsgsLoading(true);
+    contactAPI.getMine()
+      .then(({ data }) => setMyMessages(data.contacts))
+      .catch(() => toast.error('Failed to load messages'))
+      .finally(() => setMsgsLoading(false));
+  }, [tab]);
 
   if (!user) { navigate('/login'); return null; }
 
@@ -101,7 +113,7 @@ export default function Profile() {
             </div>
 
             <div style={{ background: 'white', borderRadius: 24, padding: 16, boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
-              {[['profile', '👤', 'Profile Info'], ['addresses', '📍', 'My Addresses']].map(([key, icon, label]) => (
+              {[['profile', '👤', 'Profile Info'], ['addresses', '📍', 'My Addresses'], ['messages', '💬', 'My Messages']].map(([key, icon, label]) => (
                 <div key={key} onClick={() => setTab(key)}
                   style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', cursor: 'pointer', borderRadius: 12, marginBottom: 4, background: tab === key ? '#e8f5e9' : 'transparent', color: tab === key ? 'var(--primary)' : 'var(--text)', fontWeight: tab === key ? 700 : 500, fontSize: 14, transition: 'all 0.2s' }}>
                   <span>{icon}</span> {label}
@@ -246,6 +258,93 @@ export default function Profile() {
                   <button className="btn btn-primary btn-lg" style={{ marginTop: 24 }} onClick={handleSubmit} disabled={loading}>
                     {loading ? '⏳ Saving...' : '💾 Save All Addresses'}
                   </button>
+                )}
+              </div>
+            )}
+            {tab === 'messages' && (
+              <div style={{ background: 'white', borderRadius: 24, padding: 36, boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
+                <h2 style={{ fontWeight: 700, marginBottom: 28, fontSize: 22 }}>💬 My Messages</h2>
+
+                {msgsLoading ? (
+                  <div style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</div>
+                ) : myMessages.length === 0 ? (
+                  <div className="empty-state" style={{ padding: '40px 0' }}>
+                    <div className="empty-state-icon">💬</div>
+                    <p>You haven't sent any messages yet.</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    {myMessages.map(msg => (
+                      <div key={msg._id} style={{ border: '1px solid var(--border)', borderRadius: 16, overflow: 'hidden' }}>
+                        {/* Message header */}
+                        <div
+                          onClick={() => setExpandedMsg(expandedMsg === msg._id ? null : msg._id)}
+                          style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', cursor: 'pointer', background: expandedMsg === msg._id ? '#f8f7ff' : 'white' }}>
+                          {/* Avatar */}
+                          <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg,#6c63ff,#fd79a8)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: 18, flexShrink: 0 }}>
+                            {user.name?.[0]?.toUpperCase()}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 2 }}>{msg.subject}</div>
+                            <div style={{ fontSize: 12, color: '#636e72', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{msg.message}</div>
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
+                            <div style={{ fontSize: 11, color: '#9e9e9e' }}>{new Date(msg.createdAt).toLocaleDateString('en-IN', { dateStyle: 'medium' })}</div>
+                            {msg.replies?.length > 0 && (
+                              <span style={{ background: '#e8f5e9', color: '#558b2f', borderRadius: 10, padding: '2px 8px', fontSize: 11, fontWeight: 700 }}>
+                                {msg.replies.length} {msg.replies.length === 1 ? 'reply' : 'replies'}
+                              </span>
+                            )}
+                          </div>
+                          <span style={{ color: '#9e9e9e', fontSize: 12, marginLeft: 8 }}>{expandedMsg === msg._id ? '▲' : '▼'}</span>
+                        </div>
+
+                        {/* Expanded body */}
+                        {expandedMsg === msg._id && (
+                          <div style={{ padding: '0 20px 20px', borderTop: '1px solid var(--border)' }}>
+                            {/* User's original message */}
+                            <div style={{ marginTop: 16 }}>
+                              <div style={{ fontSize: 11, color: '#9e9e9e', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>Your Message</div>
+                              <div style={{ display: 'flex', gap: 12 }}>
+                                <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,#6c63ff,#fd79a8)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
+                                  {user.name?.[0]?.toUpperCase()}
+                                </div>
+                                <div style={{ background: '#f5f5f5', borderRadius: '0 12px 12px 12px', padding: '12px 16px', fontSize: 14, lineHeight: 1.7, color: '#2d3436', flex: 1, whiteSpace: 'pre-wrap' }}>
+                                  {msg.message}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Admin replies */}
+                            {msg.replies?.length > 0 ? (
+                              <div style={{ marginTop: 16 }}>
+                                <div style={{ fontSize: 11, color: '#9e9e9e', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>Admin Replies</div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                  {msg.replies.map((r, i) => (
+                                    <div key={i} style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+                                      <div style={{ background: '#f0f0ff', borderRadius: '12px 0 12px 12px', padding: '12px 16px', fontSize: 14, lineHeight: 1.7, color: '#2d3436', maxWidth: '85%', whiteSpace: 'pre-wrap' }}>
+                                        {r.message}
+                                        <div style={{ fontSize: 11, color: '#9e9e9e', marginTop: 4 }}>
+                                          {new Date(r.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
+                                        </div>
+                                      </div>
+                                      <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,#fd79a8,#6c63ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
+                                        🌸
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ) : (
+                              <div style={{ marginTop: 16, padding: '12px 16px', background: '#fffbf0', borderRadius: 12, fontSize: 13, color: '#9e9e9e', border: '1px dashed #f0e0a0' }}>
+                                ⏳ Awaiting admin reply...
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             )}

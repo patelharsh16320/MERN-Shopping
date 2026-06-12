@@ -37,7 +37,9 @@ const getProductById = async (req, res) => {
       product = await Product.findOne({ slug: req.params.id }).populate('reviews.user', 'name avatar');
     }
     if (!product) return res.status(404).json({ message: 'Product not found' });
-    res.json(product);
+    const obj = product.toObject();
+    obj.reviews = obj.reviews.filter(r => r.isApproved !== false);
+    res.json(obj);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -237,4 +239,52 @@ const importProducts = async (req, res) => {
   }
 };
 
-module.exports = { getProducts, getAdminProducts, getProductById, createProduct, updateProduct, deleteProduct, addReview, updateReview, getFeatured, getCategories, exportProducts, importProducts };
+const getAllReviews = async (req, res) => {
+  try {
+    const products = await Product.find({ 'reviews.0': { $exists: true } }).select('name reviews').lean();
+    const reviews = [];
+    for (const product of products) {
+      for (const review of product.reviews) {
+        reviews.push({ ...review, productId: product._id, productName: product.name });
+      }
+    }
+    reviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    res.json(reviews);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const updateReviewAdmin = async (req, res) => {
+  try {
+    const { productId, reviewId, isApproved } = req.body;
+    const product = await Product.findById(productId);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    const review = product.reviews.id(reviewId);
+    if (!review) return res.status(404).json({ message: 'Review not found' });
+    review.isApproved = isApproved;
+    await product.save();
+    res.json({ message: 'Updated' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const deleteReviewAdmin = async (req, res) => {
+  try {
+    const { productId, reviewId } = req.params;
+    const product = await Product.findById(productId);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    product.reviews = product.reviews.filter(r => r._id.toString() !== reviewId);
+    product.numReviews = product.reviews.length;
+    product.rating = product.reviews.length
+      ? product.reviews.reduce((a, r) => a + r.rating, 0) / product.reviews.length
+      : 0;
+    await product.save();
+    res.json({ message: 'Review deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { getProducts, getAdminProducts, getProductById, createProduct, updateProduct, deleteProduct, addReview, updateReview, getFeatured, getCategories, exportProducts, importProducts, getAllReviews, updateReviewAdmin, deleteReviewAdmin };

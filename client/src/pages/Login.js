@@ -4,9 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
 
 const quickLogins = [
-  { label: 'Admin', email: 'admin@gmail.com' },
-  { label: 'Ben', email: 'ben@gmail.com' },
-  { label: 'Alice', email: 'alice@gmail.com' },
+  { label: 'Admin', email: 'harsh@gmail.com' },
+  { label: 'User', email: 'helly@gmail.com' },
 ];
 
 export default function Login() {
@@ -80,8 +79,8 @@ export default function Login() {
 
         <div style={{ marginTop: 20, padding: '12px 16px', background: '#f8f7ff', borderRadius: 12, fontSize: 12, color: '#636e72' }}>
           <strong>Demo Credentials:</strong><br />
-          Admin: admin@gmail.com / admin@gmail.com<br />
-          User: ben@gmail.com / ben@gmail.com<br />
+          Admin: harsh@gmail.com / harsh@gmail.com<br />
+          User: helly@gmail.com / helly@gmail.com<br />
           <em>(email and password are the same for all users)</em>
         </div>
       </div>

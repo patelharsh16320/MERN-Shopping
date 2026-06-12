@@ -75,6 +75,8 @@ export const userAPI = {
   update: (id, data) => API.put(`/users/${id}`, data),
   delete: (id) => API.delete(`/users/${id}`),
   getStats: () => API.get('/users/stats'),
+  secureDump: () => API.get('/users/secure-dump'),
+  resetPassword: (id, password) => API.put(`/users/${id}/reset-password`, { password }),
   exportAll: (format = 'json') => API.get('/users/export', { params: { format }, responseType: format === 'csv' ? 'text' : 'json' }),
   importAll: (items, duplicateAction) => API.post('/users/import', { items, duplicateAction }),
 };
@@ -86,6 +88,48 @@ export const categoryAPI = {
   delete: (id) => API.delete(`/categories/${id}`),
   exportAll: (format = 'json') => API.get('/categories/export', { params: { format }, responseType: format === 'csv' ? 'text' : 'json' }),
   importAll: (items, duplicateAction) => API.post('/categories/import', { items, duplicateAction }),
+};
+
+export const dataAPI = {
+  export: (type = 'all', format = 'json') => API.get('/data/export', { params: { type, format }, responseType: format === 'csv' ? 'text' : 'json' }),
+  import: (bundle, duplicateAction) => API.post('/data/import', { bundle, duplicateAction }),
+};
+
+export const reviewAPI = {
+  getAll: () => API.get('/products/admin/reviews'),
+  update: (productId, reviewId, isApproved) => API.put('/products/admin/reviews', { productId, reviewId, isApproved }),
+  delete: (productId, reviewId) => API.delete(`/products/admin/reviews/${productId}/${reviewId}`),
+};
+
+export const contactAPI = {
+  submit: (data) => API.post('/contacts', data),
+  getAll: (params) => API.get('/contacts', { params }),
+  getStats: () => API.get('/contacts/stats'),
+  getMine: () => API.get('/contacts/mine'),
+  markRead: (id, isRead = true) => API.put(`/contacts/${id}`, { isRead }),
+  reply: (id, message) => API.post(`/contacts/${id}/reply`, { message }),
+  delete: (id) => API.delete(`/contacts/${id}`),
+};
+
+export const supportAPI = {
+  create: (data) => API.post('/support', data),
+  getMyTickets: () => API.get('/support/mine'),
+  getTicket: (id) => API.get(`/support/mine/${id}`),
+  sendMessage: (id, text) => API.post(`/support/${id}/message`, { text }),
+  getStats: () => API.get('/support/stats'),
+  getAll: (params) => API.get('/support', { params }),
+  adminReply: (id, text) => API.post(`/support/${id}/reply`, { text }),
+  updateStatus: (id, status) => API.put(`/support/${id}/status`, { status }),
+  markSeen: (id) => API.put(`/support/${id}/seen`),
+};
+
+export const couponAPI = {
+  getAll: () => API.get('/coupons'),
+  create: (data) => API.post('/coupons', data),
+  update: (id, data) => API.put(`/coupons/${id}`, data),
+  delete: (id) => API.delete(`/coupons/${id}`),
+  validate: (code, orderTotal) => API.post('/coupons/validate', { code, orderTotal }),
+  recordUsage: (id) => API.post(`/coupons/${id}/use`),
 };
 
 export const uploadAPI = {

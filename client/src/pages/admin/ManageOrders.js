@@ -2,8 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import AdminLayout from './AdminLayout';
 import { orderAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
-import ImportModal from './ImportModal';
-
 const statuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
 const statusColors = { Pending: 'pending', Processing: 'processing', Shipped: 'shipped', Delivered: 'delivered', Cancelled: 'cancelled' };
 const PAGE_SIZE = 10;
@@ -48,10 +46,10 @@ export default function ManageOrders() {
   const [statusFilter, setStatusFilter] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modal, setModal] = useState(false);
-  const [importModal, setImportModal] = useState(false);
   const [newStatus, setNewStatus] = useState('');
   const [sortField, setSortField] = useState('');
   const [sortDir, setSortDir] = useState('asc');
+  const [selectedIds, setSelectedIds] = useState(new Set());
 
   const handleSort = (field) => {
     if (sortField === field) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
@@ -80,25 +78,6 @@ export default function ManageOrders() {
   const totalPages = Math.ceil(sortedOrders.length / PAGE_SIZE);
   const paginated = sortedOrders.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const handleExport = async (format) => {
-    try {
-      const { data } = await orderAPI.exportAll(format);
-      const isCSV = format === 'csv';
-      const blob = new Blob([isCSV ? data : JSON.stringify(data, null, 2)], { type: isCSV ? 'text/csv' : 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `orders-${new Date().toISOString().slice(0, 10)}.${format}`;
-      a.click(); URL.revokeObjectURL(url);
-      toast.success(`Exported ${isCSV ? '' : data.length + ' '}orders as ${format.toUpperCase()}`);
-    } catch { toast.error('Export failed'); }
-  };
-
-  const handleImport = async (items, duplicateAction) => {
-    const { data } = await orderAPI.importAll(items, duplicateAction);
-    fetchOrders();
-    return data;
-  };
-
   const fetchOrders = async () => {
     setLoading(true);
     try {
@@ -126,19 +105,31 @@ export default function ManageOrders() {
     catch { toast.error('Delete failed'); }
   };
 
+  const toggleSelect = id => setSelectedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const toggleSelectAll = () => {
+    const ids = paginated.map(o => o._id);
+    const allOn = ids.length > 0 && ids.every(id => selectedIds.has(id));
+    setSelectedIds(prev => { const n = new Set(prev); ids.forEach(id => allOn ? n.delete(id) : n.add(id)); return n; });
+  };
+  const handleBulkDelete = async () => {
+    if (!window.confirm(`Permanently delete ${selectedIds.size} order(s)? This cannot be undone.`)) return;
+    try {
+      await Promise.all([...selectedIds].map(id => orderAPI.delete(id)));
+      toast.success(`${selectedIds.size} order(s) deleted`);
+      setSelectedIds(new Set()); fetchOrders();
+    } catch { toast.error('Some deletions failed'); }
+  };
+
   const sortProps = { sortField, sortDir, onSort: handleSort };
 
   return (
     <AdminLayout>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800 }}>📦 <span className="gradient-text">Manage Orders</span></h1>
+      <div className="admin-header">
+        <h1>📦 <span className="gradient-text">Manage Orders</span></h1>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <div style={{ background: '#f0f0ff', borderRadius: 12, padding: '8px 20px', fontSize: 14, fontWeight: 600, color: '#6c63ff' }}>
             {statusFilter ? `${sortedOrders.length} / ${orders.length}` : orders.length} orders
           </div>
-          <button className="btn btn-secondary" onClick={() => handleExport('json')} style={{ fontWeight: 600 }}>📤 JSON</button>
-          <button className="btn btn-secondary" onClick={() => handleExport('csv')} style={{ fontWeight: 600 }}>📤 CSV</button>
-          <button className="btn btn-secondary" onClick={() => setImportModal(true)} style={{ fontWeight: 600 }}>📥 Import</button>
         </div>
       </div>
 
@@ -151,10 +142,23 @@ export default function ManageOrders() {
         ))}
       </div>
 
+      {selectedIds.size > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', background: '#fff0f0', borderRadius: 12, marginBottom: 14, border: '2px solid #ffcccc', flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: 700, fontSize: 14, color: '#c62828' }}>{selectedIds.size} selected</span>
+          <button className="btn btn-sm btn-danger" onClick={handleBulkDelete}>🗑 Delete Selected</button>
+          <button className="btn btn-sm" style={{ background: '#f5f5f5', color: '#636e72' }} onClick={() => setSelectedIds(new Set())}>✕ Deselect All</button>
+        </div>
+      )}
+
       <div className="table-container animate-fade">
         <table>
           <thead>
             <tr>
+              <th style={{ width: 44 }}>
+                <input type="checkbox" style={{ width: 16, height: 16, accentColor: '#6c63ff', cursor: 'pointer' }}
+                  checked={paginated.length > 0 && paginated.every(o => selectedIds.has(o._id))}
+                  onChange={toggleSelectAll} />
+              </th>
               <th>#</th>
               <th>Order ID</th>
               <SortTh label="Customer" field="user.name" {...sortProps} />
@@ -168,11 +172,13 @@ export default function ManageOrders() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={9} style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</td></tr>
+              <tr><td colSpan={10} style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</td></tr>
             ) : paginated.length === 0 ? (
-              <tr><td colSpan={9} style={{ textAlign: 'center', padding: 40, color: '#9e9e9e' }}>No orders found.</td></tr>
+              <tr><td colSpan={10} style={{ textAlign: 'center', padding: 40, color: '#9e9e9e' }}>No orders found.</td></tr>
             ) : paginated.map((order, i) => (
               <tr key={order._id}>
+                <td><input type="checkbox" style={{ width: 16, height: 16, accentColor: '#6c63ff', cursor: 'pointer' }}
+                  checked={selectedIds.has(order._id)} onChange={() => toggleSelect(order._id)} /></td>
                 <td style={{ color: '#636e72' }}>{(page - 1) * PAGE_SIZE + i + 1}</td>
                 <td><span style={{ fontFamily: 'monospace', color: '#6c63ff', fontWeight: 600 }}>#{order._id.slice(-8).toUpperCase()}</span></td>
                 <td>
@@ -201,10 +207,6 @@ export default function ManageOrders() {
       </div>
 
       <Paginator page={page} totalPages={totalPages} onPage={setPage} />
-
-      {importModal && (
-        <ImportModal entityName="Orders" onImport={handleImport} onClose={() => setImportModal(false)} />
-      )}
 
       {modal && selectedOrder && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000, padding: 24 }}>

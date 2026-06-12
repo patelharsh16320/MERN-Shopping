@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import AdminLayout from './AdminLayout';
 import { productAPI, categoryAPI, uploadAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
-import ImportModal from './ImportModal';
 
 const emptyForm = { name: '', description: '', price: '', originalPrice: '', discount: 0, category: '', subcategory: '', images: [''], stock: '', totalStock: '', rating: 0, numReviews: 0, isFeatured: false, freshnessDays: 365, weight: '200g', brand: 'Women HubClub', tags: '', status: 'published' };
 const PROD_COLS = ['Category', 'Price', 'Stock', 'Rating', 'Featured', 'Reviews'];
@@ -69,7 +68,7 @@ export default function ManageProducts() {
   const [sortField, setSortField] = useState('');
   const [sortDir, setSortDir] = useState('asc');
   const [categories, setCategories] = useState([]);
-  const [importModal, setImportModal] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
 
   useEffect(() => {
     categoryAPI.getAll().then(({ data }) => setCategories(data)).catch(() => {});
@@ -136,25 +135,6 @@ export default function ManageProducts() {
   };
 
   useEffect(() => { fetchProducts(); }, []);
-
-  const handleExport = async (format) => {
-    try {
-      const { data } = await productAPI.exportAll(format);
-      const isCSV = format === 'csv';
-      const blob = new Blob([isCSV ? data : JSON.stringify(data, null, 2)], { type: isCSV ? 'text/csv' : 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = `products-${new Date().toISOString().slice(0, 10)}.${format}`;
-      a.click(); URL.revokeObjectURL(url);
-      toast.success(`Exported ${isCSV ? '' : data.length + ' '}products as ${format.toUpperCase()}`);
-    } catch { toast.error('Export failed'); }
-  };
-
-  const handleImport = async (items, duplicateAction) => {
-    const { data } = await productAPI.importAll(items, duplicateAction);
-    fetchProducts();
-    return data;
-  };
 
   const openAdd = () => { setEditing(null); setForm(emptyForm); setModal(true); };
   const openEdit = (p) => {
@@ -225,19 +205,46 @@ export default function ManageProducts() {
     }
   };
 
+  const toggleSelect = id => setSelectedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const toggleSelectAll = () => {
+    const ids = paginated.map(p => p._id);
+    const allOn = ids.length > 0 && ids.every(id => selectedIds.has(id));
+    setSelectedIds(prev => { const n = new Set(prev); ids.forEach(id => allOn ? n.delete(id) : n.add(id)); return n; });
+  };
+  const handleBulkTrash = async () => {
+    if (!window.confirm(`Move ${selectedIds.size} product(s) to Trash? They will be deleted after 30 days.`)) return;
+    try {
+      await Promise.all([...selectedIds].map(id => productAPI.update(id, { status: 'trash' })));
+      toast.success(`${selectedIds.size} product(s) moved to Trash`);
+      setSelectedIds(new Set()); fetchProducts();
+    } catch { toast.error('Some operations failed'); }
+  };
+  const handleBulkDeleteForever = async () => {
+    if (!window.confirm(`Permanently delete ${selectedIds.size} product(s)? This cannot be undone.`)) return;
+    try {
+      await Promise.all([...selectedIds].map(id => productAPI.delete(id)));
+      toast.success(`${selectedIds.size} product(s) permanently deleted`);
+      setSelectedIds(new Set()); fetchProducts();
+    } catch { toast.error('Some deletions failed'); }
+  };
+  const handleBulkRestore = async () => {
+    try {
+      await Promise.all([...selectedIds].map(id => productAPI.update(id, { status: 'published' })));
+      toast.success(`${selectedIds.size} product(s) restored`);
+      setSelectedIds(new Set()); fetchProducts();
+    } catch { toast.error('Some operations failed'); }
+  };
+
   const sortProps = { sortField, sortDir, onSort: handleSort };
 
   return (
     <AdminLayout>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800 }}>🌸 <span className="gradient-text">Manage Products</span></h1>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+      <div className="admin-header">
+        <h1>🌸 <span className="gradient-text">Manage Products</span></h1>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ background: '#f0f0ff', borderRadius: 12, padding: '8px 20px', fontSize: 14, fontWeight: 600, color: '#6c63ff' }}>
             {search || statusFilter !== 'all' ? `${sortedProducts.length} / ${products.length}` : products.length} products
           </div>
-          <button className="btn btn-secondary" onClick={() => handleExport('json')} style={{ fontWeight: 600 }}>📤 JSON</button>
-          <button className="btn btn-secondary" onClick={() => handleExport('csv')} style={{ fontWeight: 600 }}>📤 CSV</button>
-          <button className="btn btn-secondary" onClick={() => setImportModal(true)} style={{ fontWeight: 600 }}>📥 Import</button>
           <button className="btn btn-primary" onClick={openAdd}>+ Add Product</button>
         </div>
       </div>
@@ -245,7 +252,7 @@ export default function ManageProducts() {
       {/* Status tabs */}
       <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
         {STATUS_TABS.map(tab => (
-          <button key={tab.key} onClick={() => { setStatusFilter(tab.key); setPage(1); }}
+          <button key={tab.key} onClick={() => { setStatusFilter(tab.key); setPage(1); setSelectedIds(new Set()); }}
             style={{ padding: '6px 16px', borderRadius: 20, border: `2px solid ${statusFilter === tab.key ? '#6c63ff' : '#e0e0e0'}`, background: statusFilter === tab.key ? '#f0f0ff' : 'white', color: statusFilter === tab.key ? '#6c63ff' : '#636e72', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>
             {tab.label}
             <span style={{ marginLeft: 6, padding: '1px 7px', borderRadius: 10, background: statusFilter === tab.key ? '#6c63ff' : '#f0f0f0', color: statusFilter === tab.key ? 'white' : '#9e9e9e', fontSize: 11, fontWeight: 700 }}>
@@ -268,10 +275,33 @@ export default function ManageProducts() {
         </div>
       </div>
 
+      {selectedIds.size > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', background: '#fff0f0', borderRadius: 12, marginBottom: 14, border: '2px solid #ffcccc', flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: 700, fontSize: 14, color: '#c62828' }}>{selectedIds.size} selected</span>
+          {statusFilter === 'trash' ? (
+            <>
+              <button className="btn btn-sm" style={{ background: '#f0fdf4', color: '#00b894' }} onClick={handleBulkRestore}>↩ Restore Selected</button>
+              <button className="btn btn-sm btn-danger" onClick={handleBulkDeleteForever}>🗑 Delete Forever</button>
+            </>
+          ) : (
+            <>
+              <button className="btn btn-sm" style={{ background: '#fff8f0', color: '#e17055', border: '1px solid #ffd5c2' }} onClick={handleBulkTrash}>🗑 Trash Selected</button>
+              <button className="btn btn-sm btn-danger" onClick={handleBulkDeleteForever}>🗑 Delete Forever</button>
+            </>
+          )}
+          <button className="btn btn-sm" style={{ background: '#f5f5f5', color: '#636e72' }} onClick={() => setSelectedIds(new Set())}>✕ Deselect All</button>
+        </div>
+      )}
+
       <div className="table-container animate-fade">
         <table>
           <thead>
             <tr>
+              <th style={{ width: 44 }}>
+                <input type="checkbox" style={{ width: 16, height: 16, accentColor: '#6c63ff', cursor: 'pointer' }}
+                  checked={paginated.length > 0 && paginated.every(p => selectedIds.has(p._id))}
+                  onChange={toggleSelectAll} />
+              </th>
               <th>#</th>
               <th>Image</th>
               <SortTh label="Name" field="name" {...sortProps} />
@@ -287,15 +317,17 @@ export default function ManageProducts() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={11} style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</td></tr>
+              <tr><td colSpan={6 + Object.values(visibleCols).filter(Boolean).length} style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</td></tr>
             ) : paginated.length === 0 ? (
-              <tr><td colSpan={11} style={{ textAlign: 'center', padding: 40, color: '#9e9e9e' }}>No products found.</td></tr>
+              <tr><td colSpan={6 + Object.values(visibleCols).filter(Boolean).length} style={{ textAlign: 'center', padding: 40, color: '#9e9e9e' }}>No products found.</td></tr>
             ) : paginated.map((p, i) => {
               const reviewCount = p.reviews?.length ?? p.numReviews ?? 0;
               const status = p.status || 'published';
               const isTrash = status === 'trash';
               return (
                 <tr key={p._id} style={isTrash ? { opacity: 0.65, background: '#fff8f8' } : {}}>
+                  <td><input type="checkbox" style={{ width: 16, height: 16, accentColor: '#6c63ff', cursor: 'pointer' }}
+                    checked={selectedIds.has(p._id)} onChange={() => toggleSelect(p._id)} /></td>
                   <td style={{ color: '#636e72' }}>{(page - 1) * PAGE_SIZE + i + 1}</td>
                   <td>
                     <div style={{ position: 'relative', display: 'inline-block' }}>
@@ -433,10 +465,6 @@ export default function ManageProducts() {
             </div>
           </div>
         </div>
-      )}
-
-      {importModal && (
-        <ImportModal entityName="Products" onImport={handleImport} onClose={() => setImportModal(false)} />
       )}
 
       {modal && (

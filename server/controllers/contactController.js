@@ -55,4 +55,38 @@ const deleteContact = async (req, res) => {
   }
 };
 
-module.exports = { submitContact, getContacts, markRead, deleteContact };
+const getMyContacts = async (req, res) => {
+  try {
+    const contacts = await Contact.find({ email: req.user.email }).sort({ createdAt: -1 });
+    res.json({ contacts });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const replyContact = async (req, res) => {
+  try {
+    const { message } = req.body;
+    if (!message?.trim()) return res.status(400).json({ message: 'Reply is required' });
+    const contact = await Contact.findByIdAndUpdate(
+      req.params.id,
+      { $push: { replies: { message: message.trim() } }, isRead: true },
+      { new: true }
+    );
+    if (!contact) return res.status(404).json({ message: 'Not found' });
+    res.json(contact);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const getContactStats = async (req, res) => {
+  try {
+    const unread = await Contact.countDocuments({ isRead: false });
+    res.json({ unread });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { submitContact, getContacts, getMyContacts, markRead, deleteContact, replyContact, getContactStats };
