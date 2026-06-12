@@ -3,7 +3,11 @@ import AdminLayout from './AdminLayout';
 import { productAPI, categoryAPI, uploadAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
 
-const emptyForm = { name: '', description: '', price: '', originalPrice: '', discount: 0, category: '', subcategory: '', images: [''], stock: '', totalStock: '', rating: 0, numReviews: 0, isFeatured: false, freshnessDays: 365, weight: '200g', brand: 'Women HubClub', tags: '', status: 'published' };
+const emptyForm = { name: '', slug: '', description: '', price: '', originalPrice: '', discount: 0, category: '', subcategory: '', images: [''], stock: '', totalStock: '', rating: 0, numReviews: 0, isFeatured: false, freshnessDays: 365, weight: '200g', brand: 'Women HubClub', tags: '', status: 'published' };
+
+function autoSlug(name) {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
 const PROD_COLS = ['Category', 'Price', 'Stock', 'Rating', 'Featured', 'Reviews'];
 const PAGE_SIZE = 10;
 const STATUS_TABS = [
@@ -139,7 +143,7 @@ export default function ManageProducts() {
   const openAdd = () => { setEditing(null); setForm(emptyForm); setModal(true); };
   const openEdit = (p) => {
     setEditing(p._id);
-    setForm({ ...emptyForm, ...p, images: p.images?.length ? p.images : [''], tags: p.tags?.join(', ') || '', totalStock: p.totalStock || p.stock || '', subcategory: p.subcategory || '', status: p.status || 'published' });
+    setForm({ ...emptyForm, ...p, slug: p.slug || '', images: p.images?.length ? p.images : [''], tags: p.tags?.join(', ') || '', totalStock: p.totalStock || p.stock || '', subcategory: p.subcategory || '', status: p.status || 'published' });
     setModal(true);
   };
 
@@ -148,6 +152,7 @@ export default function ManageProducts() {
     setSaving(true);
     try {
       const payload = { ...form, category: form.category || 'General', tags: form.tags ? form.tags.split(',').map(t => t.trim()) : [], images: form.images.filter(Boolean) };
+      if (!payload.slug) delete payload.slug;
       if (!payload.totalStock) payload.totalStock = payload.stock;
       if (editing) { await productAPI.update(editing, payload); toast.success('Product updated!'); }
       else { await productAPI.create(payload); toast.success('Product created!'); }
@@ -339,7 +344,10 @@ export default function ManageProducts() {
                       )}
                     </div>
                   </td>
-                  <td style={{ fontWeight: 600, maxWidth: 200 }}>{p.name}</td>
+                  <td style={{ maxWidth: 220 }}>
+                    <div style={{ fontWeight: 600 }}>{p.name}</div>
+                    {p.slug && <div style={{ fontSize: 11, color: '#9e9e9e', fontFamily: 'monospace', marginTop: 2 }}>/{p.slug}</div>}
+                  </td>
                   <td>
                     <span style={{ display: 'inline-block', padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 700, background: STATUS_BG[status] || '#f5f5f5', color: STATUS_COLORS[status] || '#636e72', textTransform: 'capitalize', border: `1px solid ${STATUS_COLORS[status] || '#e0e0e0'}33` }}>
                       {status}
@@ -374,7 +382,13 @@ export default function ManageProducts() {
                     </td>
                   )}
                   <td>
-                    <div style={{ display: 'flex', gap: 8 }}>
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      <a href={`/products/${p.slug || p._id}`} target="_blank" rel="noreferrer"
+                        className="btn btn-sm"
+                        style={{ background: '#e8f5e9', color: '#00897b', borderRadius: 20, textDecoration: 'none', whiteSpace: 'nowrap' }}
+                        title={`/products/${p.slug || p._id}`}>
+                        🔗 View
+                      </a>
                       {isTrash ? (
                         <>
                           <button className="btn btn-sm" style={{ background: '#f0fdf4', color: '#00b894', borderRadius: 20, whiteSpace: 'nowrap' }} onClick={() => handleRestore(p._id)}>↩ Restore</button>
@@ -479,6 +493,36 @@ export default function ManageProducts() {
                 <div className="form-group" style={{ gridColumn: 'span 2' }}>
                   <label className="form-label">Product Name *</label>
                   <input className="form-input" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
+                </div>
+                <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                  <label className="form-label">
+                    URL Slug
+                    <span style={{ fontWeight: 400, fontSize: 12, color: '#9e9e9e', marginLeft: 8 }}>auto-generated from name — edit to customise</span>
+                  </label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 0, border: '1.5px solid #e0e0e0', borderRadius: 10, overflow: 'hidden', background: 'white', focusWithin: { borderColor: '#6c63ff' } }}>
+                    <span style={{ padding: '10px 12px', background: '#f5f5f5', color: '#9e9e9e', fontSize: 13, whiteSpace: 'nowrap', borderRight: '1px solid #e0e0e0', lineHeight: 1 }}>
+                      /products/
+                    </span>
+                    <input
+                      className="form-input"
+                      style={{ border: 'none', borderRadius: 0, flex: 1, outline: 'none', boxShadow: 'none', fontSize: 14, fontFamily: 'monospace' }}
+                      placeholder={form.name ? autoSlug(form.name) : 'product-url-slug'}
+                      value={form.slug}
+                      onChange={e => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}
+                    />
+                    {form.slug && (
+                      <button type="button" title="Clear (auto-regenerate from name)"
+                        onClick={() => setForm({ ...form, slug: '' })}
+                        style={{ padding: '10px 12px', background: 'none', border: 'none', color: '#9e9e9e', cursor: 'pointer', fontSize: 14, lineHeight: 1 }}>
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                  <div style={{ fontSize: 12, color: '#9e9e9e', marginTop: 4 }}>
+                    Preview: <span style={{ fontFamily: 'monospace', color: '#6c63ff' }}>
+                      {window.location.origin}/products/{form.slug || (form.name ? autoSlug(form.name) : '...')}
+                    </span>
+                  </div>
                 </div>
                 <div className="form-group" style={{ gridColumn: 'span 2' }}>
                   <label className="form-label">Description *</label>

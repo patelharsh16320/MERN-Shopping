@@ -137,28 +137,33 @@ Import/Export – Centralized Page
 
 Admin coupen code page - for create coupen code
 
-<!-- !------ Checking-----!  -->
-
-<!-- !------ Working-----!  -->
 Admin Messaging System
 - The admin should be able to reply to user messages.
 - When the admin replies, the message should be delivered to the user’s inbox.
 - A dedicated Messages page should be shown inside the user’s Profile panel.
 - The profile panel should display a notification count (e.g., “You have X messages”) to indicate unread messages.
 
+<!-- !------ Checking-----!  -->
+
 - contact support button show where admin and user can contaact with each other, like support system    
 
-<!-- !------ Reaming-----!  -->
-init 
 
-Comment Management
-- Admin can manage all blog comments.
-- Comments can be set to Approved or Deleted.
+<!-- !------ Working-----!  -->
 
 Product Page & URLs
 - Product page URLs should be automatically created by default.
 - Admin should have the option to update product URLs.
 - Admin product page should include a direct link to view the single product page.
+
+<!-- !------ Reaming-----!  -->
+init 
+
+Make a new page for admin, where admin can see all new features, before and after.
+
+Comment Management
+- Admin can manage all blog comments.
+- Comments can be set to Approved or Deleted.
+
 
 Order Management Features
 - Add private notes to the order

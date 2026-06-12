@@ -48,6 +48,7 @@ export default function ManageCategories() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(new Set());
   const [visibleCols, setVisibleCols] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem('admin_cols_categories') || '{}');
@@ -147,6 +148,32 @@ export default function ManageCategories() {
     } catch { toast.error('Update failed'); }
   };
 
+  const toggleSelect = (id) => setSelectedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+  const toggleSelectAll = () => {
+    const ids = paginated.filter(c => !c.isDefault).map(c => c._id);
+    const allOn = ids.length > 0 && ids.every(id => selectedIds.has(id));
+    setSelectedIds(prev => { const n = new Set(prev); ids.forEach(id => allOn ? n.delete(id) : n.add(id)); return n; });
+  };
+  const handleBulkDelete = async () => {
+    const deletable = [...selectedIds].filter(id => !categories.find(c => c._id === id && c.isDefault));
+    if (deletable.length === 0) { toast.warning('Cannot delete default categories'); return; }
+    if (!window.confirm(`Delete ${deletable.length} category/categories? Products using them will keep their existing value.`)) return;
+    try {
+      await Promise.all(deletable.map(id => categoryAPI.delete(id)));
+      toast.success(`${deletable.length} category/categories deleted`);
+      setSelectedIds(new Set()); fetchCategories();
+    } catch { toast.error('Some deletions failed'); }
+  };
+  const handleBulkSetActive = async (isActive) => {
+    const targets = [...selectedIds].filter(id => !categories.find(c => c._id === id && c.isDefault));
+    if (targets.length === 0) { toast.warning('No eligible categories selected'); return; }
+    try {
+      await Promise.all(targets.map(id => categoryAPI.update(id, { isActive })));
+      toast.success(`${targets.length} ${isActive ? 'activated' : 'deactivated'}`);
+      setSelectedIds(new Set()); fetchCategories();
+    } catch { toast.error('Some updates failed'); }
+  };
+
   const sortProps = { sortField, sortDir, onSort: handleSort };
 
   return (
@@ -159,8 +186,18 @@ export default function ManageCategories() {
         </div>
       </div>
 
+      {selectedIds.size > 0 && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', background: '#f0f4ff', borderRadius: 12, marginBottom: 14, border: '2px solid #c5cae9', flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: 700, fontSize: 14, color: '#3949ab' }}>{selectedIds.size} selected</span>
+          <button className="btn btn-sm" style={{ background: '#e8f5e9', color: '#2e7d32', border: '1px solid #a5d6a7' }} onClick={() => handleBulkSetActive(true)}>✅ Activate</button>
+          <button className="btn btn-sm" style={{ background: '#fff8e1', color: '#f57f17', border: '1px solid #ffe082' }} onClick={() => handleBulkSetActive(false)}>⏸ Deactivate</button>
+          <button className="btn btn-sm btn-danger" onClick={handleBulkDelete}>🗑 Delete</button>
+          <button className="btn btn-sm" style={{ background: '#f5f5f5', color: '#636e72' }} onClick={() => setSelectedIds(new Set())}>✕ Deselect All</button>
+        </div>
+      )}
+
       <div style={{ marginBottom: 16, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-        <input className="form-input" placeholder="Search categories..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} style={{ maxWidth: 320 }} />
+        <input className="form-input" placeholder="Search categories..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); setSelectedIds(new Set()); }} style={{ maxWidth: 320 }} />
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
           <span style={{ fontSize: 13, color: '#9e9e9e', fontWeight: 600 }}>Columns:</span>
           {CAT_COLS.map(col => (
@@ -176,6 +213,11 @@ export default function ManageCategories() {
         <table>
           <thead>
             <tr>
+              <th style={{ width: 44 }}>
+                <input type="checkbox" style={{ width: 16, height: 16, accentColor: '#6c63ff', cursor: 'pointer' }}
+                  checked={paginated.filter(c => !c.isDefault).length > 0 && paginated.filter(c => !c.isDefault).every(c => selectedIds.has(c._id))}
+                  onChange={toggleSelectAll} />
+              </th>
               <th>#</th>
               <SortTh label="Name" field="name" {...sortProps} />
               {visibleCols['Description'] && <th>Description</th>}
@@ -188,11 +230,13 @@ export default function ManageCategories() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={9} style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</td></tr>
+              <tr><td colSpan={10} style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</td></tr>
             ) : paginated.length === 0 ? (
-              <tr><td colSpan={9} style={{ textAlign: 'center', padding: 40, color: '#9e9e9e' }}>No categories found.</td></tr>
+              <tr><td colSpan={10} style={{ textAlign: 'center', padding: 40, color: '#9e9e9e' }}>No categories found.</td></tr>
             ) : paginated.map((cat, i) => (
               <tr key={cat._id} style={{ opacity: cat.isActive ? 1 : 0.55 }}>
+                <td>{!cat.isDefault && <input type="checkbox" style={{ width: 16, height: 16, accentColor: '#6c63ff', cursor: 'pointer' }}
+                  checked={selectedIds.has(cat._id)} onChange={() => toggleSelect(cat._id)} />}</td>
                 <td style={{ color: '#636e72' }}>{(page - 1) * PAGE_SIZE + i + 1}</td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

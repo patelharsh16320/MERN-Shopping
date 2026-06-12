@@ -137,6 +137,17 @@ export default function ManageUsers() {
     } catch { toast.error('Some deletions failed'); }
   };
 
+  const handleBulkSetActive = async (isActive) => {
+    const targets = [...selectedIds].filter(id => !users.find(u => u._id === id && u.role === 'admin'));
+    if (targets.length === 0) { toast.warning('No eligible users selected'); return; }
+    try {
+      await Promise.all(targets.map(id => userAPI.update(id, { isActive })));
+      toast.success(`${targets.length} user(s) ${isActive ? 'activated' : 'deactivated'}`);
+      setSelectedIds(new Set());
+      fetchUsers();
+    } catch { toast.error('Some updates failed'); }
+  };
+
   const sortProps = { sortField, sortDir, onSort: handleSort };
 
   return (
@@ -151,9 +162,11 @@ export default function ManageUsers() {
       </div>
 
       {selectedIds.size > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', background: '#fff0f0', borderRadius: 12, marginBottom: 14, border: '2px solid #ffcccc', flexWrap: 'wrap' }}>
-          <span style={{ fontWeight: 700, fontSize: 14, color: '#c62828' }}>{selectedIds.size} selected</span>
-          <button className="btn btn-sm btn-danger" onClick={handleBulkDelete}>🗑 Delete Selected</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', background: '#f0f4ff', borderRadius: 12, marginBottom: 14, border: '2px solid #c5cae9', flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: 700, fontSize: 14, color: '#3949ab' }}>{selectedIds.size} selected</span>
+          <button className="btn btn-sm" style={{ background: '#e8f5e9', color: '#2e7d32', border: '1px solid #a5d6a7' }} onClick={() => handleBulkSetActive(true)}>✅ Activate</button>
+          <button className="btn btn-sm" style={{ background: '#fff8e1', color: '#f57f17', border: '1px solid #ffe082' }} onClick={() => handleBulkSetActive(false)}>⏸ Deactivate</button>
+          <button className="btn btn-sm btn-danger" onClick={handleBulkDelete}>🗑 Delete</button>
           <button className="btn btn-sm" style={{ background: '#f5f5f5', color: '#636e72' }} onClick={() => setSelectedIds(new Set())}>✕ Deselect All</button>
         </div>
       )}

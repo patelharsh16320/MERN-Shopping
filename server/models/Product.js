@@ -41,12 +41,22 @@ function generateSlug(name) {
 }
 
 productSchema.pre('save', async function (next) {
-  if (this.isModified('name') || !this.slug) {
-    let baseSlug = generateSlug(this.name);
-    let slug = baseSlug;
+  if (this.isModified('slug') && this.slug) {
+    // Admin set a custom slug — sanitize and ensure uniqueness
+    let base = generateSlug(this.slug);
+    let slug = base;
     let count = 1;
     while (await mongoose.model('Product').findOne({ slug, _id: { $ne: this._id } })) {
-      slug = `${baseSlug}-${count++}`;
+      slug = `${base}-${count++}`;
+    }
+    this.slug = slug;
+  } else if (!this.isModified('slug') && (this.isModified('name') || !this.slug)) {
+    // Auto-generate from name
+    let base = generateSlug(this.name);
+    let slug = base;
+    let count = 1;
+    while (await mongoose.model('Product').findOne({ slug, _id: { $ne: this._id } })) {
+      slug = `${base}-${count++}`;
     }
     this.slug = slug;
   }
