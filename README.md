@@ -155,10 +155,10 @@ Product Page & URLs
 - Admin should have the option to update product URLs.
 - Admin product page should include a direct link to view the single product page.
 
+Make a new page for admin, where admin can see all new features, before and after., also admin need to update URL/slug option for product too
+
 <!-- !------ Reaming-----!  -->
 init 
-
-Make a new page for admin, where admin can see all new features, before and after.
 
 Comment Management
 - Admin can manage all blog comments.

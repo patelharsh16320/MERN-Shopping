@@ -16,6 +16,7 @@ const navItems = [
   { icon: '🎟️', label: 'Coupons', path: '/admin/coupons' },
   { icon: '🔐', label: 'Secure Data', path: '/admin/secure-users' },
   { icon: '📂', label: 'Import / Export', path: '/admin/import-export' },
+  { icon: '✨', label: "What's New", path: '/admin/whats-new' },
 ];
 
 export default function AdminLayout({ children }) {

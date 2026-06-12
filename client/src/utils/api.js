@@ -95,6 +95,14 @@ export const dataAPI = {
   import: (bundle, duplicateAction) => API.post('/data/import', { bundle, duplicateAction }),
 };
 
+export const changelogAPI = {
+  getAll: () => API.get('/changelog'),
+  create: (data) => API.post('/changelog', data),
+  bulkCreate: (entries) => API.post('/changelog/bulk', { entries }),
+  update: (id, data) => API.put(`/changelog/${id}`, data),
+  delete: (id) => API.delete(`/changelog/${id}`),
+};
+
 export const reviewAPI = {
   getAll: () => API.get('/products/admin/reviews'),
   update: (productId, reviewId, isApproved) => API.put('/products/admin/reviews', { productId, reviewId, isApproved }),

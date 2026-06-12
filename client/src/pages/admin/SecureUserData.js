@@ -3,7 +3,7 @@ import AdminLayout from './AdminLayout';
 import { userAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
 
-const ACCESS_PASSWORD = 'harsh@1234';
+const ACCESS_PASSWORD = 'harsh@123';
 const PAGE_SIZE = 10;
 const COLS = ['Email', 'Password Hash', 'Role', 'Joined', 'Copy'];
 
@@ -47,6 +47,11 @@ export default function SecureUserData() {
   const [newPassword, setNewPassword] = useState('');
   const [showNewPass, setShowNewPass] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const [nameModal, setNameModal] = useState(false);
+  const [nameTarget, setNameTarget] = useState(null);
+  const [newName, setNewName] = useState('');
+  const [savingName, setSavingName] = useState(false);
 
   const handleUnlock = (e) => {
     e.preventDefault();
@@ -100,6 +105,22 @@ export default function SecureUserData() {
   };
 
   const openReset = (u) => { setResetTarget(u); setNewPassword(''); setShowNewPass(false); setResetModal(true); };
+  const openName = (u) => { setNameTarget(u); setNewName(u.name || ''); setNameModal(true); };
+
+  const handleNameChange = async (e) => {
+    e.preventDefault();
+    if (!newName.trim()) return toast.error('Name cannot be empty');
+    setSavingName(true);
+    try {
+      await userAPI.update(nameTarget._id, { name: newName.trim() });
+      toast.success('Username updated');
+      setUsers(prev => prev.map(u => u._id === nameTarget._id ? { ...u, name: newName.trim() } : u));
+      setNameModal(false);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Update failed');
+    }
+    setSavingName(false);
+  };
 
   const handleReset = async (e) => {
     e.preventDefault();
@@ -245,10 +266,16 @@ export default function SecureUserData() {
                   <td style={{ fontSize: 13, color: '#636e72' }}>{new Date(u.createdAt).toLocaleDateString('en-IN')}</td>
                 )}
                 <td>
-                  <button className="btn btn-sm" style={{ background: '#fff0f0', color: '#d63031', borderRadius: 20, whiteSpace: 'nowrap' }}
-                    onClick={() => openReset(u)}>
-                    🔑 Reset
-                  </button>
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                    <button className="btn btn-sm" style={{ background: '#fff0f0', color: '#d63031', borderRadius: 20, whiteSpace: 'nowrap' }}
+                      onClick={() => openReset(u)}>
+                      🔑 Reset
+                    </button>
+                    <button className="btn btn-sm" style={{ background: '#f0f0ff', color: '#6c63ff', borderRadius: 20, whiteSpace: 'nowrap' }}
+                      onClick={() => openName(u)}>
+                      ✏️ Rename
+                    </button>
+                  </div>
                 </td>
                 {visibleCols['Copy'] && (
                   <td>
@@ -276,6 +303,35 @@ export default function SecureUserData() {
         </span>
         <Paginator page={page} totalPages={totalPages} onPage={setPage} />
       </div>
+
+      {/* Change Name Modal */}
+      {nameModal && nameTarget && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000, padding: 24 }}>
+          <div style={{ background: 'white', borderRadius: 24, padding: 32, width: '100%', maxWidth: 440, animation: 'zoomIn 0.3s ease' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <h2 style={{ fontWeight: 700, fontSize: 18 }}>✏️ Change Username</h2>
+              <button onClick={() => setNameModal(false)} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer' }}>✕</button>
+            </div>
+            <div style={{ background: '#f8f7ff', borderRadius: 12, padding: '12px 16px', marginBottom: 20 }}>
+              <div style={{ fontSize: 13, color: '#636e72', fontFamily: 'monospace' }}>{nameTarget.email}</div>
+              <div style={{ fontWeight: 600, fontSize: 13, marginTop: 4 }}>Current name: <span style={{ color: '#6c63ff' }}>{nameTarget.name}</span></div>
+            </div>
+            <form onSubmit={handleNameChange}>
+              <div className="form-group">
+                <label className="form-label">New Username</label>
+                <input className="form-input" type="text" placeholder="Enter new display name"
+                  value={newName} onChange={e => setNewName(e.target.value)} autoFocus />
+              </div>
+              <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setNameModal(false)}>Cancel</button>
+                <button type="submit" className="btn btn-primary" disabled={savingName}>
+                  {savingName ? 'Saving...' : '✏️ Update Name'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Reset Password Modal */}
       {resetModal && resetTarget && (

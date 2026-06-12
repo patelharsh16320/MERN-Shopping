@@ -73,6 +73,7 @@ export default function ManageProducts() {
   const [sortDir, setSortDir] = useState('asc');
   const [categories, setCategories] = useState([]);
   const [selectedIds, setSelectedIds] = useState(new Set());
+  const [slugEdit, setSlugEdit] = useState({ id: null, value: '' });
 
   useEffect(() => {
     categoryAPI.getAll().then(({ data }) => setCategories(data)).catch(() => {});
@@ -240,6 +241,17 @@ export default function ManageProducts() {
     } catch { toast.error('Some operations failed'); }
   };
 
+  const handleSlugSave = async (id) => {
+    const val = slugEdit.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+    if (!val) { setSlugEdit({ id: null, value: '' }); return; }
+    try {
+      await productAPI.update(id, { slug: val });
+      toast.success('URL slug updated');
+      fetchProducts();
+    } catch { toast.error('Failed to update slug'); }
+    setSlugEdit({ id: null, value: '' });
+  };
+
   const sortProps = { sortField, sortDir, onSort: handleSort };
 
   return (
@@ -344,9 +356,30 @@ export default function ManageProducts() {
                       )}
                     </div>
                   </td>
-                  <td style={{ maxWidth: 220 }}>
+                  <td style={{ maxWidth: 240 }}>
                     <div style={{ fontWeight: 600 }}>{p.name}</div>
-                    {p.slug && <div style={{ fontSize: 11, color: '#9e9e9e', fontFamily: 'monospace', marginTop: 2 }}>/{p.slug}</div>}
+                    {slugEdit.id === p._id ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }} onClick={e => e.stopPropagation()}>
+                        <span style={{ fontSize: 11, color: '#9e9e9e', fontFamily: 'monospace', flexShrink: 0 }}>/</span>
+                        <input
+                          autoFocus
+                          value={slugEdit.value}
+                          onChange={e => setSlugEdit(s => ({ ...s, value: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') }))}
+                          onKeyDown={e => { if (e.key === 'Enter') handleSlugSave(p._id); if (e.key === 'Escape') setSlugEdit({ id: null, value: '' }); }}
+                          onBlur={() => handleSlugSave(p._id)}
+                          style={{ fontSize: 11, fontFamily: 'monospace', border: '1.5px solid #6c63ff', borderRadius: 6, padding: '2px 6px', width: 140, outline: 'none', color: '#6c63ff' }}
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        title="Click to edit URL slug"
+                        onClick={e => { e.stopPropagation(); setSlugEdit({ id: p._id, value: p.slug || autoSlug(p.name) }); }}
+                        style={{ fontSize: 11, color: '#9e9e9e', fontFamily: 'monospace', marginTop: 3, cursor: 'text', display: 'inline-flex', alignItems: 'center', gap: 3, padding: '2px 6px', borderRadius: 6, border: '1px dashed transparent', transition: 'all 0.15s' }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = '#6c63ff55'; e.currentTarget.style.color = '#6c63ff'; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.color = '#9e9e9e'; }}>
+                        ✏️ /{p.slug || autoSlug(p.name)}
+                      </div>
+                    )}
                   </td>
                   <td>
                     <span style={{ display: 'inline-block', padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 700, background: STATUS_BG[status] || '#f5f5f5', color: STATUS_COLORS[status] || '#636e72', textTransform: 'capitalize', border: `1px solid ${STATUS_COLORS[status] || '#e0e0e0'}33` }}>

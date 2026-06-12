@@ -43,6 +43,7 @@ import ManageReviews from './pages/admin/ManageReviews';
 import ManageCoupons from './pages/admin/ManageCoupons';
 import SecureUserData from './pages/admin/SecureUserData';
 import ImportExport from './pages/admin/ImportExport';
+import WhatsNew from './pages/admin/WhatsNew';
 
 function VisitTracker() {
   const location = useLocation();
@@ -85,6 +86,7 @@ function App() {
             <Route path="/admin/coupons" element={<ManageCoupons />} />
             <Route path="/admin/secure-users" element={<SecureUserData />} />
             <Route path="/admin/import-export" element={<ImportExport />} />
+            <Route path="/admin/whats-new" element={<WhatsNew />} />
 
             {/* Auth routes */}
             <Route path="/login" element={<Login />} />
