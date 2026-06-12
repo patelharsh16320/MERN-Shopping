@@ -158,7 +158,6 @@ Discount & Promotion Management
 
 - contact support button show where admin and user can contaact with each other, like support system    
 
-
 <!-- !------ Working-----!  -->
 
 Order Management Features
@@ -170,8 +169,6 @@ Site Analytics
 - Store Site Analytics data in the database.
 - Admin should be able to view both the latest analytics and previously stored data upon login.
 
-init 
-
 Comment Management
 - Admin can manage all blog comments.
 - Comments can be set to Approved or Deleted.
@@ -179,7 +176,7 @@ Comment Management
 
 <!-- !------ Reaming-----!  -->
 
-
+init 
 
 <!-- !------ ignore-----!  -->
 
