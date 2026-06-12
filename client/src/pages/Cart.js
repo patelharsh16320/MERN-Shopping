@@ -2,28 +2,46 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { couponAPI } from '../utils/api';
 import { toast } from 'react-toastify';
 
 export default function Cart() {
   const { cartItems, removeFromCart, updateQuantity, clearCart, totalPrice, totalItems } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [promoCode, setPromoCode] = useState('');
-  const [promoApplied, setPromoApplied] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [couponData, setCouponData] = useState(null);
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponLoading, setCouponLoading] = useState(false);
 
-  const handlePromo = () => {
-    if (promoCode.toUpperCase() === 'WELCOME10') { setPromoApplied(true); toast.success('🎉 Promo applied! 10% off your order.'); }
-    else toast.error('Invalid promo code');
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return toast.error('Enter a coupon code');
+    setCouponLoading(true);
+    try {
+      const { data } = await couponAPI.validate(couponCode.trim(), totalPrice);
+      setCouponData(data.coupon);
+      setCouponDiscount(data.discount);
+      toast.success(`🎉 Coupon "${data.coupon.code}" applied! You save ₹${data.discount}`);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Invalid coupon code');
+    }
+    setCouponLoading(false);
+  };
+
+  const handleRemoveCoupon = () => {
+    setCouponData(null);
+    setCouponDiscount(0);
+    setCouponCode('');
+    toast.info('Coupon removed');
   };
 
   const shipping = totalPrice > 999 ? 0 : 49;
   const tax = Math.round(totalPrice * 0.18);
-  const discount = promoApplied ? Math.round(totalPrice * 0.10) : 0;
-  const total = totalPrice + shipping + tax - discount;
+  const total = totalPrice + shipping + tax - couponDiscount;
 
   const handleCheckout = () => {
     if (!user) { toast.warning('Please login to continue'); navigate('/login'); return; }
-    navigate('/checkout');
+    navigate('/checkout', { state: couponData ? { coupon: { id: couponData._id, code: couponData.code, discount: couponDiscount } } : undefined });
   };
 
   if (cartItems.length === 0) return (
@@ -86,15 +104,40 @@ export default function Cart() {
             <div className="summary-row"><span>Subtotal ({totalItems} items)</span><span>₹{totalPrice.toLocaleString()}</span></div>
             <div className="summary-row"><span>Delivery</span><span style={{ color: shipping === 0 ? '#00b894' : 'inherit' }}>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span></div>
             <div className="summary-row"><span>GST (18%)</span><span>₹{tax}</span></div>
-            {promoApplied && <div className="summary-row" style={{ color: '#388e3c' }}><span>Promo (WELCOME10)</span><span>−₹{discount}</span></div>}
+            {couponData && (
+              <div className="summary-row" style={{ color: '#388e3c' }}>
+                <span>🎟️ Coupon ({couponData.code})</span>
+                <span>−₹{couponDiscount.toLocaleString()}</span>
+              </div>
+            )}
             <div className="summary-total"><span>Total Amount</span><span className="gradient-text">₹{total.toLocaleString()}</span></div>
-            {totalPrice > 0 && <div style={{ fontSize: 13, color: '#00b894', marginTop: 6, textAlign: 'right' }}>You save ₹{(cartItems.reduce((s, i) => s + (i.originalPrice - i.price) * i.quantity, 0) + discount).toLocaleString()}</div>}
+            {totalPrice > 0 && <div style={{ fontSize: 13, color: '#00b894', marginTop: 6, textAlign: 'right' }}>You save ₹{(cartItems.reduce((s, i) => s + ((i.originalPrice || i.price) - i.price) * i.quantity, 0) + couponDiscount).toLocaleString()}</div>}
 
-            {/* Promo code */}
-            {!promoApplied && (
-              <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-                <input className="form-input" placeholder="Promo code" value={promoCode} onChange={e => setPromoCode(e.target.value)} style={{ flex: 1, padding: '10px 14px', fontSize: 13 }} />
-                <button className="btn btn-secondary btn-sm" onClick={handlePromo} style={{ whiteSpace: 'nowrap' }}>Apply</button>
+            {/* Coupon code */}
+            {!couponData ? (
+              <div style={{ marginTop: 16 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#636e72', marginBottom: 8 }}>🎟️ Have a coupon code?</div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input className="form-input" placeholder="Enter coupon code"
+                    value={couponCode} onChange={e => setCouponCode(e.target.value.toUpperCase())}
+                    onKeyDown={e => e.key === 'Enter' && handleApplyCoupon()}
+                    style={{ flex: 1, padding: '10px 14px', fontSize: 13, fontFamily: 'monospace', letterSpacing: 1 }} />
+                  <button className="btn btn-secondary btn-sm" onClick={handleApplyCoupon}
+                    disabled={couponLoading} style={{ whiteSpace: 'nowrap' }}>
+                    {couponLoading ? '...' : 'Apply'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#e8f5e9', borderRadius: 12, padding: '10px 14px' }}>
+                <div>
+                  <span style={{ fontWeight: 700, color: '#2e7d32', fontSize: 13 }}>🎟️ {couponData.code}</span>
+                  <div style={{ fontSize: 12, color: '#388e3c' }}>
+                    {couponData.discountType === 'percentage' ? `${couponData.discountValue}% off` : `₹${couponData.discountValue} off`} applied
+                  </div>
+                </div>
+                <button onClick={handleRemoveCoupon}
+                  style={{ background: 'none', border: 'none', color: '#c62828', cursor: 'pointer', fontWeight: 700, fontSize: 18 }}>✕</button>
               </div>
             )}
 

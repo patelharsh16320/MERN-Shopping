@@ -142,9 +142,6 @@ Import/Export – Centralized Page
 - contact support button show where admin and user can contaact with each other, like support system    
 Admin coupen code page - for create coupen code
 
-admin 
-- see all users email id and real password, make secure page, open with only password:harsh@1234
-
 <!-- !------ Reaming-----!  -->
 
 Product Management

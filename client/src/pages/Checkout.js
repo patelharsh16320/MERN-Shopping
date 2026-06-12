@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { orderAPI, authAPI } from '../utils/api';
+import { orderAPI, authAPI, couponAPI } from '../utils/api';
 import { toast } from 'react-toastify';
 
 const paymentMethods = [
@@ -30,6 +30,8 @@ export default function Checkout() {
   const { cartItems, totalPrice, clearCart } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const coupon = location.state?.coupon || null;
 
   const [loading, setLoading]               = useState(false);
   const [address, setAddress]               = useState(emptyAddress);
@@ -44,9 +46,10 @@ export default function Checkout() {
   const [savedCards, setSavedCards]         = useState([]);
   const [selectedCard, setSelectedCard]     = useState(null);
 
-  const shipping = totalPrice > 999 ? 0 : 49;
-  const tax      = Math.round(totalPrice * 0.18);
-  const total    = totalPrice + shipping + tax;
+  const shipping        = totalPrice > 999 ? 0 : 49;
+  const tax             = Math.round(totalPrice * 0.18);
+  const couponDiscount  = coupon?.discount || 0;
+  const total           = totalPrice + shipping + tax - couponDiscount;
 
   const isCOD        = paymentMethod === 'COD';
   const isCard       = paymentMethod === 'Credit Card' || paymentMethod === 'Debit Card';
@@ -150,9 +153,12 @@ export default function Checkout() {
 
       const { data } = await orderAPI.create({
         orderItems, shippingAddress: address, paymentMethod,
-        itemsPrice: totalPrice, shippingPrice: shipping, taxPrice: tax, totalPrice: total,
+        itemsPrice: totalPrice, shippingPrice: shipping, taxPrice: tax,
+        discountPrice: couponDiscount, totalPrice: total,
+        couponCode: coupon?.code || null,
         isPaid: !isCOD, paymentResult,
       });
+      if (coupon?.id) { couponAPI.recordUsage(coupon.id).catch(() => {}); }
       clearCart();
       toast.success('🎉 Order placed successfully!');
       navigate(`/orders/${data._id}`, { state: { fromCheckout: true } });
@@ -431,6 +437,12 @@ export default function Checkout() {
             <div className="summary-row" style={{ marginTop: 8 }}><span>Subtotal</span><span>₹{totalPrice.toLocaleString()}</span></div>
             <div className="summary-row"><span>Shipping</span><span style={{ color: shipping === 0 ? '#00b894' : 'inherit' }}>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span></div>
             <div className="summary-row"><span>GST (18%)</span><span>₹{tax}</span></div>
+            {coupon && (
+              <div className="summary-row" style={{ color: '#388e3c' }}>
+                <span>🎟️ Coupon ({coupon.code})</span>
+                <span>−₹{couponDiscount.toLocaleString()}</span>
+              </div>
+            )}
             <div className="summary-total"><span>Total</span><span className="gradient-text">₹{total.toLocaleString()}</span></div>
             {shipping === 0 && <div style={{ marginTop: 10, padding: '8px 12px', background: '#e8f5e9', borderRadius: 10, fontSize: 12, color: '#2e7d32', fontWeight: 600, textAlign: 'center' }}>🎉 You qualify for free shipping!</div>}
           </div>
