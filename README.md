@@ -135,19 +135,21 @@ Import/Export – Centralized Page
 - When uploading a file, the system should automatically import and restore all data according to its correct path and structure.
 - All other existing Import/Export or JSON/CSV download buttons on individual admin pages must be removed.
 
+Admin coupen code page - for create coupen code
+
 <!-- !------ Checking-----!  -->
 
 <!-- !------ Working-----!  -->
+Admin Messaging System
+- The admin should be able to reply to user messages.
+- When the admin replies, the message should be delivered to the user’s inbox.
+- A dedicated Messages page should be shown inside the user’s Profile panel.
+- The profile panel should display a notification count (e.g., “You have X messages”) to indicate unread messages.
 
 - contact support button show where admin and user can contaact with each other, like support system    
-Admin coupen code page - for create coupen code
 
 <!-- !------ Reaming-----!  -->
-
-Product Management
-- Products can be added to a single category or multiple categories.
-- On the product page, multiple filters can be selected.
-- On the admin product page, multiple dropdowns can be selected.
+init 
 
 Comment Management
 - Admin can manage all blog comments.
@@ -157,8 +159,6 @@ Product Page & URLs
 - Product page URLs should be automatically created by default.
 - Admin should have the option to update product URLs.
 - Admin product page should include a direct link to view the single product page.
-Customer Data
-- Customers can be exported to Excel.
 
 Order Management Features
 - Add private notes to the order
@@ -175,9 +175,7 @@ Site Analytics
 
 <!-- !------ ignore-----!  -->
 
-Admin Messaging System
-- The admin should be able to reply to user messages.
-- When the admin replies, the message should be delivered to the user’s inbox.
-- A dedicated Messages page should be shown inside the user’s Profile panel.
-- The profile panel should display a notification count (e.g., “You have X messages”) to indicate unread messages.
-
+Product Management
+- Products can be added to a single category or multiple categories.
+- On the product page, multiple filters can be selected.
+- On the admin product page, multiple dropdowns can be selected.

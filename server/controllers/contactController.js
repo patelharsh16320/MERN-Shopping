@@ -70,7 +70,7 @@ const replyContact = async (req, res) => {
     if (!message?.trim()) return res.status(400).json({ message: 'Reply is required' });
     const contact = await Contact.findByIdAndUpdate(
       req.params.id,
-      { $push: { replies: { message: message.trim() } }, isRead: true },
+      { $push: { replies: { message: message.trim() } }, isRead: true, userRead: false },
       { new: true }
     );
     if (!contact) return res.status(404).json({ message: 'Not found' });
@@ -89,4 +89,29 @@ const getContactStats = async (req, res) => {
   }
 };
 
-module.exports = { submitContact, getContacts, getMyContacts, markRead, deleteContact, replyContact, getContactStats };
+const getUserStats = async (req, res) => {
+  try {
+    const unread = await Contact.countDocuments({
+      email: req.user.email,
+      userRead: false,
+      'replies.0': { $exists: true },
+    });
+    res.json({ unread });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const markUserRead = async (req, res) => {
+  try {
+    await Contact.findOneAndUpdate(
+      { _id: req.params.id, email: req.user.email },
+      { userRead: true }
+    );
+    res.json({ message: 'Marked as read' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { submitContact, getContacts, getMyContacts, markRead, deleteContact, replyContact, getContactStats, getUserStats, markUserRead };

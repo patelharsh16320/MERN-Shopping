@@ -105,8 +105,10 @@ export const contactAPI = {
   submit: (data) => API.post('/contacts', data),
   getAll: (params) => API.get('/contacts', { params }),
   getStats: () => API.get('/contacts/stats'),
+  getUserStats: () => API.get('/contacts/user-stats'),
   getMine: () => API.get('/contacts/mine'),
   markRead: (id, isRead = true) => API.put(`/contacts/${id}`, { isRead }),
+  markUserRead: (id) => API.put(`/contacts/mine/${id}/read`),
   reply: (id, message) => API.post(`/contacts/${id}/reply`, { message }),
   delete: (id) => API.delete(`/contacts/${id}`),
 };

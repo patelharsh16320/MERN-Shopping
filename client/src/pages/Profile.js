@@ -24,6 +24,13 @@ export default function Profile() {
   const [myMessages, setMyMessages] = useState([]);
   const [msgsLoading, setMsgsLoading] = useState(false);
   const [expandedMsg, setExpandedMsg] = useState(null);
+  const [unreadMsgCount, setUnreadMsgCount] = useState(0);
+
+  useEffect(() => {
+    contactAPI.getUserStats()
+      .then(({ data }) => setUnreadMsgCount(data.unread || 0))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (tab !== 'messages') return;
@@ -116,7 +123,13 @@ export default function Profile() {
               {[['profile', '👤', 'Profile Info'], ['addresses', '📍', 'My Addresses'], ['messages', '💬', 'My Messages']].map(([key, icon, label]) => (
                 <div key={key} onClick={() => setTab(key)}
                   style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', cursor: 'pointer', borderRadius: 12, marginBottom: 4, background: tab === key ? '#e8f5e9' : 'transparent', color: tab === key ? 'var(--primary)' : 'var(--text)', fontWeight: tab === key ? 700 : 500, fontSize: 14, transition: 'all 0.2s' }}>
-                  <span>{icon}</span> {label}
+                  <span>{icon}</span>
+                  <span style={{ flex: 1 }}>{label}</span>
+                  {key === 'messages' && unreadMsgCount > 0 && (
+                    <span style={{ background: '#d63031', color: 'white', borderRadius: 10, padding: '1px 7px', fontSize: 11, fontWeight: 700, minWidth: 18, textAlign: 'center' }}>
+                      {unreadMsgCount > 99 ? '99+' : unreadMsgCount}
+                    </span>
+                  )}
                 </div>
               ))}
               <div className="divider" style={{ margin: '8px 0' }} />
@@ -263,7 +276,14 @@ export default function Profile() {
             )}
             {tab === 'messages' && (
               <div style={{ background: 'white', borderRadius: 24, padding: 36, boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
-                <h2 style={{ fontWeight: 700, marginBottom: 28, fontSize: 22 }}>💬 My Messages</h2>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 12 }}>
+                  <h2 style={{ fontWeight: 700, fontSize: 22, margin: 0 }}>💬 My Messages</h2>
+                  {unreadMsgCount > 0 && (
+                    <div style={{ background: '#fff3e0', border: '1px solid #ffcc02', borderRadius: 12, padding: '8px 16px', fontSize: 13, color: '#e65100', fontWeight: 600 }}>
+                      🔔 You have {unreadMsgCount} unread {unreadMsgCount === 1 ? 'reply' : 'replies'}
+                    </div>
+                  )}
+                </div>
 
                 {msgsLoading ? (
                   <div style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</div>
@@ -275,10 +295,18 @@ export default function Profile() {
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     {myMessages.map(msg => (
-                      <div key={msg._id} style={{ border: '1px solid var(--border)', borderRadius: 16, overflow: 'hidden' }}>
+                      <div key={msg._id} style={{ border: `2px solid ${!msg.userRead && msg.replies?.length > 0 ? '#6c63ff' : 'var(--border)'}`, borderRadius: 16, overflow: 'hidden' }}>
                         {/* Message header */}
                         <div
-                          onClick={() => setExpandedMsg(expandedMsg === msg._id ? null : msg._id)}
+                          onClick={() => {
+                            const isOpening = expandedMsg !== msg._id;
+                            setExpandedMsg(isOpening ? msg._id : null);
+                            if (isOpening && !msg.userRead && msg.replies?.length > 0) {
+                              contactAPI.markUserRead(msg._id).catch(() => {});
+                              setMyMessages(prev => prev.map(m => m._id === msg._id ? { ...m, userRead: true } : m));
+                              setUnreadMsgCount(c => Math.max(0, c - 1));
+                            }
+                          }}
                           style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', cursor: 'pointer', background: expandedMsg === msg._id ? '#f8f7ff' : 'white' }}>
                           {/* Avatar */}
                           <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg,#6c63ff,#fd79a8)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: 18, flexShrink: 0 }}>
@@ -291,8 +319,8 @@ export default function Profile() {
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
                             <div style={{ fontSize: 11, color: '#9e9e9e' }}>{new Date(msg.createdAt).toLocaleDateString('en-IN', { dateStyle: 'medium' })}</div>
                             {msg.replies?.length > 0 && (
-                              <span style={{ background: '#e8f5e9', color: '#558b2f', borderRadius: 10, padding: '2px 8px', fontSize: 11, fontWeight: 700 }}>
-                                {msg.replies.length} {msg.replies.length === 1 ? 'reply' : 'replies'}
+                              <span style={{ background: !msg.userRead ? '#e8f0ff' : '#e8f5e9', color: !msg.userRead ? '#6c63ff' : '#558b2f', borderRadius: 10, padding: '2px 8px', fontSize: 11, fontWeight: 700 }}>
+                                {!msg.userRead ? '🔵 New reply' : `${msg.replies.length} ${msg.replies.length === 1 ? 'reply' : 'replies'}`}
                               </span>
                             )}
                           </div>
