@@ -5,8 +5,9 @@ const Order    = require('../models/Order');
 const Invoice  = require('../models/Invoice');
 const Visit    = require('../models/Visit');
 const Contact  = require('../models/Contact');
+const Coupon   = require('../models/Coupon');
 
-const TYPES = ['products', 'categories', 'users', 'orders', 'invoices', 'analytics', 'contacts', 'reviews'];
+const TYPES = ['products', 'categories', 'users', 'orders', 'invoices', 'analytics', 'contacts', 'reviews', 'coupons'];
 
 const CSV_FIELDS = {
   products:   ['name','description','price','originalPrice','discount','category','subcategory','images','stock','totalStock','rating','numReviews','brand','tags','isActive','isFeatured','weight','freshnessDays','status'],
@@ -16,6 +17,7 @@ const CSV_FIELDS = {
   invoices:   ['invoiceNumber','status','total','subtotal','tax','shipping','paymentMethod','createdAt'],
   contacts:   ['name','email','subject','message','isRead','createdAt'],
   reviews:    ['productName','reviewerName','rating','comment','isApproved','createdAt'],
+  coupons:    ['code','discountType','discountValue','minOrderAmount','maxUsage','usageCount','expiresAt','isActive','createdAt'],
 };
 
 const toCSV = (rows, fields) => {
@@ -106,6 +108,14 @@ async function getData(type, csvMode = false) {
         }
       }
       return out;
+    }
+    case 'coupons': {
+      const rows = await Coupon.find().lean();
+      return rows.map(c => ({
+        code: c.code, discountType: c.discountType, discountValue: c.discountValue,
+        minOrderAmount: c.minOrderAmount, maxUsage: c.maxUsage, usageCount: c.usageCount,
+        expiresAt: c.expiresAt || '', isActive: c.isActive, createdAt: c.createdAt,
+      }));
     }
     default:
       return null;
@@ -266,6 +276,35 @@ const importData = async (req, res) => {
       } catch { skipped++; }
     }
     results.reviews = { imported, skipped };
+  }
+
+  // --- coupons ---
+  if (Array.isArray(bundle.coupons)) {
+    const items = bundle.coupons;
+    let imported = 0, skipped = 0;
+    for (const item of items) {
+      if (!item.code?.trim() || !item.discountType || item.discountValue == null) continue;
+      try {
+        const code = item.code.trim().toUpperCase();
+        const exists = await Coupon.findOne({ code });
+        if (exists) {
+          if (duplicateAction === 'remove') await Coupon.deleteOne({ _id: exists._id });
+          else { skipped++; continue; }
+        }
+        await Coupon.create({
+          code,
+          discountType: item.discountType,
+          discountValue: Number(item.discountValue) || 0,
+          minOrderAmount: Number(item.minOrderAmount) || 0,
+          maxUsage: Number(item.maxUsage) || 0,
+          usageCount: 0,
+          expiresAt: item.expiresAt ? new Date(item.expiresAt) : null,
+          isActive: item.isActive !== false && item.isActive !== 'false',
+        });
+        imported++;
+      } catch { skipped++; }
+    }
+    results.coupons = { imported, skipped };
   }
 
   // analytics + orders + invoices: read-only or complex relational — skipped with note

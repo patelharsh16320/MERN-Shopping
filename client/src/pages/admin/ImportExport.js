@@ -12,9 +12,10 @@ const DATASETS = [
   { key: 'analytics',  label: 'Analytics',  icon: '📈', csv: false },
   { key: 'contacts',   label: 'Messages',   icon: '💬', csv: true },
   { key: 'reviews',    label: 'Reviews',    icon: '⭐', csv: true },
+  { key: 'coupons',    label: 'Coupons',    icon: '🎟️', csv: true },
 ];
 
-const IMPORTABLE = new Set(['products', 'categories', 'users', 'contacts', 'reviews']);
+const IMPORTABLE = new Set(['products', 'categories', 'users', 'contacts', 'reviews', 'coupons']);
 
 function download(content, filename, mime) {
   const blob = new Blob([typeof content === 'string' ? content : JSON.stringify(content, null, 2)], { type: mime });
@@ -202,7 +203,7 @@ export default function ImportExport() {
       <div style={{ background: 'white', borderRadius: 20, padding: 28, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', border: '1px solid #f0f0f0' }}>
         <h2 style={{ fontWeight: 700, fontSize: 18, marginBottom: 6 }}>📥 Import Data</h2>
         <p style={{ color: '#9e9e9e', fontSize: 13, marginBottom: 22 }}>
-          Upload a JSON bundle (all datasets) or a single JSON/CSV file. Importable: Products, Categories, Users, Messages, Reviews.
+          Upload a JSON bundle (all datasets) or a single JSON/CSV file. Importable: Products, Categories, Users, Messages, Reviews, Coupons.
         </p>
 
         {/* Drop zone */}
