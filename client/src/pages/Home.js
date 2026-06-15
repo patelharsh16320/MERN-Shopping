@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { productAPI } from '../utils/api';
+import { productAPI, subscriberAPI } from '../utils/api';
 import ProductCard from '../components/ProductCard';
 import { SkeletonCard } from '../components/Loader';
 import DailyStreak from '../components/DailyStreak';
@@ -118,10 +118,15 @@ export default function Home() {
     return () => { clearInterval(timer); clearInterval(tipTimer); };
   }, []);
 
-  const handleNewsletterSubmit = (e) => {
+  const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
     if (!email) return;
-    toast.success('🎉 Welcome to Women HubClub! Check your inbox for exclusive deals.');
+    try {
+      await subscriberAPI.subscribe(email);
+      toast.success('🎉 Welcome to Women HubClub! Check your inbox for exclusive deals.');
+    } catch {
+      toast.error('Could not subscribe. Please try again.');
+    }
     setEmail('');
   };
 

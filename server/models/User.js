@@ -43,7 +43,14 @@ const userSchema = new mongoose.Schema({
     current: { type: Number, default: 0 },
     longest: { type: Number, default: 0 },
     lastCheckIn: { type: Date, default: null },
-    rewardsClaimed: [{ type: Number }]
+    rewardsClaimed: [{ type: Number }],
+    earnedCoupons: [{
+      code:          { type: String },
+      discountValue: { type: Number },
+      expiresAt:     { type: Date },
+      milestone:     { type: Number },
+      earnedAt:      { type: Date, default: Date.now },
+    }],
   }
 }, { timestamps: true });
 

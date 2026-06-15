@@ -22,33 +22,6 @@ JWT_SECRET=your_jwt_secret_here
 NODE_ENV=development
 ```
 
-Seed credentials — **admin**: `admin@gmail.com / admin@gmail.com` · **users**: `priya@gmail.com / priya@gmail.com` (password = email for all seeded users)
-
----
-
-## Key Design Notes
-
-- **Email locked**: Email cannot be changed after registration. Both `updateProfile` (user) and `updateUser` (admin) intentionally exclude email from updates.
-
-- **Account deactivation**: Admin sets `user.isActive = false` → next API call with that JWT returns `401 { deactivated: true }` → Axios interceptor fires `auth:deactivated` event → `AuthContext` clears session, toasts, redirects to `/login`. Login also blocked for inactive users.
-
-- **Dynamic categories**: Categories live in a MongoDB `Category` collection (not a Product enum). `GET /api/categories` returns each category with a `productCount` via aggregation. The product filter page shows categories with `productCount > 0` as clickable; zero-count categories are greyed out at the bottom.
-
-- **Stock management**: `stock` is decremented on order creation. `totalStock` tracks original stock for admin reference and is not auto-decremented.
-
-- **Invoice auto-generation**: Created automatically on order placement. Set to `Paid` when order status reaches `Delivered`.
-
-- **Responsive design**: Full mobile/tablet/laptop/desktop support via CSS utility layout classes with breakpoints at 1024px, 768px, 480px. Hamburger menu on mobile. Admin sidebar slides in with overlay on mobile.
-
-- **Scroll animations**: `useInView` hook (IntersectionObserver) used across Home, Blog, Privacy Policy, Refund Policy, and other pages — animations only trigger when elements scroll into view.
-
-- **Blog**: Entirely static — no backend needed. Posts are defined as a data array in `src/pages/Blog.js`. Full-text search + category filter client-side.
-
-- **Sorting**: All four admin tables sort client-side via `useMemo` — no backend round-trip needed.
-
-- **Visit tracking**: `VisitTracker` component (in `App.js`) records every customer route change to the `Visit` collection. Admin routes are excluded.
-Pagination & Filtering
-
 
 <!-- !------ Done -----!  -->
 Default Category – “General”
@@ -194,7 +167,6 @@ Daily Login Streak & Rewards
 - Reward coupons are real single-use Coupon records, usable at checkout like any other code; the code is shown with a copy button + toast.
 - Week-dot progress view (7 circles), progress bar to the next milestone, and longest-streak record.
 - Backend: streak fields on the User model + GET /api/auth/streak and POST /api/auth/streak/checkin endpoints.
-
 
 <!-- !------ ignore-----!  -->
 

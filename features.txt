@@ -1,0 +1,139 @@
+========================================
+  MERN Shopping App — Feature List
+========================================
+
+--------------------
+AUTHENTICATION
+--------------------
+- JWT-based login and registration
+- Role-based access: customer vs admin
+- Protected routes (token verified on every request)
+- Deactivated account detection with forced logout via custom DOM event
+- Admin guard redirects non-admins away from /admin/* routes
+
+--------------------
+PRODUCT MANAGEMENT (Admin)
+--------------------
+- Create, edit, and delete products
+- Product status: Published / Draft / Trash
+- Trashed products auto-deleted after 30 days (MongoDB TTL index)
+- Auto-generated URL slugs from product name (admin can override)
+- Image uploads via Multer (stored in server/uploads/)
+- Stock tracking: `stock` (live) and `totalStock` (original quantity)
+- Column visibility preferences saved to localStorage
+- Client-side sorting and filtering (no extra API calls)
+
+--------------------
+CATEGORY MANAGEMENT (Admin)
+--------------------
+- Create, edit, delete categories
+- Parent / subcategory hierarchy support
+- "General" default category: undeletable, cannot be a subcategory, no other category may use it as a parent
+- Column visibility preferences saved to localStorage
+
+--------------------
+ORDER MANAGEMENT
+--------------------
+- Place orders from cart with email confirmation (Nodemailer)
+- Stock automatically decremented on order creation
+- Admin can update order status
+- Admin-only private notes per order (with timestamp and author)
+- Excel export of orders (xlsx package)
+- Invoice auto-created on order placement; marked "Paid" when status reaches "Delivered"
+
+--------------------
+INVOICE MANAGEMENT
+--------------------
+- Auto-generated invoice on every order
+- Invoice status synced with order delivery status
+- Admin invoice management page
+- Customer invoice view page
+
+--------------------
+COUPON SYSTEM
+--------------------
+- Create and manage discount coupons (Admin)
+- Apply coupons at checkout
+
+--------------------
+CART & CHECKOUT
+--------------------
+- Add / remove / update items in cart
+- Cart state persisted in localStorage via CartContext
+- Coupon code application at checkout
+- Order placement with address and payment details
+
+--------------------
+USER MANAGEMENT (Admin)
+--------------------
+- View, edit, and deactivate user accounts
+- Email is immutable (excluded from update operations)
+- Secure User Data page: view email, password hash, role (password-gated with ACCESS_PASSWORD)
+- Paginated user list with copy-to-clipboard support
+
+--------------------
+CUSTOMER FEATURES
+--------------------
+- Product listing with search and category filtering
+- Product detail page with reviews
+- Wishlist page
+- Order history and order detail view
+- User profile management (name, address, etc.)
+- Beauty quiz interactive page
+- Daily streak component
+
+--------------------
+BLOG (Static)
+--------------------
+- Hardcoded blog posts (no backend)
+- Full-text search (client-side)
+- Category filtering (client-side)
+- Blog comment management (Admin)
+
+--------------------
+CONTACT & SUPPORT
+--------------------
+- Contact Us form submission
+- Admin contact message management
+- Support ticket system (SupportTicket model)
+
+--------------------
+ANALYTICS & REPORTING
+--------------------
+- Visit tracking on every customer route change (VisitTracker in App.js)
+- Admin analytics dashboard with snapshots (AnalyticsSnapshot model)
+- Admin dashboard with unread message and pending order badges
+- Badges polled on every admin route change
+
+--------------------
+ADMIN TOOLS
+--------------------
+- Import / Export data (ImportExport page + ImportModal)
+- Manage Reviews
+- What's New / Changelog page (Changelog model)
+- Analytics page with snapshot history
+
+--------------------
+UI & FRONTEND
+--------------------
+- Two React Contexts: AuthContext (session) and CartContext (cart)
+- Both contexts persist to localStorage
+- React Router v7 with separate layouts for customer and admin
+- MainLayout wraps all customer routes (BubbleBackground, Navbar, Footer)
+- AdminLayout wraps all /admin/* routes (no Navbar/Footer)
+- Scroll animations with useInView (IntersectionObserver) on Home, Blog, and policy pages
+- Animated bubble background on customer pages
+- Toast notifications (react-toastify)
+- Loader component for async states
+
+--------------------
+BACKEND INFRASTRUCTURE
+--------------------
+- Express server on port 5000
+- MongoDB via Mongoose
+- Single Axios instance (api.js) with request/response interceptors
+- Static file serving for uploaded images at /uploads/<filename>
+- DB seeder: users, categories, products, orders (npm run seed)
+- Environment config via server/.env
+
+========================================

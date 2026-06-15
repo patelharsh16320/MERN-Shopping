@@ -155,6 +155,12 @@ export const uploadAPI = {
   },
 };
 
+export const subscriberAPI = {
+  subscribe: (email) => API.post('/subscribers', { email }),
+  getAll: () => API.get('/subscribers'),
+  delete: (id) => API.delete(`/subscribers/${id}`),
+};
+
 export const visitAPI = {
   record: (data) => API.post('/visits', data),
   getStats: () => API.get('/visits/stats'),

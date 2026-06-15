@@ -46,14 +46,6 @@ export default function Navbar() {
             <li><Link to="/about" className={`nav-link ${isActive('/about')}`}>About</Link></li>
             <li><Link to="/contact" className={`nav-link ${isActive('/contact')}`}>Contact</Link></li>
             <li><Link to="/quiz" className={`nav-link ${isActive('/quiz')}`}>✨ Quiz</Link></li>
-            <li>
-              <Link to="/cart" className="nav-link" style={{ position: 'relative', padding: '7px 13px' }}>
-                <span className="cart-badge">
-                  🛒 Cart
-                  {totalItems > 0 && <span className="cart-count">{totalItems}</span>}
-                </span>
-              </Link>
-            </li>
             {user ? (
               <>
                 <li><Link to="/wishlist" className={`nav-link ${isActive('/wishlist')}`}>🤍 Wishlist</Link></li>

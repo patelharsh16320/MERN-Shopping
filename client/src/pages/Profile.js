@@ -4,6 +4,11 @@ import { authAPI, contactAPI } from '../utils/api';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
+const MILESTONES = [
+  { day: 7, reward: '10% OFF', emoji: '🎁' },
+  { day: 30, reward: '25% OFF', emoji: '👑' },
+];
+
 const emptyAddress = { label: 'Home', street: '', city: '', state: '', zip: '', country: 'India', isDefault: false };
 
 export default function Profile() {
@@ -25,12 +30,18 @@ export default function Profile() {
   const [msgsLoading, setMsgsLoading] = useState(false);
   const [expandedMsg, setExpandedMsg] = useState(null);
   const [unreadMsgCount, setUnreadMsgCount] = useState(0);
+  const [streak, setStreak] = useState(null);
 
   useEffect(() => {
     contactAPI.getUserStats()
       .then(({ data }) => setUnreadMsgCount(data.unread || 0))
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (tab !== 'streak') return;
+    authAPI.getStreak().then(({ data }) => setStreak(data)).catch(() => {});
+  }, [tab]);
 
   useEffect(() => {
     if (tab !== 'messages') return;
@@ -120,7 +131,7 @@ export default function Profile() {
             </div>
 
             <div style={{ background: 'white', borderRadius: 24, padding: 16, boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
-              {[['profile', '👤', 'Profile Info'], ['addresses', '📍', 'My Addresses'], ['messages', '💬', 'My Messages']].map(([key, icon, label]) => (
+              {[['profile', '👤', 'Profile Info'], ['addresses', '📍', 'My Addresses'], ['streak', '🔥', 'My Streak'], ['messages', '💬', 'My Messages']].map(([key, icon, label]) => (
                 <div key={key} onClick={() => setTab(key)}
                   style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', cursor: 'pointer', borderRadius: 12, marginBottom: 4, background: tab === key ? '#e8f5e9' : 'transparent', color: tab === key ? 'var(--primary)' : 'var(--text)', fontWeight: tab === key ? 700 : 500, fontSize: 14, transition: 'all 0.2s' }}>
                   <span>{icon}</span>
@@ -274,6 +285,119 @@ export default function Profile() {
                 )}
               </div>
             )}
+            {tab === 'streak' && (
+              <div style={{ background: 'white', borderRadius: 24, padding: 36, boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
+                <h2 style={{ fontWeight: 700, marginBottom: 28, fontSize: 22 }}>🔥 My Daily Streak</h2>
+
+                {!streak ? (
+                  <div style={{ textAlign: 'center', padding: 40, color: '#9e9e9e' }}>Loading streak...</div>
+                ) : (() => {
+                  const nextMilestone = MILESTONES.find(m => streak.current < m.day) || MILESTONES[MILESTONES.length - 1];
+                  const progress = Math.min(100, (streak.current / nextMilestone.day) * 100);
+                  const daysLeft = Math.max(0, nextMilestone.day - streak.current);
+                  const weekPos = streak.current === 0 ? 0 : ((streak.current - 1) % 7) + 1;
+
+                  return (
+                    <>
+                      {/* Stat cards */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(160px,1fr))', gap: 16, marginBottom: 28 }}>
+                        <div style={{ background: 'linear-gradient(135deg,#fff0f5,#fce4ec)', borderRadius: 16, padding: '20px 24px', textAlign: 'center', border: '1px solid #f8bbd0' }}>
+                          <div style={{ fontSize: 36 }}>🔥</div>
+                          <div style={{ fontSize: 32, fontWeight: 800, color: '#c2185b', lineHeight: 1.1 }}>{streak.current}</div>
+                          <div style={{ fontSize: 13, color: '#9e9e9e', marginTop: 4 }}>Current Streak</div>
+                        </div>
+                        <div style={{ background: 'linear-gradient(135deg,#f3e5f5,#e8eaf6)', borderRadius: 16, padding: '20px 24px', textAlign: 'center', border: '1px solid #e1bee7' }}>
+                          <div style={{ fontSize: 36 }}>🏆</div>
+                          <div style={{ fontSize: 32, fontWeight: 800, color: '#7b1fa2', lineHeight: 1.1 }}>{streak.longest}</div>
+                          <div style={{ fontSize: 13, color: '#9e9e9e', marginTop: 4 }}>Longest Streak</div>
+                        </div>
+                        <div style={{ background: 'linear-gradient(135deg,#e8f5e9,#f1f8e9)', borderRadius: 16, padding: '20px 24px', textAlign: 'center', border: '1px solid #c8e6c9' }}>
+                          <div style={{ fontSize: 36 }}>{streak.checkedToday ? '✅' : '⏰'}</div>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: streak.checkedToday ? '#2e7d32' : '#e65100', lineHeight: 1.3, marginTop: 4 }}>
+                            {streak.checkedToday ? 'Checked In' : 'Not Yet Today'}
+                          </div>
+                          <div style={{ fontSize: 13, color: '#9e9e9e', marginTop: 4 }}>Today's Status</div>
+                        </div>
+                      </div>
+
+                      {/* Week dots */}
+                      <div style={{ marginBottom: 24 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#555', marginBottom: 12 }}>This week</div>
+                        <div style={{ display: 'flex', gap: 10 }}>
+                          {Array.from({ length: 7 }, (_, i) => {
+                            const filled = i < weekPos;
+                            return (
+                              <div key={i} style={{ width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, background: filled ? 'linear-gradient(135deg,#c2185b,#e91e63)' : 'white', color: filled ? 'white' : '#bdbdbd', border: filled ? 'none' : '2px dashed #f8bbd0', transition: 'all 0.3s' }}>
+                                {filled ? '✓' : i + 1}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Progress bar */}
+                      <div style={{ marginBottom: 28 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 600, color: '#9e9e9e', marginBottom: 6 }}>
+                          <span>🎁 7 days = 10% OFF</span>
+                          <span>👑 30 days = 25% OFF</span>
+                        </div>
+                        <div style={{ background: '#f5f5f5', borderRadius: 50, height: 10, overflow: 'hidden', border: '1px solid #f8bbd0' }}>
+                          <div style={{ height: '100%', width: `${progress}%`, borderRadius: 50, background: 'linear-gradient(90deg,#c2185b,#f06292)', transition: 'width 0.6s ease' }} />
+                        </div>
+                        {daysLeft > 0 && (
+                          <div style={{ fontSize: 12, color: '#9e9e9e', marginTop: 6 }}>
+                            <strong style={{ color: '#c2185b' }}>{daysLeft} more days</strong> to unlock {nextMilestone.reward} {nextMilestone.emoji}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Earned coupons */}
+                      <div>
+                        <div style={{ fontSize: 15, fontWeight: 700, color: '#333', marginBottom: 14 }}>🎟️ My Streak Rewards</div>
+                        {(!streak.earnedCoupons || streak.earnedCoupons.length === 0) ? (
+                          <div style={{ padding: '24px', background: '#fafafa', borderRadius: 16, textAlign: 'center', color: '#9e9e9e', border: '1px dashed #e0e0e0' }}>
+                            <div style={{ fontSize: 32, marginBottom: 8 }}>🎁</div>
+                            <div style={{ fontWeight: 600, fontSize: 14 }}>No rewards yet</div>
+                            <div style={{ fontSize: 13, marginTop: 4 }}>Reach a 7-day streak to earn your first coupon!</div>
+                          </div>
+                        ) : (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                            {streak.earnedCoupons.map((c, i) => {
+                              const expired = new Date(c.expiresAt) < new Date();
+                              return (
+                                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 16, background: expired ? '#fafafa' : 'linear-gradient(135deg,#fff0f5,#fce4ec)', border: `1px solid ${expired ? '#e0e0e0' : '#f8bbd0'}`, flexWrap: 'wrap' }}>
+                                  <div style={{ fontSize: 28 }}>{c.milestone >= 30 ? '👑' : '🎁'}</div>
+                                  <div style={{ flex: 1 }}>
+                                    <div style={{ fontSize: 12, color: '#9e9e9e', fontWeight: 600 }}>
+                                      {c.milestone}-day milestone reward
+                                    </div>
+                                    <div style={{ fontSize: 16, fontWeight: 800, color: expired ? '#9e9e9e' : '#c2185b', fontFamily: 'monospace', letterSpacing: 1 }}>
+                                      {c.code}
+                                    </div>
+                                    <div style={{ fontSize: 12, color: '#9e9e9e', marginTop: 2 }}>
+                                      {c.discountValue}% OFF · {expired ? 'Expired' : `Expires ${new Date(c.expiresAt).toLocaleDateString('en-IN')}`}
+                                    </div>
+                                  </div>
+                                  {!expired && (
+                                    <button
+                                      onClick={() => navigator.clipboard.writeText(c.code).then(() => toast.info('Coupon copied! 📋', { autoClose: 1500 }))}
+                                      style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#c2185b', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                                      Copy 📋
+                                    </button>
+                                  )}
+                                  {expired && <span style={{ fontSize: 12, color: '#bdbdbd', fontWeight: 600 }}>Expired</span>}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  );
+                })()}
+              </div>
+            )}
+
             {tab === 'messages' && (
               <div style={{ background: 'white', borderRadius: 24, padding: 36, boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 12 }}>

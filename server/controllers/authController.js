@@ -136,6 +136,7 @@ const streakPayload = (user, reward = null) => {
     lastCheckIn: user.streak.lastCheckIn,
     checkedToday: !!checkedToday,
     rewardsClaimed: user.streak.rewardsClaimed,
+    earnedCoupons: user.streak.earnedCoupons || [],
     milestones: Object.keys(STREAK_REWARDS).map(Number),
     reward,
   };
@@ -192,6 +193,7 @@ const checkIn = async (req, res) => {
       });
       user.streak.rewardsClaimed.push(user.streak.current);
       reward = { code: coupon.code, discountValue: coupon.discountValue, expiresAt: coupon.expiresAt };
+      user.streak.earnedCoupons.push({ code: coupon.code, discountValue: coupon.discountValue, expiresAt: coupon.expiresAt, milestone: user.streak.current, earnedAt: new Date() });
     }
 
     await user.save();

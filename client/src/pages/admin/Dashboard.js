@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from './AdminLayout';
-import { orderAPI, userAPI, productAPI } from '../../utils/api';
+import { orderAPI, userAPI, productAPI, contactAPI, subscriberAPI } from '../../utils/api';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({ orders: {}, users: {}, products: 0 });
   const [recentOrders, setRecentOrders] = useState([]);
+  const [contacts, setContacts] = useState([]);
+  const [subscribers, setSubscribers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -12,10 +14,14 @@ export default function Dashboard() {
       orderAPI.getStats(),
       userAPI.getStats(),
       productAPI.getAll({ limit: 1 }),
-      orderAPI.getAll({ limit: 5 })
-    ]).then(([ord, usr, prd, orders]) => {
+      orderAPI.getAll({ limit: 5 }),
+      contactAPI.getAll({ limit: 5 }),
+      subscriberAPI.getAll(),
+    ]).then(([ord, usr, prd, orders, msgs, subs]) => {
       setStats({ orders: ord.data, users: usr.data, products: prd.data.total });
       setRecentOrders(orders.data.orders);
+      setContacts(msgs.data.contacts || []);
+      setSubscribers(subs.data.subscribers || []);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
@@ -40,6 +46,7 @@ export default function Dashboard() {
         <p style={{ color: '#636e72' }}>Welcome back! Here's what's happening with your store.</p>
       </div>
 
+      {/* Stat cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 20, marginBottom: 32 }}>
         {cards.map((card, i) => (
           <div key={card.label} className="stat-card" style={{ animationDelay: `${i * 0.1}s`, background: 'white' }}>
@@ -53,7 +60,7 @@ export default function Dashboard() {
       </div>
 
       {/* Recent Orders */}
-      <div className="table-container animate-fade">
+      <div className="table-container animate-fade" style={{ marginBottom: 32 }}>
         <div className="table-header">
           <h3 style={{ fontWeight: 700, fontSize: 18 }}>Recent Orders</h3>
           <a href="/admin/orders" style={{ color: '#6c63ff', textDecoration: 'none', fontSize: 14, fontWeight: 600 }}>View All →</a>
@@ -86,6 +93,100 @@ export default function Dashboard() {
             </tbody>
           </table>
         )}
+      </div>
+
+      {/* Messages section */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))', gap: 24 }}>
+
+        {/* Contact form messages */}
+        <div className="table-container animate-fade">
+          <div className="table-header">
+            <h3 style={{ fontWeight: 700, fontSize: 18 }}>📩 Contact Messages</h3>
+            <a href="/admin/contacts" style={{ color: '#6c63ff', textDecoration: 'none', fontSize: 14, fontWeight: 600 }}>View All →</a>
+          </div>
+          {loading ? (
+            <div style={{ padding: 30, textAlign: 'center', color: '#636e72' }}>Loading...</div>
+          ) : contacts.length === 0 ? (
+            <div style={{ padding: 30, textAlign: 'center', color: '#bdbdbd' }}>No messages yet.</div>
+          ) : (
+            <div>
+              {contacts.map(c => (
+                <div key={c._id} style={{
+                  padding: '14px 18px',
+                  borderBottom: '1px solid #f5f5f5',
+                  background: c.isRead ? 'white' : '#fff8fb',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 4,
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
+                    <div style={{ fontWeight: 700, fontSize: 14, color: '#333' }}>{c.name}</div>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      {!c.isRead && (
+                        <span style={{ background: '#c2185b', color: 'white', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20 }}>NEW</span>
+                      )}
+                      <span style={{ fontSize: 11, color: '#9e9e9e' }}>{new Date(c.createdAt).toLocaleDateString('en-IN')}</span>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 12, color: '#c2185b', fontWeight: 600 }}>{c.email}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#555' }}>{c.subject}</div>
+                  <div style={{ fontSize: 12, color: '#757575', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+                    {c.message}
+                  </div>
+                  {c.replies?.length > 0 && (
+                    <div style={{ fontSize: 11, color: '#00b894', fontWeight: 600, marginTop: 2 }}>
+                      ✓ {c.replies.length} repl{c.replies.length === 1 ? 'y' : 'ies'} sent
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Newsletter subscribers */}
+        <div className="table-container animate-fade">
+          <div className="table-header">
+            <h3 style={{ fontWeight: 700, fontSize: 18 }}>💌 Inner Circle Subscribers</h3>
+            <span style={{ fontSize: 14, fontWeight: 700, color: '#c2185b' }}>
+              {subscribers.length} member{subscribers.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+          {loading ? (
+            <div style={{ padding: 30, textAlign: 'center', color: '#636e72' }}>Loading...</div>
+          ) : subscribers.length === 0 ? (
+            <div style={{ padding: 30, textAlign: 'center', color: '#bdbdbd' }}>No subscribers yet.</div>
+          ) : (
+            <div>
+              {subscribers.map((s, i) => (
+                <div key={s._id} style={{
+                  padding: '11px 18px',
+                  borderBottom: '1px solid #f5f5f5',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: 10,
+                  background: i % 2 === 0 ? 'white' : '#fafafa',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{
+                      width: 32, height: 32, borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #c2185b, #e91e63)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      color: 'white', fontWeight: 800, fontSize: 13, flexShrink: 0,
+                    }}>
+                      {s.email[0].toUpperCase()}
+                    </div>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: '#333', wordBreak: 'break-all' }}>{s.email}</span>
+                  </div>
+                  <span style={{ fontSize: 11, color: '#9e9e9e', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                    {new Date(s.createdAt).toLocaleDateString('en-IN')}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </AdminLayout>
   );

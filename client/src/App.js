@@ -12,6 +12,7 @@ import { visitAPI } from './utils/api';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import BubbleBackground from './components/BubbleBackground';
+import ScrollButtons from './components/ScrollButtons';
 
 import Home from './pages/Home';
 import Products from './pages/Products';
@@ -44,6 +45,7 @@ import ManageCoupons from './pages/admin/ManageCoupons';
 import SecureUserData from './pages/admin/SecureUserData';
 import ImportExport from './pages/admin/ImportExport';
 import WhatsNew from './pages/admin/WhatsNew';
+import StreakLeaderboard from './pages/admin/StreakLeaderboard';
 
 function VisitTracker() {
   const location = useLocation();
@@ -87,6 +89,7 @@ function App() {
             <Route path="/admin/secure-users" element={<SecureUserData />} />
             <Route path="/admin/import-export" element={<ImportExport />} />
             <Route path="/admin/whats-new" element={<WhatsNew />} />
+            <Route path="/admin/streaks" element={<StreakLeaderboard />} />
 
             {/* Auth routes */}
             <Route path="/login" element={<Login />} />
@@ -112,6 +115,7 @@ function App() {
             <Route path="/quiz" element={<MainLayout><BeautyQuiz /></MainLayout>} />
           </Routes>
 
+          <ScrollButtons />
           <ToastContainer
             position="bottom-right"
             autoClose={3000}
