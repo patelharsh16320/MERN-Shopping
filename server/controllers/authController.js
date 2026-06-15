@@ -11,6 +11,8 @@ const register = async (req, res) => {
     const exists = await User.findOne({ email });
     if (exists) return res.status(400).json({ message: 'User already exists' });
     const user = await User.create({ name, email, password });
+    const io = req.app.get('io');
+    if (io) io.to('admin_room').emit('new_user', { userId: String(user._id), userName: user.name, email: user.email, createdAt: user.createdAt });
     res.status(201).json({
       _id: user._id, name: user.name, email: user.email, role: user.role,
       token: generateToken(user._id)

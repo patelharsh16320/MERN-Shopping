@@ -51,6 +51,12 @@ const orderSchema = new mongoose.Schema({
   }],
   discountPrice: { type: Number, default: 0 },
   couponCode: { type: String, default: '' },
+  giftPacking: {
+    enabled: { type: Boolean, default: false },
+    size: { type: String, enum: ['Small', 'Medium', 'Large', ''], default: '' },
+    price: { type: Number, default: 0 },
+    message: { type: String, default: '' },
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);

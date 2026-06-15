@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-06-12T13:09:24.648Z",
+  "exportedAt": "2026-06-15T06:36:26.114Z",
   "version": "1.0",
   "products": [
     {
@@ -391,7 +391,7 @@
       "images": [
         "https://images.unsplash.com/photo-1608571423539-e951a8d56f8e?w=400"
       ],
-      "stock": 40,
+      "stock": 39,
       "totalStock": 40,
       "rating": 4.9,
       "numReviews": 267,
@@ -526,7 +526,7 @@
       "images": [
         "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=400"
       ],
-      "stock": 50,
+      "stock": 47,
       "totalStock": 50,
       "rating": 4.6,
       "numReviews": 321,
@@ -580,7 +580,7 @@
       "images": [
         "https://images.unsplash.com/photo-1594938298603-c8148c4b4057?w=400"
       ],
-      "stock": 35,
+      "stock": 34,
       "totalStock": 35,
       "rating": 4.7,
       "numReviews": 198,
@@ -661,7 +661,7 @@
       "images": [
         "https://images.unsplash.com/photo-1510771463146-e89e6e86560e?w=400"
       ],
-      "stock": 60,
+      "stock": 59,
       "totalStock": 60,
       "rating": 4.6,
       "numReviews": 289,
@@ -688,7 +688,7 @@
       "images": [
         "https://images.unsplash.com/photo-1517971129774-8a2b38fa128e?w=400"
       ],
-      "stock": 78,
+      "stock": 77,
       "totalStock": 80,
       "rating": 4.8,
       "numReviews": 567,
@@ -715,7 +715,7 @@
       "images": [
         "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400"
       ],
-      "stock": 65,
+      "stock": 64,
       "totalStock": 65,
       "rating": 4.7,
       "numReviews": 389,
@@ -737,12 +737,12 @@
       "price": 999,
       "originalPrice": 1299,
       "discount": 23,
-      "category": "Home & Living",
-      "subcategory": "",
+      "category": "Books & Journals",
+      "subcategory": "Planners",
       "images": [
         "https://images.unsplash.com/photo-1602028915047-37269d1a73f7?w=400"
       ],
-      "stock": 53,
+      "stock": 52,
       "totalStock": 55,
       "rating": 4.9,
       "numReviews": 478,
@@ -752,11 +752,11 @@
         "soy",
         "fragrance"
       ],
-      "isActive": false,
+      "isActive": true,
       "isFeatured": true,
       "weight": "3x200g",
       "freshnessDays": 365,
-      "status": "trash"
+      "status": "published"
     },
     {
       "name": "Velvet Cushion Cover Set (5 Pcs)",
@@ -779,11 +779,11 @@
         "velvet",
         "decor"
       ],
-      "isActive": false,
+      "isActive": true,
       "isFeatured": false,
       "weight": "800g",
       "freshnessDays": 365,
-      "status": "trash"
+      "status": "published"
     },
     {
       "name": "Inspirational Ceramic Mug (350ml)",
@@ -860,11 +860,11 @@
         "folic acid",
         "supplement"
       ],
-      "isActive": false,
+      "isActive": true,
       "isFeatured": false,
       "weight": "60 capsules",
       "freshnessDays": 365,
-      "status": "trash"
+      "status": "published"
     },
     {
       "name": "Organic Women's Protein Powder (Vanilla)",
@@ -1144,7 +1144,45 @@
       "phone": "9999999999",
       "role": "admin",
       "isActive": true,
-      "createdAt": "2026-06-11T11:11:42.525Z"
+      "createdAt": "2026-06-11T11:11:42.525Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "12, Rose Garden Lane",
+          "city": "Mumbai",
+          "state": "Maharashtra",
+          "zip": "400001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "A-204, Tech Park, Hiranandani",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Mom's",
+          "street": "7/B, Green View Society",
+          "city": "Ahmedabad",
+          "state": "Gujarat",
+          "zip": "380015",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "33, MG Road, Indiranagar",
+          "city": "Bengaluru",
+          "state": "Karnataka",
+          "zip": "560038",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Priya Sharma",
@@ -1152,7 +1190,45 @@
       "phone": "9876543210",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-11T11:11:42.526Z"
+      "createdAt": "2026-06-11T11:11:42.526Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "45, Shyam Nagar, Sector 12",
+          "city": "Jaipur",
+          "state": "Rajasthan",
+          "zip": "302001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "Plot 5, Cyber City",
+          "city": "Gurugram",
+          "state": "Haryana",
+          "zip": "122002",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Hostel",
+          "street": "Block C, Ladies Hostel, VIT",
+          "city": "Vellore",
+          "state": "Tamil Nadu",
+          "zip": "632014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "201, Jubilee Hills, Road No. 36",
+          "city": "Hyderabad",
+          "state": "Telangana",
+          "zip": "500033",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Anjali Mehta",
@@ -1160,7 +1236,45 @@
       "phone": "9876543211",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-11T11:11:42.526Z"
+      "createdAt": "2026-06-11T11:11:42.526Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "8, Lake View Road, Salt Lake",
+          "city": "Kolkata",
+          "state": "West Bengal",
+          "zip": "700064",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "14/3, Anna Nagar East",
+          "city": "Chennai",
+          "state": "Tamil Nadu",
+          "zip": "600102",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Sister",
+          "street": "Flat 302, Sun Manor, Kothrud",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411029",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "22, Civil Lines",
+          "city": "Nagpur",
+          "state": "Maharashtra",
+          "zip": "440001",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Sneha Kapoor",
@@ -1168,7 +1282,45 @@
       "phone": "9876543212",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-11T11:11:42.526Z"
+      "createdAt": "2026-06-11T11:11:42.526Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "12, Rose Garden Lane",
+          "city": "Mumbai",
+          "state": "Maharashtra",
+          "zip": "400001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "A-204, Tech Park, Hiranandani",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Mom's",
+          "street": "7/B, Green View Society",
+          "city": "Ahmedabad",
+          "state": "Gujarat",
+          "zip": "380015",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "33, MG Road, Indiranagar",
+          "city": "Bengaluru",
+          "state": "Karnataka",
+          "zip": "560038",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Kavya Nair",
@@ -1176,7 +1328,45 @@
       "phone": "9876543213",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-11T11:11:42.527Z"
+      "createdAt": "2026-06-11T11:11:42.527Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "45, Shyam Nagar, Sector 12",
+          "city": "Jaipur",
+          "state": "Rajasthan",
+          "zip": "302001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "Plot 5, Cyber City",
+          "city": "Gurugram",
+          "state": "Haryana",
+          "zip": "122002",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Hostel",
+          "street": "Block C, Ladies Hostel, VIT",
+          "city": "Vellore",
+          "state": "Tamil Nadu",
+          "zip": "632014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "201, Jubilee Hills, Road No. 36",
+          "city": "Hyderabad",
+          "state": "Telangana",
+          "zip": "500033",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Divya Patel",
@@ -1184,7 +1374,45 @@
       "phone": "9876543214",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-11T11:11:42.527Z"
+      "createdAt": "2026-06-11T11:11:42.527Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "8, Lake View Road, Salt Lake",
+          "city": "Kolkata",
+          "state": "West Bengal",
+          "zip": "700064",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "14/3, Anna Nagar East",
+          "city": "Chennai",
+          "state": "Tamil Nadu",
+          "zip": "600102",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Sister",
+          "street": "Flat 302, Sun Manor, Kothrud",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411029",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "22, Civil Lines",
+          "city": "Nagpur",
+          "state": "Maharashtra",
+          "zip": "440001",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Meera Iyer",
@@ -1192,7 +1420,45 @@
       "phone": "9876543215",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-11T11:11:42.527Z"
+      "createdAt": "2026-06-11T11:11:42.527Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "12, Rose Garden Lane",
+          "city": "Mumbai",
+          "state": "Maharashtra",
+          "zip": "400001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "A-204, Tech Park, Hiranandani",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Mom's",
+          "street": "7/B, Green View Society",
+          "city": "Ahmedabad",
+          "state": "Gujarat",
+          "zip": "380015",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "33, MG Road, Indiranagar",
+          "city": "Bengaluru",
+          "state": "Karnataka",
+          "zip": "560038",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Riya Singh",
@@ -1200,7 +1466,45 @@
       "phone": "9876543216",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-11T11:11:42.527Z"
+      "createdAt": "2026-06-11T11:11:42.527Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "45, Shyam Nagar, Sector 12",
+          "city": "Jaipur",
+          "state": "Rajasthan",
+          "zip": "302001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "Plot 5, Cyber City",
+          "city": "Gurugram",
+          "state": "Haryana",
+          "zip": "122002",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Hostel",
+          "street": "Block C, Ladies Hostel, VIT",
+          "city": "Vellore",
+          "state": "Tamil Nadu",
+          "zip": "632014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "201, Jubilee Hills, Road No. 36",
+          "city": "Hyderabad",
+          "state": "Telangana",
+          "zip": "500033",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Pooja Verma",
@@ -1208,7 +1512,45 @@
       "phone": "9876543217",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-11T11:11:42.527Z"
+      "createdAt": "2026-06-11T11:11:42.527Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "8, Lake View Road, Salt Lake",
+          "city": "Kolkata",
+          "state": "West Bengal",
+          "zip": "700064",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "14/3, Anna Nagar East",
+          "city": "Chennai",
+          "state": "Tamil Nadu",
+          "zip": "600102",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Sister",
+          "street": "Flat 302, Sun Manor, Kothrud",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411029",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "22, Civil Lines",
+          "city": "Nagpur",
+          "state": "Maharashtra",
+          "zip": "440001",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Nisha Gupta",
@@ -1216,7 +1558,45 @@
       "phone": "9876543218",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-11T11:11:42.527Z"
+      "createdAt": "2026-06-11T11:11:42.527Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "12, Rose Garden Lane",
+          "city": "Mumbai",
+          "state": "Maharashtra",
+          "zip": "400001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "A-204, Tech Park, Hiranandani",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Mom's",
+          "street": "7/B, Green View Society",
+          "city": "Ahmedabad",
+          "state": "Gujarat",
+          "zip": "380015",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "33, MG Road, Indiranagar",
+          "city": "Bengaluru",
+          "state": "Karnataka",
+          "zip": "560038",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Sana Khan",
@@ -1224,7 +1604,45 @@
       "phone": "9876543219",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-11T11:11:42.527Z"
+      "createdAt": "2026-06-11T11:11:42.527Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "45, Shyam Nagar, Sector 12",
+          "city": "Jaipur",
+          "state": "Rajasthan",
+          "zip": "302001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "Plot 5, Cyber City",
+          "city": "Gurugram",
+          "state": "Haryana",
+          "zip": "122002",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Hostel",
+          "street": "Block C, Ladies Hostel, VIT",
+          "city": "Vellore",
+          "state": "Tamil Nadu",
+          "zip": "632014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "201, Jubilee Hills, Road No. 36",
+          "city": "Hyderabad",
+          "state": "Telangana",
+          "zip": "500033",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Tanya Reddy",
@@ -1232,7 +1650,45 @@
       "phone": "9876543220",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-11T11:11:42.527Z"
+      "createdAt": "2026-06-11T11:11:42.527Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "8, Lake View Road, Salt Lake",
+          "city": "Kolkata",
+          "state": "West Bengal",
+          "zip": "700064",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "14/3, Anna Nagar East",
+          "city": "Chennai",
+          "state": "Tamil Nadu",
+          "zip": "600102",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Sister",
+          "street": "Flat 302, Sun Manor, Kothrud",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411029",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "22, Civil Lines",
+          "city": "Nagpur",
+          "state": "Maharashtra",
+          "zip": "440001",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Harsh",
@@ -1240,7 +1696,45 @@
       "phone": "",
       "role": "admin",
       "isActive": true,
-      "createdAt": "2026-06-11T11:14:27.532Z"
+      "createdAt": "2026-06-11T11:14:27.532Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "12, Rose Garden Lane",
+          "city": "Mumbai",
+          "state": "Maharashtra",
+          "zip": "400001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "A-204, Tech Park, Hiranandani",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Mom's",
+          "street": "7/B, Green View Society",
+          "city": "Ahmedabad",
+          "state": "Gujarat",
+          "zip": "380015",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "33, MG Road, Indiranagar",
+          "city": "Bengaluru",
+          "state": "Karnataka",
+          "zip": "560038",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Helly",
@@ -1248,7 +1742,45 @@
       "phone": "",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T04:19:35.156Z"
+      "createdAt": "2026-06-12T04:19:35.156Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "45, Shyam Nagar, Sector 12",
+          "city": "Jaipur",
+          "state": "Rajasthan",
+          "zip": "302001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "Plot 5, Cyber City",
+          "city": "Gurugram",
+          "state": "Haryana",
+          "zip": "122002",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Hostel",
+          "street": "Block C, Ladies Hostel, VIT",
+          "city": "Vellore",
+          "state": "Tamil Nadu",
+          "zip": "632014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "201, Jubilee Hills, Road No. 36",
+          "city": "Hyderabad",
+          "state": "Telangana",
+          "zip": "500033",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Gwen",
@@ -1256,7 +1788,45 @@
       "phone": "",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T04:20:53.682Z"
+      "createdAt": "2026-06-12T04:20:53.682Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "8, Lake View Road, Salt Lake",
+          "city": "Kolkata",
+          "state": "West Bengal",
+          "zip": "700064",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "14/3, Anna Nagar East",
+          "city": "Chennai",
+          "state": "Tamil Nadu",
+          "zip": "600102",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Sister",
+          "street": "Flat 302, Sun Manor, Kothrud",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411029",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "22, Civil Lines",
+          "city": "Nagpur",
+          "state": "Maharashtra",
+          "zip": "440001",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Izuku Midoriya",
@@ -1264,7 +1834,45 @@
       "phone": "9876543301",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T05:18:09.899Z"
+      "createdAt": "2026-06-12T05:18:09.899Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "12, Rose Garden Lane",
+          "city": "Mumbai",
+          "state": "Maharashtra",
+          "zip": "400001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "A-204, Tech Park, Hiranandani",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Mom's",
+          "street": "7/B, Green View Society",
+          "city": "Ahmedabad",
+          "state": "Gujarat",
+          "zip": "380015",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "33, MG Road, Indiranagar",
+          "city": "Bengaluru",
+          "state": "Karnataka",
+          "zip": "560038",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Katsuki Bakugo",
@@ -1272,7 +1880,45 @@
       "phone": "9876543302",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T05:18:10.468Z"
+      "createdAt": "2026-06-12T05:18:10.468Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "45, Shyam Nagar, Sector 12",
+          "city": "Jaipur",
+          "state": "Rajasthan",
+          "zip": "302001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "Plot 5, Cyber City",
+          "city": "Gurugram",
+          "state": "Haryana",
+          "zip": "122002",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Hostel",
+          "street": "Block C, Ladies Hostel, VIT",
+          "city": "Vellore",
+          "state": "Tamil Nadu",
+          "zip": "632014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "201, Jubilee Hills, Road No. 36",
+          "city": "Hyderabad",
+          "state": "Telangana",
+          "zip": "500033",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Shoto Todoroki",
@@ -1280,7 +1926,45 @@
       "phone": "9876543303",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T05:18:11.030Z"
+      "createdAt": "2026-06-12T05:18:11.030Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "8, Lake View Road, Salt Lake",
+          "city": "Kolkata",
+          "state": "West Bengal",
+          "zip": "700064",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "14/3, Anna Nagar East",
+          "city": "Chennai",
+          "state": "Tamil Nadu",
+          "zip": "600102",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Sister",
+          "street": "Flat 302, Sun Manor, Kothrud",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411029",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "22, Civil Lines",
+          "city": "Nagpur",
+          "state": "Maharashtra",
+          "zip": "440001",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Ochaco Uraraka",
@@ -1288,7 +1972,45 @@
       "phone": "9876543304",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T05:18:11.622Z"
+      "createdAt": "2026-06-12T05:18:11.622Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "12, Rose Garden Lane",
+          "city": "Mumbai",
+          "state": "Maharashtra",
+          "zip": "400001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "A-204, Tech Park, Hiranandani",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Mom's",
+          "street": "7/B, Green View Society",
+          "city": "Ahmedabad",
+          "state": "Gujarat",
+          "zip": "380015",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "33, MG Road, Indiranagar",
+          "city": "Bengaluru",
+          "state": "Karnataka",
+          "zip": "560038",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Tenya Iida",
@@ -1296,7 +2018,45 @@
       "phone": "9876543305",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T05:18:12.175Z"
+      "createdAt": "2026-06-12T05:18:12.175Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "45, Shyam Nagar, Sector 12",
+          "city": "Jaipur",
+          "state": "Rajasthan",
+          "zip": "302001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "Plot 5, Cyber City",
+          "city": "Gurugram",
+          "state": "Haryana",
+          "zip": "122002",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Hostel",
+          "street": "Block C, Ladies Hostel, VIT",
+          "city": "Vellore",
+          "state": "Tamil Nadu",
+          "zip": "632014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "201, Jubilee Hills, Road No. 36",
+          "city": "Hyderabad",
+          "state": "Telangana",
+          "zip": "500033",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Tsuyu Asui",
@@ -1304,7 +2064,45 @@
       "phone": "9876543306",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T05:18:12.754Z"
+      "createdAt": "2026-06-12T05:18:12.754Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "8, Lake View Road, Salt Lake",
+          "city": "Kolkata",
+          "state": "West Bengal",
+          "zip": "700064",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "14/3, Anna Nagar East",
+          "city": "Chennai",
+          "state": "Tamil Nadu",
+          "zip": "600102",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Sister",
+          "street": "Flat 302, Sun Manor, Kothrud",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411029",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "22, Civil Lines",
+          "city": "Nagpur",
+          "state": "Maharashtra",
+          "zip": "440001",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Momo Yaoyorozu",
@@ -1312,7 +2110,45 @@
       "phone": "9876543307",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T05:18:13.318Z"
+      "createdAt": "2026-06-12T05:18:13.318Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "12, Rose Garden Lane",
+          "city": "Mumbai",
+          "state": "Maharashtra",
+          "zip": "400001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "A-204, Tech Park, Hiranandani",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Mom's",
+          "street": "7/B, Green View Society",
+          "city": "Ahmedabad",
+          "state": "Gujarat",
+          "zip": "380015",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "33, MG Road, Indiranagar",
+          "city": "Bengaluru",
+          "state": "Karnataka",
+          "zip": "560038",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Eijiro Kirishima",
@@ -1320,7 +2156,45 @@
       "phone": "9876543308",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T05:18:13.896Z"
+      "createdAt": "2026-06-12T05:18:13.896Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "45, Shyam Nagar, Sector 12",
+          "city": "Jaipur",
+          "state": "Rajasthan",
+          "zip": "302001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "Plot 5, Cyber City",
+          "city": "Gurugram",
+          "state": "Haryana",
+          "zip": "122002",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Hostel",
+          "street": "Block C, Ladies Hostel, VIT",
+          "city": "Vellore",
+          "state": "Tamil Nadu",
+          "zip": "632014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "201, Jubilee Hills, Road No. 36",
+          "city": "Hyderabad",
+          "state": "Telangana",
+          "zip": "500033",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Denki Kaminari",
@@ -1328,7 +2202,45 @@
       "phone": "9876543309",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T05:18:14.522Z"
+      "createdAt": "2026-06-12T05:18:14.522Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "8, Lake View Road, Salt Lake",
+          "city": "Kolkata",
+          "state": "West Bengal",
+          "zip": "700064",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "14/3, Anna Nagar East",
+          "city": "Chennai",
+          "state": "Tamil Nadu",
+          "zip": "600102",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Sister",
+          "street": "Flat 302, Sun Manor, Kothrud",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411029",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "22, Civil Lines",
+          "city": "Nagpur",
+          "state": "Maharashtra",
+          "zip": "440001",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Kyoka Jiro",
@@ -1336,7 +2248,45 @@
       "phone": "9876543310",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T05:18:15.208Z"
+      "createdAt": "2026-06-12T05:18:15.208Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "12, Rose Garden Lane",
+          "city": "Mumbai",
+          "state": "Maharashtra",
+          "zip": "400001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "A-204, Tech Park, Hiranandani",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Mom's",
+          "street": "7/B, Green View Society",
+          "city": "Ahmedabad",
+          "state": "Gujarat",
+          "zip": "380015",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "33, MG Road, Indiranagar",
+          "city": "Bengaluru",
+          "state": "Karnataka",
+          "zip": "560038",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Mina Ashido",
@@ -1344,7 +2294,45 @@
       "phone": "9876543311",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T05:19:20.844Z"
+      "createdAt": "2026-06-12T05:19:20.844Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "45, Shyam Nagar, Sector 12",
+          "city": "Jaipur",
+          "state": "Rajasthan",
+          "zip": "302001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "Plot 5, Cyber City",
+          "city": "Gurugram",
+          "state": "Haryana",
+          "zip": "122002",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Hostel",
+          "street": "Block C, Ladies Hostel, VIT",
+          "city": "Vellore",
+          "state": "Tamil Nadu",
+          "zip": "632014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "201, Jubilee Hills, Road No. 36",
+          "city": "Hyderabad",
+          "state": "Telangana",
+          "zip": "500033",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Fumikage Tokoyami",
@@ -1352,7 +2340,45 @@
       "phone": "9876543312",
       "role": "user",
       "isActive": false,
-      "createdAt": "2026-06-12T05:19:21.285Z"
+      "createdAt": "2026-06-12T05:19:21.285Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "8, Lake View Road, Salt Lake",
+          "city": "Kolkata",
+          "state": "West Bengal",
+          "zip": "700064",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "14/3, Anna Nagar East",
+          "city": "Chennai",
+          "state": "Tamil Nadu",
+          "zip": "600102",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Sister",
+          "street": "Flat 302, Sun Manor, Kothrud",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411029",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "22, Civil Lines",
+          "city": "Nagpur",
+          "state": "Maharashtra",
+          "zip": "440001",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Yuga Aoyama",
@@ -1360,7 +2386,45 @@
       "phone": "9876543313",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T05:19:21.718Z"
+      "createdAt": "2026-06-12T05:19:21.718Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "12, Rose Garden Lane",
+          "city": "Mumbai",
+          "state": "Maharashtra",
+          "zip": "400001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "A-204, Tech Park, Hiranandani",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Mom's",
+          "street": "7/B, Green View Society",
+          "city": "Ahmedabad",
+          "state": "Gujarat",
+          "zip": "380015",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "33, MG Road, Indiranagar",
+          "city": "Bengaluru",
+          "state": "Karnataka",
+          "zip": "560038",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Mashirao Ojiro",
@@ -1368,7 +2432,45 @@
       "phone": "9876543314",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T05:19:22.141Z"
+      "createdAt": "2026-06-12T05:19:22.141Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "45, Shyam Nagar, Sector 12",
+          "city": "Jaipur",
+          "state": "Rajasthan",
+          "zip": "302001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "Plot 5, Cyber City",
+          "city": "Gurugram",
+          "state": "Haryana",
+          "zip": "122002",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Hostel",
+          "street": "Block C, Ladies Hostel, VIT",
+          "city": "Vellore",
+          "state": "Tamil Nadu",
+          "zip": "632014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "201, Jubilee Hills, Road No. 36",
+          "city": "Hyderabad",
+          "state": "Telangana",
+          "zip": "500033",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Rikido Sato",
@@ -1376,7 +2478,45 @@
       "phone": "9876543315",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T05:19:22.571Z"
+      "createdAt": "2026-06-12T05:19:22.571Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "8, Lake View Road, Salt Lake",
+          "city": "Kolkata",
+          "state": "West Bengal",
+          "zip": "700064",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "14/3, Anna Nagar East",
+          "city": "Chennai",
+          "state": "Tamil Nadu",
+          "zip": "600102",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Sister",
+          "street": "Flat 302, Sun Manor, Kothrud",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411029",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "22, Civil Lines",
+          "city": "Nagpur",
+          "state": "Maharashtra",
+          "zip": "440001",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Koji Koda",
@@ -1384,7 +2524,45 @@
       "phone": "9876543316",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T05:19:23.001Z"
+      "createdAt": "2026-06-12T05:19:23.001Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "12, Rose Garden Lane",
+          "city": "Mumbai",
+          "state": "Maharashtra",
+          "zip": "400001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "A-204, Tech Park, Hiranandani",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Mom's",
+          "street": "7/B, Green View Society",
+          "city": "Ahmedabad",
+          "state": "Gujarat",
+          "zip": "380015",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "33, MG Road, Indiranagar",
+          "city": "Bengaluru",
+          "state": "Karnataka",
+          "zip": "560038",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Hanta Sero",
@@ -1392,7 +2570,45 @@
       "phone": "9876543317",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T05:19:23.426Z"
+      "createdAt": "2026-06-12T05:19:23.426Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "45, Shyam Nagar, Sector 12",
+          "city": "Jaipur",
+          "state": "Rajasthan",
+          "zip": "302001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "Plot 5, Cyber City",
+          "city": "Gurugram",
+          "state": "Haryana",
+          "zip": "122002",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Hostel",
+          "street": "Block C, Ladies Hostel, VIT",
+          "city": "Vellore",
+          "state": "Tamil Nadu",
+          "zip": "632014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "201, Jubilee Hills, Road No. 36",
+          "city": "Hyderabad",
+          "state": "Telangana",
+          "zip": "500033",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Mezo Shoji",
@@ -1400,7 +2616,45 @@
       "phone": "9876543318",
       "role": "user",
       "isActive": false,
-      "createdAt": "2026-06-12T05:19:23.849Z"
+      "createdAt": "2026-06-12T05:19:23.849Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "8, Lake View Road, Salt Lake",
+          "city": "Kolkata",
+          "state": "West Bengal",
+          "zip": "700064",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "14/3, Anna Nagar East",
+          "city": "Chennai",
+          "state": "Tamil Nadu",
+          "zip": "600102",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Sister",
+          "street": "Flat 302, Sun Manor, Kothrud",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411029",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "22, Civil Lines",
+          "city": "Nagpur",
+          "state": "Maharashtra",
+          "zip": "440001",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Toru Hagakure",
@@ -1408,7 +2662,45 @@
       "phone": "9876543319",
       "role": "user",
       "isActive": false,
-      "createdAt": "2026-06-12T05:19:24.275Z"
+      "createdAt": "2026-06-12T05:19:24.275Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "12, Rose Garden Lane",
+          "city": "Mumbai",
+          "state": "Maharashtra",
+          "zip": "400001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "A-204, Tech Park, Hiranandani",
+          "city": "Pune",
+          "state": "Maharashtra",
+          "zip": "411014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Mom's",
+          "street": "7/B, Green View Society",
+          "city": "Ahmedabad",
+          "state": "Gujarat",
+          "zip": "380015",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "33, MG Road, Indiranagar",
+          "city": "Bengaluru",
+          "state": "Karnataka",
+          "zip": "560038",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     },
     {
       "name": "Minoru Mineta",
@@ -1416,7 +2708,45 @@
       "phone": "9876543320",
       "role": "user",
       "isActive": true,
-      "createdAt": "2026-06-12T05:19:24.709Z"
+      "createdAt": "2026-06-12T05:19:24.709Z",
+      "addresses": [
+        {
+          "label": "Home",
+          "street": "45, Shyam Nagar, Sector 12",
+          "city": "Jaipur",
+          "state": "Rajasthan",
+          "zip": "302001",
+          "country": "India",
+          "isDefault": true
+        },
+        {
+          "label": "Work",
+          "street": "Plot 5, Cyber City",
+          "city": "Gurugram",
+          "state": "Haryana",
+          "zip": "122002",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Hostel",
+          "street": "Block C, Ladies Hostel, VIT",
+          "city": "Vellore",
+          "state": "Tamil Nadu",
+          "zip": "632014",
+          "country": "India",
+          "isDefault": false
+        },
+        {
+          "label": "Other",
+          "street": "201, Jubilee Hills, Road No. 36",
+          "city": "Hyderabad",
+          "state": "Telangana",
+          "zip": "500033",
+          "country": "India",
+          "isDefault": false
+        }
+      ]
     }
   ],
   "orders": [
@@ -1987,6 +3317,86 @@
         }
       ],
       "createdAt": "2026-06-12T06:53:01.996Z"
+    },
+    {
+      "_id": "6a2f9bea249ef7b6df2bcd0f",
+      "userEmail": "helly@gmail.com",
+      "totalPrice": 7762,
+      "orderStatus": "Delivered",
+      "paymentMethod": "UPI",
+      "isPaid": true,
+      "trackingNumber": "",
+      "items": [
+        {
+          "product": "6a2a97ee84d1631c6e82e70e",
+          "name": "Luxury Soy Wax Candle Set (3 Pcs)",
+          "image": "https://images.unsplash.com/photo-1602028915047-37269d1a73f7?w=400",
+          "price": 999,
+          "quantity": 1,
+          "_id": "6a2f9bea249ef7b6df2bcd10"
+        },
+        {
+          "product": "6a2a97ee84d1631c6e82e70c",
+          "name": "Guided Gratitude Journal — 90 Days",
+          "image": "https://images.unsplash.com/photo-1517971129774-8a2b38fa128e?w=400",
+          "price": 399,
+          "quantity": 1,
+          "_id": "6a2f9bea249ef7b6df2bcd11"
+        },
+        {
+          "product": "6a2a97ee84d1631c6e82e706",
+          "name": "Floral Rayon Kurti (S/M/L/XL)",
+          "image": "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=400",
+          "price": 899,
+          "quantity": 3,
+          "_id": "6a2f9bea249ef7b6df2bcd12"
+        },
+        {
+          "product": "6a2a97ee84d1631c6e82e708",
+          "name": "Cozy Pastel Loungewear Set",
+          "image": "https://images.unsplash.com/photo-1594938298603-c8148c4b4057?w=400",
+          "price": 1099,
+          "quantity": 1,
+          "_id": "6a2f9bea249ef7b6df2bcd13"
+        },
+        {
+          "product": "6a2a97ee84d1631c6e82e701",
+          "name": "Aromatherapy Essential Oil Set (8 Oils)",
+          "image": "https://images.unsplash.com/photo-1608571423539-e951a8d56f8e?w=400",
+          "price": 1299,
+          "quantity": 1,
+          "_id": "6a2f9bea249ef7b6df2bcd14"
+        }
+      ],
+      "createdAt": "2026-06-15T06:30:02.709Z"
+    },
+    {
+      "_id": "6a2f9d293ad651db074a7533",
+      "userEmail": "helly@gmail.com",
+      "totalPrice": 1296,
+      "orderStatus": "Pending",
+      "paymentMethod": "Net Banking",
+      "isPaid": true,
+      "trackingNumber": "",
+      "items": [
+        {
+          "product": "6a2a97ee84d1631c6e82e70b",
+          "name": "Women's High-Support Sports Bra",
+          "image": "https://images.unsplash.com/photo-1510771463146-e89e6e86560e?w=400",
+          "price": 599,
+          "quantity": 1,
+          "_id": "6a2f9d293ad651db074a7534"
+        },
+        {
+          "product": "6a2a97ee84d1631c6e82e70d",
+          "name": "Women's Self-Care Planner 2024-25",
+          "image": "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=400",
+          "price": 499,
+          "quantity": 1,
+          "_id": "6a2f9d293ad651db074a7535"
+        }
+      ],
+      "createdAt": "2026-06-15T06:35:21.821Z"
     }
   ],
   "invoices": [
@@ -2209,19 +3619,40 @@
       "shipping": 49,
       "paymentMethod": "COD",
       "createdAt": "2026-06-12T06:53:02.003Z"
+    },
+    {
+      "invoiceNumber": "INV-1781505002762-692",
+      "status": "Paid",
+      "total": 7762,
+      "subtotal": 6493,
+      "tax": 1169,
+      "shipping": 0,
+      "paymentMethod": "UPI",
+      "createdAt": "2026-06-15T06:30:02.772Z"
+    },
+    {
+      "invoiceNumber": "INV-1781505321836-930",
+      "status": "Sent",
+      "total": 1296,
+      "subtotal": 1098,
+      "tax": 198,
+      "shipping": 0,
+      "paymentMethod": "Net Banking",
+      "createdAt": "2026-06-15T06:35:21.838Z"
     }
   ],
   "analytics": {
-    "total": 509,
+    "total": 656,
     "daily": {
       "2026-06-11": 269,
-      "2026-06-12": 240
+      "2026-06-12": 251,
+      "2026-06-15": 136
     },
     "monthly": {
-      "2026-06": 509
+      "2026-06": 656
     },
     "yearly": {
-      "2026": 509
+      "2026": 656
     }
   },
   "contacts": [
@@ -2301,6 +3732,268 @@
       "expiresAt": "2026-06-13T00:00:00.000Z",
       "isActive": true,
       "createdAt": "2026-06-12T06:27:57.273Z"
+    },
+    {
+      "code": "Z1J3UQW6",
+      "discountType": "fixed",
+      "discountValue": 499,
+      "minOrderAmount": 5999,
+      "maxUsage": 10,
+      "usageCount": 0,
+      "expiresAt": "2026-06-25T00:00:00.000Z",
+      "isActive": true,
+      "createdAt": "2026-06-15T05:50:28.055Z"
     }
-  ]
+  ],
+  "subscribers": [
+    {
+      "email": "shoto.todoroki@gmail.com",
+      "createdAt": "2026-06-15T05:24:45.051Z"
+    },
+    {
+      "email": "izuku.midoriya@gmail.com",
+      "createdAt": "2026-06-15T05:27:25.234Z"
+    }
+  ],
+  "changelog": [
+    {
+      "icon": "🔗",
+      "tag": "SEO",
+      "title": "Product URL Slugs",
+      "summary": "Clean, readable URLs for every product page instead of cryptic MongoDB IDs.",
+      "before": {
+        "label": "URL used MongoDB Object ID",
+        "code": "/products/6642f3a1b2c4e5d6a7f8901b",
+        "points": [
+          "Not human-readable",
+          "Bad for SEO",
+          "Cannot be shared meaningfully"
+        ]
+      },
+      "after": {
+        "label": "Auto-generated slug + admin can customise",
+        "code": "/products/rose-water-mist",
+        "points": [
+          "Auto-generated from product name on create",
+          "Admin can override with any custom slug",
+          "Inline edit right from the product table",
+          "Live preview shown while typing"
+        ]
+      },
+      "date": "Jun 2026",
+      "order": 10
+    },
+    {
+      "icon": "🎟️",
+      "tag": "Promotions",
+      "title": "Coupon Code System",
+      "summary": "Full coupon management — create, edit, bulk delete, and apply codes at checkout.",
+      "before": {
+        "label": "Hardcoded WELCOME10 promo only",
+        "code": "// Cart.js — hardcoded\nif (promoCode === 'WELCOME10') discount = 10%;",
+        "points": [
+          "Single hardcoded code",
+          "Always 10% — no config",
+          "No expiry or usage limits"
+        ]
+      },
+      "after": {
+        "label": "Admin CRUD with full validation",
+        "code": "POST /api/coupons/validate\n{ code, orderTotal } → { discount, type }",
+        "points": [
+          "Percentage or fixed-amount discounts",
+          "Expiry date, usage limits, min order amount",
+          "Toggle active/inactive instantly",
+          "Usage counter auto-increments on checkout",
+          "Import / Export included"
+        ]
+      },
+      "date": "Jun 2026",
+      "order": 20
+    },
+    {
+      "icon": "🏷️",
+      "tag": "Catalog",
+      "title": "Category Hierarchy",
+      "summary": "Subcategory support — products can belong to a parent and a child category.",
+      "before": {
+        "label": "Flat list, no nesting",
+        "code": "category: \"Skincare\"   // only one level",
+        "points": [
+          "No subcategories",
+          "All categories at same level",
+          "\"General\" could be deleted accidentally"
+        ]
+      },
+      "after": {
+        "label": "Parent → Subcategory tree",
+        "code": "category: \"Skincare\"\nsubcategory: \"Moisturisers\"",
+        "points": [
+          "\"General\" is protected — cannot be deleted",
+          "Subcategory dropdown appears when parent has children",
+          "Bulk activate / deactivate / delete categories"
+        ]
+      },
+      "date": "Jun 2026",
+      "order": 30
+    },
+    {
+      "icon": "💬",
+      "tag": "Communication",
+      "title": "Admin → User Messaging",
+      "summary": "Admin replies to contact messages are delivered to the user's profile inbox.",
+      "before": {
+        "label": "One-way contact form only",
+        "code": "Contact form → DB → Admin reads → dead end",
+        "points": [
+          "Admin could read messages",
+          "No way to reply",
+          "Users had no inbox"
+        ]
+      },
+      "after": {
+        "label": "Two-way with unread badges",
+        "code": "Admin replies → userRead: false\nProfile \"My Messages\" shows 🔵 badge",
+        "points": [
+          "Admin types reply in admin panel",
+          "User sees unread badge on Profile sidebar",
+          "Thread expands to show all replies",
+          "Auto-marked read when user opens the message"
+        ]
+      },
+      "date": "Jun 2026",
+      "order": 40
+    },
+    {
+      "icon": "🔐",
+      "tag": "Security",
+      "title": "Secure User Data Page",
+      "summary": "Password-locked admin page showing user emails, bcrypt hashes, and password reset.",
+      "before": {
+        "label": "No way to inspect or reset user credentials",
+        "code": "// No endpoint for admin password ops",
+        "points": [
+          "Could not see which users existed",
+          "No admin password reset for users"
+        ]
+      },
+      "after": {
+        "label": "Locked behind harsh@1234",
+        "code": "GET /api/users/secure-dump  (admin only)\nPUT /api/users/:id/reset-password\nPUT /api/users/:id (name change)",
+        "points": [
+          "Password: harsh@1234 to unlock",
+          "Shows email, bcrypt hash (not plaintext)",
+          "Reset any user's password",
+          "Change username per user",
+          "Pagination, sort, column toggles"
+        ]
+      },
+      "date": "Jun 2026",
+      "order": 50
+    },
+    {
+      "icon": "📦",
+      "tag": "UX",
+      "title": "Orders Page — Column Toggles & Search",
+      "summary": "User orders page rebuilt with search, sort, column visibility, and status filters.",
+      "before": {
+        "label": "Simple list, no controls",
+        "code": "orders.map(o => <OrderCard ... />)",
+        "points": [
+          "No search",
+          "No sort",
+          "All items always shown",
+          "No status filter tabs"
+        ]
+      },
+      "after": {
+        "label": "Full table with toolbar",
+        "code": "Columns: Items | Total | Payment | Status | Date\nSearch by Order ID or item name",
+        "points": [
+          "5 toggleable columns saved to localStorage",
+          "Sort by date, total, or status",
+          "Status tabs: All / Pending / Shipped / Delivered…",
+          "Pagination 10 per page"
+        ]
+      },
+      "date": "Jun 2026",
+      "order": 60
+    },
+    {
+      "icon": "👥",
+      "tag": "Admin UX",
+      "title": "Bulk User Activate / Deactivate",
+      "summary": "Select multiple users and activate or deactivate them in one click.",
+      "before": {
+        "label": "Toggle one user at a time",
+        "code": "PUT /api/users/:id  { isActive: false }",
+        "points": [
+          "Had to edit each user individually",
+          "No multi-select"
+        ]
+      },
+      "after": {
+        "label": "Checkbox multi-select + bulk bar",
+        "code": "Promise.all(ids.map(id => userAPI.update(id, { isActive })))",
+        "points": [
+          "Checkbox per row + select all on page",
+          "Activate / Deactivate in bulk",
+          "Admin accounts always protected"
+        ]
+      },
+      "date": "Jun 2026",
+      "order": 70
+    },
+    {
+      "icon": "🗂️",
+      "tag": "Admin UX",
+      "title": "Bulk Category Actions",
+      "summary": "Bulk activate, deactivate, or delete multiple categories at once.",
+      "before": {
+        "label": "Edit / delete one category at a time",
+        "code": "DELETE /api/categories/:id  // one at a time",
+        "points": [
+          "No multi-select",
+          "\"General\" category could be accidentally selected"
+        ]
+      },
+      "after": {
+        "label": "Checkbox + bulk action bar",
+        "code": "Promise.all(ids.map(id => categoryAPI.delete(id)))",
+        "points": [
+          "\"General\" default category excluded from selection",
+          "Activate / Deactivate / Delete in one action",
+          "Confirmation dialog before delete"
+        ]
+      },
+      "date": "Jun 2026",
+      "order": 80
+    },
+    {
+      "icon": "📂",
+      "tag": "Data",
+      "title": "Coupon Import / Export",
+      "summary": "Coupons added to the Import/Export system alongside products, users, etc.",
+      "before": {
+        "label": "Coupons missing from data bundle",
+        "code": "bundle = { products, categories, users, orders }",
+        "points": [
+          "Coupon data lost on backup/restore",
+          "No CSV export for coupons"
+        ]
+      },
+      "after": {
+        "label": "Full coupon support in data bundle",
+        "code": "bundle = { ..., coupons: [...] }\nCSV fields: code, discountType, discountValue, ...",
+        "points": [
+          "Export coupons as JSON or CSV",
+          "Import with duplicate handling (skip / replace)",
+          "usageCount reset to 0 on import"
+        ]
+      },
+      "date": "Jun 2026",
+      "order": 90
+    }
+  ],
+  "supportTickets": []
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from './AdminLayout';
 import { orderAPI, userAPI, productAPI, contactAPI, subscriberAPI } from '../../utils/api';
+import { getSocket } from '../../utils/socket';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({ orders: {}, users: {}, products: 0 });
@@ -24,6 +25,56 @@ export default function Dashboard() {
       setSubscribers(subs.data.subscribers || []);
       setLoading(false);
     }).catch(() => setLoading(false));
+  }, []);
+
+  // Live socket updates — no page refresh needed
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+
+    const onNewOrder = (data) => {
+      setStats(prev => ({
+        ...prev,
+        orders: {
+          ...prev.orders,
+          total:   (prev.orders.total   || 0) + 1,
+          revenue: (prev.orders.revenue || 0) + (data.totalPrice || 0),
+          pending: (prev.orders.pending || 0) + 1,
+        }
+      }));
+      setRecentOrders(prev => [
+        {
+          _id: data.orderId, orderStatus: 'Pending',
+          totalPrice: data.totalPrice,
+          user: { name: data.userName },
+          createdAt: data.createdAt,
+        },
+        ...prev.slice(0, 4),
+      ]);
+    };
+
+    const onNewUser = () => {
+      setStats(prev => ({
+        ...prev,
+        users: { ...prev.users, total: (prev.users.total || 0) + 1, active: (prev.users.active || 0) + 1 }
+      }));
+    };
+
+    const onProductsUpdated = () => {
+      productAPI.getAll({ limit: 1 }).then(({ data }) => {
+        setStats(prev => ({ ...prev, products: data.total }));
+      }).catch(() => {});
+    };
+
+    socket.on('new_order',        onNewOrder);
+    socket.on('new_user',         onNewUser);
+    socket.on('products_updated', onProductsUpdated);
+
+    return () => {
+      socket.off('new_order',        onNewOrder);
+      socket.off('new_user',         onNewUser);
+      socket.off('products_updated', onProductsUpdated);
+    };
   }, []);
 
   const cards = [
@@ -148,9 +199,24 @@ export default function Dashboard() {
         <div className="table-container animate-fade">
           <div className="table-header">
             <h3 style={{ fontWeight: 700, fontSize: 18 }}>💌 Inner Circle Subscribers</h3>
-            <span style={{ fontSize: 14, fontWeight: 700, color: '#c2185b' }}>
-              {subscribers.length} member{subscribers.length !== 1 ? 's' : ''}
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span style={{ fontSize: 14, fontWeight: 700, color: '#c2185b' }}>
+                {subscribers.length} member{subscribers.length !== 1 ? 's' : ''}
+              </span>
+              <button
+                onClick={async () => {
+                  try {
+                    const res = await subscriberAPI.export();
+                    const url = URL.createObjectURL(res.data);
+                    const a = document.createElement('a');
+                    a.href = url; a.download = 'newsletter_subscribers.xlsx';
+                    a.click(); URL.revokeObjectURL(url);
+                  } catch { alert('Export failed'); }
+                }}
+                style={{ padding: '6px 14px', borderRadius: 20, border: '2px solid #00b894', background: '#f0fdf4', color: '#00b894', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+                ⬇ Export Excel
+              </button>
+            </div>
           </div>
           {loading ? (
             <div style={{ padding: 30, textAlign: 'center', color: '#636e72' }}>Loading...</div>

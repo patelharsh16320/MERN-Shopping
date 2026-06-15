@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { contactAPI, orderAPI } from '../../utils/api';
+import { contactAPI, orderAPI, supportAPI } from '../../utils/api';
+import { initSocket } from '../../utils/socket';
+import { toast } from 'react-toastify';
+import AdminChatWidget from '../../components/AdminChatWidget';
 
 const navItems = [
   { icon: '📊', label: 'Dashboard', path: '/admin' },
@@ -18,6 +21,8 @@ const navItems = [
   { icon: '📂', label: 'Import / Export', path: '/admin/import-export' },
   { icon: '✨', label: "What's New", path: '/admin/whats-new' },
   { icon: '🔥', label: 'Streak Board', path: '/admin/streaks' },
+  { icon: '🎧', label: 'Support', path: '/admin/support' },
+  { icon: '🔘', label: 'Pages', path: '/admin/pages' },
 ];
 
 export default function AdminLayout({ children }) {
@@ -25,17 +30,48 @@ export default function AdminLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [badges, setBadges] = useState({ messages: 0, orders: 0 });
+  const [badges, setBadges] = useState({ messages: 0, orders: 0, support: 0 });
+  const socketRef = useRef(null);
 
+  // Fetch badge counts on every route change
   useEffect(() => {
     const fetchBadges = async () => {
       try {
-        const [msgRes, ordRes] = await Promise.all([contactAPI.getStats(), orderAPI.getStats()]);
-        setBadges({ messages: msgRes.data.unread || 0, orders: ordRes.data.pending || 0 });
+        const [msgRes, ordRes, supRes] = await Promise.all([contactAPI.getStats(), orderAPI.getStats(), supportAPI.getStats()]);
+        setBadges({ messages: msgRes.data.unread || 0, orders: ordRes.data.pending || 0, support: supRes.data.unread || 0 });
       } catch {}
     };
     fetchBadges();
   }, [location.pathname]);
+
+  // Live socket listeners — increment badges without page refresh
+  useEffect(() => {
+    if (!user || user.role !== 'admin') return;
+    const stored = JSON.parse(localStorage.getItem('user') || 'null');
+    if (!stored?.token) return;
+    const socket = initSocket(stored.token);
+    socketRef.current = socket;
+
+    const onNewOrder = (data) => {
+      setBadges(prev => ({ ...prev, orders: prev.orders + 1 }));
+      toast.info(
+        `📦 New order from ${data.userName} — ₹${data.totalPrice?.toLocaleString('en-IN')} (${data.itemCount} item${data.itemCount !== 1 ? 's' : ''})`,
+        { autoClose: 6000, position: 'top-right' }
+      );
+    };
+
+    const onNewUser = (data) => {
+      toast.info(`👤 New user registered: ${data.userName}`, { autoClose: 4000, position: 'top-right' });
+    };
+
+    socket.on('new_order', onNewOrder);
+    socket.on('new_user',  onNewUser);
+
+    return () => {
+      socket.off('new_order', onNewOrder);
+      socket.off('new_user',  onNewUser);
+    };
+  }, [user]);
 
   if (!user || user.role !== 'admin') {
     navigate('/login');
@@ -62,6 +98,7 @@ export default function AdminLayout({ children }) {
         {navItems.map(item => {
           const badge = item.path === '/admin/contacts' ? badges.messages
                       : item.path === '/admin/orders' ? badges.orders
+                      : item.path === '/admin/support' ? badges.support
                       : 0;
           return (
             <Link key={item.path} to={item.path} onClick={closeSidebar}
@@ -95,6 +132,7 @@ export default function AdminLayout({ children }) {
           {children}
         </div>
       </div>
+      <AdminChatWidget />
     </div>
   );
 }

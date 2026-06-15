@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { productAPI, categoryAPI } from '../utils/api';
 import ProductCard from '../components/ProductCard';
 import { SkeletonCard } from '../components/Loader';
+import { initPublicSocket } from '../utils/socket';
 const sortOptions = [
   { label: 'Featured', value: '' },
   { label: 'Price: Low to High', value: 'price_asc' },
@@ -48,6 +49,14 @@ export default function Products() {
   }, [filters, page]);
 
   useEffect(() => { fetchProducts(); }, [fetchProducts]);
+
+  // Auto-refresh when products are updated (import, create, update) without page reload
+  useEffect(() => {
+    const socket = initPublicSocket();
+    const onUpdated = () => fetchProducts();
+    socket.on('products_updated', onUpdated);
+    return () => socket.off('products_updated', onUpdated);
+  }, [fetchProducts]);
 
   useEffect(() => {
     const cat = searchParams.get('category') || '';

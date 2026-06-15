@@ -1,139 +1,142 @@
 ========================================
-  MERN Shopping App — Feature List
+  MERN Shopping App — Feature Changelog
+  (sorted by date — newest first)
 ========================================
 
---------------------
-AUTHENTICATION
---------------------
-- JWT-based login and registration
-- Role-based access: customer vs admin
-- Protected routes (token verified on every request)
-- Deactivated account detection with forced logout via custom DOM event
-- Admin guard redirects non-admins away from /admin/* routes
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Jun 15, 2026
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
---------------------
-PRODUCT MANAGEMENT (Admin)
---------------------
-- Create, edit, and delete products
-- Product status: Published / Draft / Trash
-- Trashed products auto-deleted after 30 days (MongoDB TTL index)
-- Auto-generated URL slugs from product name (admin can override)
-- Image uploads via Multer (stored in server/uploads/)
-- Stock tracking: `stock` (live) and `totalStock` (original quantity)
-- Column visibility preferences saved to localStorage
-- Client-side sorting and filtering (no extra API calls)
+- POST-PURCHASE ORDER REDIRECT
+  After checkout user is now redirected to /orders/:id (order detail page)
+  with a "🎉 Order Confirmed!" banner. Previously went to invoice page.
 
---------------------
-CATEGORY MANAGEMENT (Admin)
---------------------
-- Create, edit, delete categories
-- Parent / subcategory hierarchy support
-- "General" default category: undeletable, cannot be a subcategory, no other category may use it as a parent
-- Column visibility preferences saved to localStorage
+- ADMIN PAGE VISIBILITY CONTROL  [NEW]
+  Admin toggles any customer page ON/OFF from /admin/pages.
+  Inactive pages show 🚧 "Coming Soon" to users (live via Socket.io).
+  Controllable: Home, Shop, Offers, Quiz, About, Contact, Support, Wishlist.
+  Core pages (Cart, Checkout, Orders, Profile, Login) always visible.
+  Files: server/models/PageSetting.js, server/routes/pageSettings.js,
+         client/src/context/PageSettingContext.js,
+         client/src/pages/admin/ManagePages.js, client/src/App.js
 
---------------------
-ORDER MANAGEMENT
---------------------
-- Place orders from cart with email confirmation (Nodemailer)
-- Stock automatically decremented on order creation
-- Admin can update order status
-- Admin-only private notes per order (with timestamp and author)
-- Excel export of orders (xlsx package)
-- Invoice auto-created on order placement; marked "Paid" when status reaches "Delivered"
+- SPECIAL OFFERS — LEFT FILTER SIDEBAR  [NEW]
+  Filter panel on /offers page: search, sort (Highest Discount / Price /
+  Ending Soon), discount chips (10%+ / 25%+ / 50%+ / 70%+), price range,
+  offer-type chips (dynamic), In Stock Only toggle.
+  Mobile: collapsible toggle button with active filter count.
 
---------------------
-INVOICE MANAGEMENT
---------------------
-- Auto-generated invoice on every order
-- Invoice status synced with order delivery status
-- Admin invoice management page
-- Customer invoice view page
+- SPECIAL OFFERS — PRODUCT CARD REDESIGN  [NEW]
+  New OfferCard component:
+  • Image hover zoom + "👁 Quick View" overlay
+  • Discount badge + Offer label badge
+  • Wishlist ❤️/🤍 button (top-right)
+  • Star rating + review count
+  • Sale price / crossed-out original / "Save ₹X" pill
+  • Countdown timer with styled unit boxes (hr : min : sec)
+  • Low-stock progress bar (when stock < 10)
+  • Quantity −/+ stepper
+  • "✓ Added!" animated green confirmation on cart add
+  • Skeleton shimmer loading placeholders
+  • Out-of-stock dark overlay
 
---------------------
-COUPON SYSTEM
---------------------
-- Create and manage discount coupons (Admin)
-- Apply coupons at checkout
+- DASHBOARD LIVE STAT UPDATES  [ENHANCEMENT]
+  Admin Dashboard updates in real-time via Socket.io:
+  new_order → Orders+1 / Revenue+amount / Pending+1 / Recent Orders prepend
+  new_user  → Users+1
+  products_updated → product count refetch
 
---------------------
-CART & CHECKOUT
---------------------
-- Add / remove / update items in cart
-- Cart state persisted in localStorage via CartContext
-- Coupon code application at checkout
-- Order placement with address and payment details
+- ADMIN PRODUCTS AUTO-REFRESH  [ENHANCEMENT]
+  /admin/products listens for products_updated socket and auto-refetches list.
 
---------------------
-USER MANAGEMENT (Admin)
---------------------
-- View, edit, and deactivate user accounts
-- Email is immutable (excluded from update operations)
-- Secure User Data page: view email, password hash, role (password-gated with ACCESS_PASSWORD)
-- Paginated user list with copy-to-clipboard support
+- CUSTOMER PRODUCTS PAGE AUTO-REFRESH  [ENHANCEMENT]
+  /products page subscribes via initPublicSocket() to products_updated and
+  calls fetchProducts() automatically — no browser reload.
 
---------------------
-CUSTOMER FEATURES
---------------------
-- Product listing with search and category filtering
-- Product detail page with reviews
-- Wishlist page
-- Order history and order detail view
-- User profile management (name, address, etc.)
-- Beauty quiz interactive page
-- Daily streak component
 
---------------------
-BLOG (Static)
---------------------
-- Hardcoded blog posts (no backend)
-- Full-text search (client-side)
-- Category filtering (client-side)
-- Blog comment management (Admin)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Jun 14, 2026
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
---------------------
-CONTACT & SUPPORT
---------------------
-- Contact Us form submission
-- Admin contact message management
-- Support ticket system (SupportTicket model)
+- USER ADDRESS BOOK  [NEW]
+  Separate UserAddress MongoDB collection (not embedded in User).
+  Admin: view / add / edit / delete / set-default addresses per user.
+  "📍 N" badge in Manage Users table opens AddressModal.
+  User export/import automatically includes addresses.
+  Seeded 140 dummy Indian addresses (4 per user) across 35 users.
 
---------------------
-ANALYTICS & REPORTING
---------------------
-- Visit tracking on every customer route change (VisitTracker in App.js)
-- Admin analytics dashboard with snapshots (AnalyticsSnapshot model)
-- Admin dashboard with unread message and pending order badges
-- Badges polled on every admin route change
+- FULL DATABASE BACKUP & RESTORE  [NEW]
+  One-click export all collections → full-backup-YYYY-MM-DD.json.
+  Restore on any device — a-to-z data migration.
+  Purple panel on Import/Export page. Collections: products, categories,
+  users (+addresses), orders, invoices, coupons, analytics, contacts,
+  subscribers, changelog, supportTickets.
 
---------------------
-ADMIN TOOLS
---------------------
-- Import / Export data (ImportExport page + ImportModal)
-- Manage Reviews
-- What's New / Changelog page (Changelog model)
-- Analytics page with snapshot history
+- ORDER TRACKING IN CHAT WIDGET  [NEW]
+  Chat now has 2 tabs: 💬 Chat + 📦 My Orders.
+  My Orders shows: color-coded status badge, progress steps bar
+  (Pending → Processing → Shipped → Delivered), item thumbnails,
+  payment info. "📦 Track my orders" quick-button in empty chat.
 
---------------------
-UI & FRONTEND
---------------------
-- Two React Contexts: AuthContext (session) and CartContext (cart)
-- Both contexts persist to localStorage
-- React Router v7 with separate layouts for customer and admin
-- MainLayout wraps all customer routes (BubbleBackground, Navbar, Footer)
-- AdminLayout wraps all /admin/* routes (no Navbar/Footer)
-- Scroll animations with useInView (IntersectionObserver) on Home, Blog, and policy pages
-- Animated bubble background on customer pages
-- Toast notifications (react-toastify)
-- Loader component for async states
+- LIVE UNREAD MESSAGE BADGE  [NEW]
+  Real-time +1/+2 counter on chat button (user & admin) via Socket.io.
+  No page refresh. Badge persists via localStorage (chat_lastRead_{userId}).
+  Pulse animation, 99+ cap. Badge shows even while popup is open.
 
---------------------
-BACKEND INFRASTRUCTURE
---------------------
-- Express server on port 5000
-- MongoDB via Mongoose
-- Single Axios instance (api.js) with request/response interceptors
-- Static file serving for uploaded images at /uploads/<filename>
-- DB seeder: users, categories, products, orders (npm run seed)
-- Environment config via server/.env
+- SOCKET.IO REAL-TIME FULL SITE  [NEW]
+  Events:
+    new_order          → admin_room  (badge + Dashboard + toast)
+    products_updated   → public_room (Products + ManageProducts refresh)
+    new_user           → admin_room  (Dashboard counter + toast)
+    new_message        → user_{id}   (chat badge)
+    page_settings_updated → public_room (live page toggle)
+  Guest (unauthenticated) socket connections supported → public_room.
 
-========================================
+- BOT MESSAGE ON ORDER PLACEMENT  [NEW]
+  After order placed, bot auto-sends:
+  "🎉 Thank you {name}! Your order #{id} has been placed. Tap 📦 My Orders to track it!"
+  Saved to ChatMessage DB + emitted via socket instantly to user.
+
+- SCROLL BUTTONS MOVED  [FIX]
+  ScrollButtons moved from right:82 to left:20 — no longer overlaps chat widget.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Earlier — Jun 2026
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+- Product URL Slugs               — SEO-friendly /products/rose-water-mist
+- Coupon Code System              — CRUD, percentage/fixed, expiry, usage limits
+- Category Hierarchy              — parent → subcategory, "General" protected
+- Admin → User Messaging          — two-way replies, unread badges on Profile
+- Secure User Data Page           — password-locked, shows hash, admin reset
+- Orders Page Column Toggles      — search, sort, 5 columns, status tabs, pagination
+- Bulk User Activate/Deactivate   — checkbox multi-select + bulk action bar
+- Bulk Category Actions           — activate / deactivate / delete multiple
+- Coupon Import / Export          — coupons in JSON/CSV data bundle
+- Real-time Live Chat             — user ↔ admin Socket.io; JWT auth per socket
+- Smart Navbar                    — hides on scroll down, slides back on scroll up
+- Loyalty Points System           — earn 1pt/₹10; 4 tiers; redeem at cart
+- Special Offers / Flash Deals    — per-product sale price + countdown; /offers page
+- Gift Packing at Checkout        — 3 sizes (₹50/₹100/₹150) + message field
+- Newsletter Export to Excel      — subscriber list download from Dashboard
+- Support Ticket System           — open/close/reply; /support + /admin/support
+- Product Active/Inactive Toggle  — quick toggle, independent of status
+- Admin Streak Leaderboard        — /admin/streaks; tier/streak filters; medals
+- Profile Loyalty Tab             — tier card, progress bar, points history
+- Daily Login Streak              — streak + milestone coupon rewards (7d=10%, 30d=25%)
+- Order Emails                    — confirmation to customer + alert to admin
+- What's New / Changelog Page     — before/after feature cards, tag filters
+- Analytics Snapshots             — daily snapshot model + admin charts
+- Invoice Auto-Creation           — auto-generated + marked Paid on Delivered
+- Blog Comment Management         — admin moderation (blog section later removed)
+- Admin Order Private Notes       — timestamp + author per note
+- Beauty Quiz                     — interactive quiz page (/quiz)
+- Scroll To Top/Bottom Buttons    — fixed position, threshold-triggered
+- Terms & Conditions Page         — 10 sections at /terms
+- Mobile Responsive               — fluid layout, horizontal-scroll tabs, stacked footer
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Total: 40+ features built
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

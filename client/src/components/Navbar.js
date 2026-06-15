@@ -11,7 +11,10 @@ export default function Navbar() {
   const [search, setSearch] = useState('');
   const [dropOpen, setDropOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [navVisible, setNavVisible] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
   const dropRef = useRef();
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
     const handler = (e) => { if (dropRef.current && !dropRef.current.contains(e.target)) setDropOpen(false); };
@@ -20,6 +23,24 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const current = window.scrollY;
+      setScrolled(current > 10);
+      if (current < 80) {
+        setNavVisible(true);
+      } else if (current > lastScrollY.current + 6) {
+        setNavVisible(false);
+        setDropOpen(false);
+      } else if (current < lastScrollY.current - 4) {
+        setNavVisible(true);
+      }
+      lastScrollY.current = current;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -31,7 +52,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="navbar">
+      <nav className={`navbar${!navVisible ? ' navbar-hidden' : ''}${scrolled ? ' navbar-scrolled' : ''}`}>
         <div className="navbar-inner">
           <Link to="/" className="navbar-brand">💗 Women HubClub</Link>
 
@@ -45,6 +66,7 @@ export default function Navbar() {
             <li><Link to="/products" className={`nav-link ${isActive('/products')}`}>Shop</Link></li>
             <li><Link to="/about" className={`nav-link ${isActive('/about')}`}>About</Link></li>
             <li><Link to="/contact" className={`nav-link ${isActive('/contact')}`}>Contact</Link></li>
+            <li><Link to="/offers" className={`nav-link ${isActive('/offers')}`}>🔥 Offers</Link></li>
             <li><Link to="/quiz" className={`nav-link ${isActive('/quiz')}`}>✨ Quiz</Link></li>
             {user ? (
               <>
@@ -106,11 +128,13 @@ export default function Navbar() {
         <Link to="/products" className="nav-link" onClick={close}>🛍️ Shop</Link>
         <Link to="/about" className="nav-link" onClick={close}>💫 About</Link>
         <Link to="/contact" className="nav-link" onClick={close}>📞 Contact</Link>
+        <Link to="/offers" className="nav-link" onClick={close}>🔥 Special Offers</Link>
         <Link to="/quiz" className="nav-link" onClick={close}>✨ Beauty Quiz</Link>
         {user ? (
           <>
             <Link to="/wishlist" className="nav-link" onClick={close}>🤍 Wishlist</Link>
             <Link to="/orders" className="nav-link" onClick={close}>📦 My Orders</Link>
+            <Link to="/support" className="nav-link" onClick={close}>🎧 Support</Link>
             <Link to="/profile" className="nav-link" onClick={close}>👤 Profile ({user.name.split(' ')[0]})</Link>
             {user.role === 'admin' && <Link to="/admin" className="nav-link" onClick={close}>⚙️ Admin Panel</Link>}
             <div className="nav-link" style={{ color: '#c62828', cursor: 'pointer' }} onClick={() => { logout(); close(); navigate('/'); }}>🚪 Logout</div>

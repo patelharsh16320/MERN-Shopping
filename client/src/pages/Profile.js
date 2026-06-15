@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { authAPI, contactAPI } from '../utils/api';
+import { authAPI, contactAPI, loyaltyAPI } from '../utils/api';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
@@ -31,6 +31,7 @@ export default function Profile() {
   const [expandedMsg, setExpandedMsg] = useState(null);
   const [unreadMsgCount, setUnreadMsgCount] = useState(0);
   const [streak, setStreak] = useState(null);
+  const [loyalty, setLoyalty] = useState(null);
 
   useEffect(() => {
     contactAPI.getUserStats()
@@ -41,6 +42,11 @@ export default function Profile() {
   useEffect(() => {
     if (tab !== 'streak') return;
     authAPI.getStreak().then(({ data }) => setStreak(data)).catch(() => {});
+  }, [tab]);
+
+  useEffect(() => {
+    if (tab !== 'loyalty') return;
+    loyaltyAPI.getMyLoyalty().then(({ data }) => setLoyalty(data)).catch(() => {});
   }, [tab]);
 
   useEffect(() => {
@@ -131,7 +137,7 @@ export default function Profile() {
             </div>
 
             <div style={{ background: 'white', borderRadius: 24, padding: 16, boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
-              {[['profile', '👤', 'Profile Info'], ['addresses', '📍', 'My Addresses'], ['streak', '🔥', 'My Streak'], ['messages', '💬', 'My Messages']].map(([key, icon, label]) => (
+              {[['profile', '👤', 'Profile Info'], ['addresses', '📍', 'My Addresses'], ['streak', '🔥', 'My Streak'], ['loyalty', '⭐', 'Loyalty Points'], ['messages', '💬', 'My Messages']].map(([key, icon, label]) => (
                 <div key={key} onClick={() => setTab(key)}
                   style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', cursor: 'pointer', borderRadius: 12, marginBottom: 4, background: tab === key ? '#e8f5e9' : 'transparent', color: tab === key ? 'var(--primary)' : 'var(--text)', fontWeight: tab === key ? 700 : 500, fontSize: 14, transition: 'all 0.2s' }}>
                   <span>{icon}</span>
@@ -392,6 +398,106 @@ export default function Profile() {
                           </div>
                         )}
                       </div>
+                    </>
+                  );
+                })()}
+              </div>
+            )}
+
+            {tab === 'loyalty' && (
+              <div style={{ background: 'white', borderRadius: 24, padding: 36, boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
+                <h2 style={{ fontWeight: 700, marginBottom: 28, fontSize: 22 }}>⭐ My Loyalty Points</h2>
+                {!loyalty ? (
+                  <div style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</div>
+                ) : (() => {
+                  const TIER_COLORS = { Bronze: '#cd7f32', Silver: '#9e9e9e', Gold: '#f39c12', Platinum: '#6c63ff' };
+                  const TIER_BG    = { Bronze: '#fdf3e7', Silver: '#f5f5f5', Gold: '#fffbf0', Platinum: '#f0f0ff' };
+                  const nextTier   = { Bronze: 'Silver', Silver: 'Gold', Gold: 'Platinum', Platinum: null };
+                  const thresholds = loyalty.tierThresholds || { Bronze: 0, Silver: 500, Gold: 2000, Platinum: 5000 };
+                  const curColor   = TIER_COLORS[loyalty.tier];
+                  const nt         = nextTier[loyalty.tier];
+                  const progress   = nt ? Math.min(100, ((loyalty.totalEarned - thresholds[loyalty.tier]) / (thresholds[nt] - thresholds[loyalty.tier])) * 100) : 100;
+                  return (
+                    <>
+                      {/* Tier card */}
+                      <div style={{ background: TIER_BG[loyalty.tier], border: `2px solid ${curColor}30`, borderRadius: 20, padding: 28, marginBottom: 28, display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
+                        <div style={{ width: 80, height: 80, borderRadius: '50%', background: curColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, color: 'white', fontWeight: 900, flexShrink: 0 }}>
+                          {loyalty.tier === 'Bronze' ? '🥉' : loyalty.tier === 'Silver' ? '🥈' : loyalty.tier === 'Gold' ? '🥇' : '💎'}
+                        </div>
+                        <div style={{ flex: 1, minWidth: 180 }}>
+                          <div style={{ fontSize: 13, color: '#9e9e9e', fontWeight: 600, marginBottom: 4 }}>Your Tier</div>
+                          <div style={{ fontSize: 26, fontWeight: 900, color: curColor }}>{loyalty.tier}</div>
+                          <div style={{ fontSize: 13, color: '#636e72', marginTop: 4 }}>{loyalty.totalEarned.toLocaleString()} points earned lifetime</div>
+                          {nt && (
+                            <div style={{ marginTop: 12 }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#9e9e9e', marginBottom: 4 }}>
+                                <span>{loyalty.tier}</span><span>{nt} ({(thresholds[nt] - loyalty.totalEarned).toLocaleString()} pts away)</span>
+                              </div>
+                              <div style={{ height: 8, background: '#e0e0e0', borderRadius: 4, overflow: 'hidden' }}>
+                                <div style={{ height: '100%', width: `${progress}%`, background: `linear-gradient(90deg, ${curColor}, ${TIER_COLORS[nt]})`, borderRadius: 4, transition: 'width 0.5s' }} />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                          <div style={{ fontSize: 36, fontWeight: 900, color: curColor }}>{loyalty.points.toLocaleString()}</div>
+                          <div style={{ fontSize: 12, color: '#9e9e9e', fontWeight: 600 }}>Available Points</div>
+                          <div style={{ fontSize: 12, color: '#636e72', marginTop: 4 }}>≈ ₹{Math.floor(loyalty.points * (loyalty.pointsToRupee || 0.5))} value</div>
+                        </div>
+                      </div>
+
+                      {/* How to earn / redeem */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 28 }}>
+                        <div style={{ background: '#f8f7ff', borderRadius: 16, padding: 20, border: '1px solid #e0e0ff' }}>
+                          <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 15 }}>🎯 How to Earn</div>
+                          <div style={{ fontSize: 13, color: '#636e72', lineHeight: 1.8 }}>
+                            • Every ₹10 spent = <strong>1 point</strong><br />
+                            • Daily login streak milestones<br />
+                            • Special promotional events
+                          </div>
+                        </div>
+                        <div style={{ background: '#f0fdf4', borderRadius: 16, padding: 20, border: '1px solid #b2dfdb' }}>
+                          <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 15 }}>💸 Redemption Rate</div>
+                          <div style={{ fontSize: 13, color: '#636e72', lineHeight: 1.8 }}>
+                            • <strong>1 point = ₹{loyalty.pointsToRupee || 0.5}</strong> off<br />
+                            • Use at checkout<br />
+                            • No minimum points required
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Tier benefits */}
+                      <div style={{ marginBottom: 28 }}>
+                        <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 12 }}>🏆 Tier Benefits</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(120px,1fr))', gap: 10 }}>
+                          {Object.entries({ Bronze: ['Free shipping >₹999', 'Basic support'], Silver: ['Free shipping >₹499', 'Priority support', '5% bonus points'], Gold: ['Free shipping always', 'VIP support', '10% bonus points', 'Early sale access'], Platinum: ['Free shipping always', 'Dedicated support', '20% bonus points', 'Exclusive launches', 'Birthday rewards'] }).map(([tier, perks]) => (
+                            <div key={tier} style={{ background: tier === loyalty.tier ? TIER_BG[tier] : '#fafafa', border: `2px solid ${tier === loyalty.tier ? curColor : '#e0e0e0'}`, borderRadius: 14, padding: 14 }}>
+                              <div style={{ fontWeight: 700, fontSize: 13, color: TIER_COLORS[tier], marginBottom: 8 }}>{tier === 'Bronze' ? '🥉' : tier === 'Silver' ? '🥈' : tier === 'Gold' ? '🥇' : '💎'} {tier}</div>
+                              {perks.map(p => <div key={p} style={{ fontSize: 11, color: '#636e72', marginBottom: 3 }}>✓ {p}</div>)}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Points history */}
+                      {loyalty.history && loyalty.history.length > 0 && (
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 12 }}>📋 Points History</div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {loyalty.history.map((h, i) => (
+                              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px', background: '#fafafa', borderRadius: 12, border: '1px solid #f0f0f0' }}>
+                                <div>
+                                  <div style={{ fontWeight: 600, fontSize: 13 }}>{h.reason}</div>
+                                  <div style={{ fontSize: 11, color: '#9e9e9e' }}>{new Date(h.date).toLocaleDateString('en-IN', { dateStyle: 'medium' })}</div>
+                                </div>
+                                <div style={{ fontWeight: 800, fontSize: 15, color: h.type === 'earned' ? '#00b894' : '#d63031' }}>
+                                  {h.type === 'earned' ? '+' : ''}{h.points} pts
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </>
                   );
                 })()}

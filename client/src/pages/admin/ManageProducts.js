@@ -2,8 +2,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import AdminLayout from './AdminLayout';
 import { productAPI, categoryAPI, uploadAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
+import { getSocket } from '../../utils/socket';
 
-const emptyForm = { name: '', slug: '', description: '', price: '', originalPrice: '', discount: 0, category: '', subcategory: '', images: [''], stock: '', totalStock: '', rating: 0, numReviews: 0, isFeatured: false, freshnessDays: 365, weight: '200g', brand: 'Women HubClub', tags: '', status: 'published' };
+const emptyForm = { name: '', slug: '', description: '', price: '', originalPrice: '', discount: 0, category: '', subcategory: '', images: [''], stock: '', totalStock: '', rating: 0, numReviews: 0, isFeatured: false, isActive: true, freshnessDays: 365, weight: '200g', brand: 'Women HubClub', tags: '', status: 'published', specialOffer: { enabled: false, label: '', salePrice: '', endsAt: '' } };
 
 function autoSlug(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -71,6 +72,7 @@ export default function ManageProducts() {
   });
   const [sortField, setSortField] = useState('');
   const [sortDir, setSortDir] = useState('asc');
+  const [activeFilter, setActiveFilter] = useState('all');
   const [categories, setCategories] = useState([]);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [slugEdit, setSlugEdit] = useState({ id: null, value: '' });
@@ -96,6 +98,8 @@ export default function ManageProducts() {
     if (statusFilter !== 'all') {
       list = list.filter(p => (p.status || 'published') === statusFilter);
     }
+    if (activeFilter === 'active')   list = list.filter(p => p.isActive !== false);
+    if (activeFilter === 'inactive') list = list.filter(p => p.isActive === false);
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(p =>
@@ -105,7 +109,7 @@ export default function ManageProducts() {
       );
     }
     return list;
-  }, [products, search, statusFilter]);
+  }, [products, search, statusFilter, activeFilter]);
 
   const sortedProducts = useMemo(() => {
     if (!sortField) return filteredProducts;
@@ -127,6 +131,8 @@ export default function ManageProducts() {
     STATUS_TABS.slice(1).forEach(t => {
       counts[t.key] = products.filter(p => (p.status || 'published') === t.key).length;
     });
+    counts.active   = products.filter(p => p.isActive !== false).length;
+    counts.inactive = products.filter(p => p.isActive === false).length;
     return counts;
   }, [products]);
 
@@ -141,11 +147,28 @@ export default function ManageProducts() {
 
   useEffect(() => { fetchProducts(); }, []);
 
+  // Refresh product list when products change via socket (import, create, update, delete)
+  useEffect(() => {
+    const socket = getSocket();
+    if (!socket) return;
+    const onUpdated = () => fetchProducts();
+    socket.on('products_updated', onUpdated);
+    return () => socket.off('products_updated', onUpdated);
+  }, []);
+
   const openAdd = () => { setEditing(null); setForm(emptyForm); setModal(true); };
   const openEdit = (p) => {
     setEditing(p._id);
-    setForm({ ...emptyForm, ...p, slug: p.slug || '', images: p.images?.length ? p.images : [''], tags: p.tags?.join(', ') || '', totalStock: p.totalStock || p.stock || '', subcategory: p.subcategory || '', status: p.status || 'published' });
+    setForm({ ...emptyForm, ...p, slug: p.slug || '', images: p.images?.length ? p.images : [''], tags: p.tags?.join(', ') || '', totalStock: p.totalStock || p.stock || '', subcategory: p.subcategory || '', status: p.status || 'published', isActive: p.isActive !== false, specialOffer: { enabled: p.specialOffer?.enabled || false, label: p.specialOffer?.label || '', salePrice: p.specialOffer?.salePrice || '', endsAt: p.specialOffer?.endsAt ? new Date(p.specialOffer.endsAt).toISOString().slice(0, 16) : '' } });
     setModal(true);
+  };
+
+  const handleToggleActive = async (p) => {
+    try {
+      await productAPI.update(p._id, { isActive: !p.isActive });
+      toast.success(p.isActive ? `"${p.name}" disabled` : `"${p.name}" enabled`);
+      fetchProducts();
+    } catch { toast.error('Failed to update'); }
   };
 
   const handleSave = async (e) => {
@@ -155,6 +178,9 @@ export default function ManageProducts() {
       const payload = { ...form, category: form.category || 'General', tags: form.tags ? form.tags.split(',').map(t => t.trim()) : [], images: form.images.filter(Boolean) };
       if (!payload.slug) delete payload.slug;
       if (!payload.totalStock) payload.totalStock = payload.stock;
+      if (payload.specialOffer) {
+        payload.specialOffer = { ...payload.specialOffer, salePrice: parseFloat(payload.specialOffer.salePrice) || 0, endsAt: payload.specialOffer.endsAt || null };
+      }
       if (editing) { await productAPI.update(editing, payload); toast.success('Product updated!'); }
       else { await productAPI.create(payload); toast.success('Product created!'); }
       setModal(false);
@@ -267,20 +293,37 @@ export default function ManageProducts() {
       </div>
 
       {/* Status tabs */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+        <span style={{ fontSize: 12, fontWeight: 700, color: '#9e9e9e', marginRight: 4 }}>Status:</span>
         {STATUS_TABS.map(tab => (
           <button key={tab.key} onClick={() => { setStatusFilter(tab.key); setPage(1); setSelectedIds(new Set()); }}
-            style={{ padding: '6px 16px', borderRadius: 20, border: `2px solid ${statusFilter === tab.key ? '#6c63ff' : '#e0e0e0'}`, background: statusFilter === tab.key ? '#f0f0ff' : 'white', color: statusFilter === tab.key ? '#6c63ff' : '#636e72', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>
+            style={{ padding: '5px 14px', borderRadius: 20, border: `2px solid ${statusFilter === tab.key ? '#6c63ff' : '#e0e0e0'}`, background: statusFilter === tab.key ? '#f0f0ff' : 'white', color: statusFilter === tab.key ? '#6c63ff' : '#636e72', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>
             {tab.label}
             <span style={{ marginLeft: 6, padding: '1px 7px', borderRadius: 10, background: statusFilter === tab.key ? '#6c63ff' : '#f0f0f0', color: statusFilter === tab.key ? 'white' : '#9e9e9e', fontSize: 11, fontWeight: 700 }}>
               {tabCounts[tab.key] ?? 0}
             </span>
           </button>
         ))}
+        <span style={{ width: 1, height: 24, background: '#e0e0e0', margin: '0 4px' }} />
+        <span style={{ fontSize: 12, fontWeight: 700, color: '#9e9e9e', marginRight: 4 }}>Visibility:</span>
+        {[
+          { key: 'all',      label: 'All',      color: '#636e72', bg: '#f5f5f5' },
+          { key: 'active',   label: '🟢 Active',   color: '#2e7d32', bg: '#e8f5e9' },
+          { key: 'inactive', label: '🔴 Inactive', color: '#d63031', bg: '#fff0f0' },
+        ].map(f => (
+          <button key={f.key} onClick={() => { setActiveFilter(f.key); setPage(1); setSelectedIds(new Set()); }}
+            style={{ padding: '5px 14px', borderRadius: 20, border: `2px solid ${activeFilter === f.key ? f.color : '#e0e0e0'}`, background: activeFilter === f.key ? f.bg : 'white', color: activeFilter === f.key ? f.color : '#636e72', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>
+            {f.label}
+            <span style={{ marginLeft: 6, padding: '1px 7px', borderRadius: 10, background: activeFilter === f.key ? f.color : '#f0f0f0', color: activeFilter === f.key ? 'white' : '#9e9e9e', fontSize: 11, fontWeight: 700 }}>
+              {f.key === 'all' ? tabCounts.all : (tabCounts[f.key] ?? 0)}
+            </span>
+          </button>
+        ))}
       </div>
 
       <div style={{ marginBottom: 16, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-        <input className="form-input" placeholder="Search products..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} style={{ maxWidth: 320 }} />
+        <input className="form-input" placeholder="Search products..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} style={{ maxWidth: 280 }} />
+
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
           <span style={{ fontSize: 13, color: '#9e9e9e', fontWeight: 600 }}>Columns:</span>
           {PROD_COLS.map(col => (
@@ -382,9 +425,22 @@ export default function ManageProducts() {
                     )}
                   </td>
                   <td>
-                    <span style={{ display: 'inline-block', padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 700, background: STATUS_BG[status] || '#f5f5f5', color: STATUS_COLORS[status] || '#636e72', textTransform: 'capitalize', border: `1px solid ${STATUS_COLORS[status] || '#e0e0e0'}33` }}>
-                      {status}
-                    </span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <span style={{ display: 'inline-block', padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 700, background: STATUS_BG[status] || '#f5f5f5', color: STATUS_COLORS[status] || '#636e72', textTransform: 'capitalize', border: `1px solid ${STATUS_COLORS[status] || '#e0e0e0'}33` }}>
+                        {status}
+                      </span>
+                      {!isTrash && (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 700, color: p.isActive !== false ? '#00b894' : '#d63031' }}>
+                          <span style={{ width: 7, height: 7, borderRadius: '50%', background: p.isActive !== false ? '#00b894' : '#d63031', display: 'inline-block' }} />
+                          {p.isActive !== false ? 'Active' : 'Inactive'}
+                        </span>
+                      )}
+                      {p.specialOffer?.enabled && (
+                        <span style={{ display: 'inline-block', padding: '2px 7px', borderRadius: 10, fontSize: 10, fontWeight: 700, background: '#fff3e0', color: '#e17055', border: '1px solid #ffe0b2' }}>
+                          🔥 On Sale
+                        </span>
+                      )}
+                    </div>
                   </td>
                   {visibleCols['Category'] && (
                     <td>
@@ -430,6 +486,13 @@ export default function ManageProducts() {
                       ) : (
                         <>
                           <button className="btn btn-sm" style={{ background: '#f0f0ff', color: '#6c63ff', borderRadius: 20 }} onClick={() => openEdit(p)}>Edit</button>
+                          <button
+                            className="btn btn-sm"
+                            title={p.isActive !== false ? 'Disable product (hide from store)' : 'Enable product (show in store)'}
+                            onClick={() => handleToggleActive(p)}
+                            style={{ borderRadius: 20, whiteSpace: 'nowrap', background: p.isActive !== false ? '#e8f5e9' : '#fff0f0', color: p.isActive !== false ? '#2e7d32' : '#d63031', border: `1px solid ${p.isActive !== false ? '#a5d6a7' : '#ffcdd2'}` }}>
+                            {p.isActive !== false ? '🟢 Active' : '🔴 Inactive'}
+                          </button>
                           <button className="btn btn-sm" style={{ background: '#fff8f0', color: '#e17055', borderRadius: 20, border: '1px solid #ffd5c2' }} onClick={() => handleTrash(p._id, p.name)}>🗑 Trash</button>
                         </>
                       )}
@@ -656,7 +719,43 @@ export default function ManageProducts() {
                     Mark as Featured
                   </label>
                 </div>
+                <div className="form-group">
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontWeight: 600 }}>
+                    <input type="checkbox" checked={form.isActive !== false} onChange={e => setForm({ ...form, isActive: e.target.checked })} style={{ width: 20, height: 20, accentColor: '#00b894' }} />
+                    <span>Active <span style={{ fontWeight: 400, fontSize: 12, color: '#9e9e9e' }}>(uncheck to hide from store without trashing)</span></span>
+                  </label>
+                </div>
               </div>
+
+              {/* Special Offer */}
+              <div style={{ background: '#fff9f0', borderRadius: 16, padding: 18, border: '2px solid #ffe0b2', marginTop: 8 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', fontWeight: 700, marginBottom: form.specialOffer?.enabled ? 14 : 0 }}>
+                  <input type="checkbox" checked={!!form.specialOffer?.enabled}
+                    onChange={e => setForm(f => ({ ...f, specialOffer: { ...f.specialOffer, enabled: e.target.checked } }))}
+                    style={{ width: 20, height: 20, accentColor: '#e17055' }} />
+                  🔥 Special Offer / Flash Sale
+                </label>
+                {form.specialOffer?.enabled && (
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label">Offer Badge Label</label>
+                      <input className="form-input" placeholder="e.g. Flash Sale, 50% OFF, Deal of the Day"
+                        value={form.specialOffer?.label || ''} onChange={e => setForm(f => ({ ...f, specialOffer: { ...f.specialOffer, label: e.target.value } }))} />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label">Sale Price (₹)</label>
+                      <input className="form-input" type="number" min="0" placeholder="Sale price"
+                        value={form.specialOffer?.salePrice || ''} onChange={e => setForm(f => ({ ...f, specialOffer: { ...f.specialOffer, salePrice: e.target.value } }))} />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: 0, gridColumn: '1 / -1' }}>
+                      <label className="form-label">Offer Ends At (optional)</label>
+                      <input className="form-input" type="datetime-local"
+                        value={form.specialOffer?.endsAt || ''} onChange={e => setForm(f => ({ ...f, specialOffer: { ...f.specialOffer, endsAt: e.target.value } }))} />
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
                 <button type="button" className="btn btn-secondary" onClick={() => setModal(false)}>Cancel</button>
                 <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? '⏳ Saving...' : '💾 Save Product'}</button>

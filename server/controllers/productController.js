@@ -45,12 +45,18 @@ const getProductById = async (req, res) => {
   }
 };
 
+const emitProductsUpdated = (req, action, count = 1) => {
+  const io = req.app.get('io');
+  if (io) io.to('public_room').emit('products_updated', { action, count });
+};
+
 const createProduct = async (req, res) => {
   try {
     const body = { ...req.body };
     if (!body.totalStock) body.totalStock = body.stock;
     const product = new Product(body);
     const saved = await product.save();
+    emitProductsUpdated(req, 'created');
     res.status(201).json(saved);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -67,11 +73,13 @@ const updateProduct = async (req, res) => {
       body.isActive = false;
     } else if (body.status && body.status !== 'trash') {
       body.trashedAt = null;
-      body.isActive = body.status === 'published';
+      // Only auto-set isActive from status when the caller didn't explicitly send it
+      if (body.isActive === undefined) body.isActive = body.status === 'published';
     }
     Object.assign(product, body);
     if (!product.totalStock) product.totalStock = product.stock;
     const saved = await product.save();
+    emitProductsUpdated(req, 'updated');
     res.json(saved);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -82,6 +90,7 @@ const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
+    emitProductsUpdated(req, 'deleted');
     res.json({ message: 'Product deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });

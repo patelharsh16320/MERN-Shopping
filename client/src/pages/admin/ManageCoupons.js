@@ -204,8 +204,8 @@ export default function ManageCoupons() {
                   </div>
                 </td>
                 <td>
-                  <span style={{ fontWeight: 700, color: c.discountType === 'percentage' ? '#6c63ff' : '#00b894' }}>
-                    {c.discountType === 'percentage' ? `${c.discountValue}% OFF` : `₹${c.discountValue} OFF`}
+                  <span style={{ fontWeight: 700, color: c.discountType === 'percentage' ? '#6c63ff' : c.discountType === 'set_price' ? '#e17055' : '#00b894' }}>
+                    {c.discountType === 'percentage' ? `${c.discountValue}% OFF` : c.discountType === 'set_price' ? `₹${c.discountValue} FIXED` : `₹${c.discountValue} OFF`}
                   </span>
                 </td>
                 <td style={{ color: '#636e72', fontSize: 13 }}>{c.minOrderAmount > 0 ? `₹${c.minOrderAmount}` : '—'}</td>
@@ -262,14 +262,17 @@ export default function ManageCoupons() {
                   <label className="form-label">Discount Type</label>
                   <select className="form-select" value={form.discountType}
                     onChange={e => setForm(f => ({ ...f, discountType: e.target.value }))}>
-                    <option value="percentage">Percentage (%)</option>
-                    <option value="fixed">Fixed Amount (₹)</option>
+                    <option value="percentage">Percentage Off (%)</option>
+                    <option value="fixed">Amount Off (₹)</option>
+                    <option value="set_price">Set Price (₹ fixed total)</option>
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Discount Value {form.discountType === 'percentage' ? '(%)' : '(₹)'}</label>
+                  <label className="form-label">
+                    {form.discountType === 'percentage' ? 'Discount (%)' : form.discountType === 'set_price' ? 'Final Price (₹)' : 'Discount Amount (₹)'}
+                  </label>
                   <input className="form-input" type="number" min="0" max={form.discountType === 'percentage' ? 100 : undefined}
-                    placeholder={form.discountType === 'percentage' ? 'e.g. 20' : 'e.g. 100'}
+                    placeholder={form.discountType === 'percentage' ? 'e.g. 20' : form.discountType === 'set_price' ? 'e.g. 499' : 'e.g. 100'}
                     value={form.discountValue} onChange={e => setForm(f => ({ ...f, discountValue: e.target.value }))} required />
                 </div>
               </div>

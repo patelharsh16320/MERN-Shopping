@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { couponAPI } from '../utils/api';
+import { couponAPI, loyaltyAPI } from '../utils/api';
 import { toast } from 'react-toastify';
 
 export default function Cart() {
@@ -13,6 +13,14 @@ export default function Cart() {
   const [couponData, setCouponData] = useState(null);
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [couponLoading, setCouponLoading] = useState(false);
+  const [loyaltyInfo, setLoyaltyInfo] = useState(null);
+  const [loyaltyPoints, setLoyaltyPoints] = useState('');
+  const [loyaltyDiscount, setLoyaltyDiscount] = useState(0);
+  const [loyaltyPointsUsed, setLoyaltyPointsUsed] = useState(0);
+
+  useEffect(() => {
+    if (user) loyaltyAPI.getMyLoyalty().then(({ data }) => setLoyaltyInfo(data)).catch(() => {});
+  }, [user]);
 
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) return toast.error('Enter a coupon code');
@@ -35,13 +43,27 @@ export default function Cart() {
     toast.info('Coupon removed');
   };
 
+  const handleApplyLoyalty = async () => {
+    const pts = parseInt(loyaltyPoints);
+    if (!pts || pts <= 0) return toast.error('Enter valid points');
+    if (!loyaltyInfo || pts > loyaltyInfo.points) return toast.error(`You only have ${loyaltyInfo?.points || 0} points`);
+    try {
+      const { data } = await loyaltyAPI.redeem(pts);
+      setLoyaltyDiscount(data.discount);
+      setLoyaltyPointsUsed(pts);
+      toast.success(`⭐ ${pts} points applied! You save ₹${data.discount}`);
+    } catch (err) { toast.error(err.response?.data?.message || 'Failed to apply points'); }
+  };
+
+  const handleRemoveLoyalty = () => { setLoyaltyDiscount(0); setLoyaltyPointsUsed(0); setLoyaltyPoints(''); };
+
   const shipping = totalPrice > 999 ? 0 : 49;
   const tax = Math.round(totalPrice * 0.18);
-  const total = totalPrice + shipping + tax - couponDiscount;
+  const total = totalPrice + shipping + tax - couponDiscount - loyaltyDiscount;
 
   const handleCheckout = () => {
     if (!user) { toast.warning('Please login to continue'); navigate('/login'); return; }
-    navigate('/checkout', { state: couponData ? { coupon: { id: couponData._id, code: couponData.code, discount: couponDiscount } } : undefined });
+    navigate('/checkout', { state: { coupon: couponData ? { id: couponData._id, code: couponData.code, discount: couponDiscount } : null, loyaltyPointsUsed: loyaltyPointsUsed || 0, loyaltyDiscount: loyaltyDiscount || 0 } });
   };
 
   if (cartItems.length === 0) return (
@@ -110,8 +132,14 @@ export default function Cart() {
                 <span>−₹{couponDiscount.toLocaleString()}</span>
               </div>
             )}
+            {loyaltyDiscount > 0 && (
+              <div className="summary-row" style={{ color: '#6c63ff' }}>
+                <span>⭐ Points ({loyaltyPointsUsed} pts)</span>
+                <span>−₹{loyaltyDiscount.toLocaleString()}</span>
+              </div>
+            )}
             <div className="summary-total"><span>Total Amount</span><span className="gradient-text">₹{total.toLocaleString()}</span></div>
-            {totalPrice > 0 && <div style={{ fontSize: 13, color: '#00b894', marginTop: 6, textAlign: 'right' }}>You save ₹{(cartItems.reduce((s, i) => s + ((i.originalPrice || i.price) - i.price) * i.quantity, 0) + couponDiscount).toLocaleString()}</div>}
+            {totalPrice > 0 && <div style={{ fontSize: 13, color: '#00b894', marginTop: 6, textAlign: 'right' }}>You save ₹{(cartItems.reduce((s, i) => s + ((i.originalPrice || i.price) - i.price) * i.quantity, 0) + couponDiscount + loyaltyDiscount).toLocaleString()}</div>}
 
             {/* Coupon code */}
             {!couponData ? (
@@ -138,6 +166,30 @@ export default function Cart() {
                 </div>
                 <button onClick={handleRemoveCoupon}
                   style={{ background: 'none', border: 'none', color: '#c62828', cursor: 'pointer', fontWeight: 700, fontSize: 18 }}>✕</button>
+              </div>
+            )}
+
+            {/* Loyalty points */}
+            {user && loyaltyInfo && loyaltyInfo.points > 0 && !loyaltyPointsUsed && (
+              <div style={{ marginTop: 14 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: '#636e72', marginBottom: 8 }}>⭐ Use Loyalty Points ({loyaltyInfo.points} available ≈ ₹{Math.floor(loyaltyInfo.points * 0.5)} value)</div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input className="form-input" type="number" min="1" max={loyaltyInfo.points} placeholder={`Max ${loyaltyInfo.points}`}
+                    value={loyaltyPoints} onChange={e => setLoyaltyPoints(e.target.value)}
+                    style={{ flex: 1, padding: '10px 14px', fontSize: 13 }} />
+                  <button className="btn btn-secondary btn-sm" onClick={handleApplyLoyalty} style={{ whiteSpace: 'nowrap' }}>
+                    Redeem
+                  </button>
+                </div>
+              </div>
+            )}
+            {loyaltyPointsUsed > 0 && (
+              <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f0f0ff', borderRadius: 12, padding: '10px 14px' }}>
+                <div>
+                  <span style={{ fontWeight: 700, color: '#6c63ff', fontSize: 13 }}>⭐ {loyaltyPointsUsed} points applied</span>
+                  <div style={{ fontSize: 12, color: '#8e7cf8' }}>Saving ₹{loyaltyDiscount}</div>
+                </div>
+                <button onClick={handleRemoveLoyalty} style={{ background: 'none', border: 'none', color: '#c62828', cursor: 'pointer', fontWeight: 700, fontSize: 18 }}>✕</button>
               </div>
             )}
 

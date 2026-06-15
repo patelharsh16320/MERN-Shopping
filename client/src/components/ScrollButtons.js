@@ -27,7 +27,7 @@ export default function ScrollButtons() {
 
   return (
     <div style={{
-      position: 'fixed', right: 20, bottom: 28,
+      position: 'fixed', left: 20, bottom: 28,
       display: 'flex', flexDirection: 'column', gap: 10, zIndex: 9999,
     }}>
       {showTop && (

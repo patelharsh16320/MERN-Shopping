@@ -43,6 +43,7 @@ export default function Footer() {
           <Link to="/contact" className="footer-link">Contact Us</Link>
           <Link to="/refund" className="footer-link">Refund & Returns</Link>
           <Link to="/privacy" className="footer-link">Privacy Policy</Link>
+          <Link to="/terms" className="footer-link">Terms & Conditions</Link>
           <div style={{ marginTop: 16 }}>
             <div className="footer-link">📍 123 Pink Street, Mumbai</div>
             <div className="footer-link">📞 +91 99999 99999</div>
@@ -61,8 +62,17 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="footer-bottom">
-        <p>© 2026 Women HubClub. All rights reserved. Made with 💗 for women, by women.</p>
+      <div className="footer-bottom" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+        <p style={{ margin: 0 }}>© 2026 Women HubClub. All rights reserved. Made with 💗 for women, by women.</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+          <Link to="/privacy" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, textDecoration: 'none', transition: 'color 0.2s' }}
+            onMouseEnter={e => e.target.style.color = 'rgba(255,255,255,0.9)'}
+            onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.5)'}>Privacy Policy</Link>
+          <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 12 }}>|</span>
+          <Link to="/terms" style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, textDecoration: 'none', transition: 'color 0.2s' }}
+            onMouseEnter={e => e.target.style.color = 'rgba(255,255,255,0.9)'}
+            onMouseLeave={e => e.target.style.color = 'rgba(255,255,255,0.5)'}>Terms &amp; Conditions</Link>
+        </div>
       </div>
     </footer>
   );

@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const UserAddress = require('../models/UserAddress');
 
 const toCSV = (rows, fields) => {
   const esc = (v) => { const s = v === null || v === undefined ? '' : String(v).replace(/"/g, '""'); return s.includes(',') || s.includes('\n') || s.includes('"') ? `"${s}"` : s; };
@@ -68,10 +69,18 @@ const getStats = async (req, res) => {
 
 const exportUsers = async (req, res) => {
   try {
-    const users = await User.find().select('-password').sort({ createdAt: -1 });
+    const users = await User.find().select('-password').sort({ createdAt: -1 }).lean();
+    const allAddresses = await UserAddress.find().lean();
+    const addrMap = {};
+    allAddresses.forEach(a => {
+      const uid = String(a.userId);
+      if (!addrMap[uid]) addrMap[uid] = [];
+      addrMap[uid].push({ label: a.label, street: a.street, city: a.city, state: a.state, zip: a.zip, country: a.country, isDefault: a.isDefault });
+    });
     const data = users.map(u => ({
       name: u.name, email: u.email, phone: u.phone || '',
       role: u.role, isActive: u.isActive,
+      addresses: addrMap[String(u._id)] || [],
     }));
     if (req.query.format === 'csv') {
       res.setHeader('Content-Type', 'text/csv');
@@ -108,7 +117,7 @@ const importUsers = async (req, res) => {
       const emailLower = item.email.trim().toLowerCase();
       if (duplicateAction === 'ignore' && existingEmails.includes(emailLower)) { skipped++; continue; }
       try {
-        await User.create({
+        const newUser = await User.create({
           name: item.name.trim(),
           email: emailLower,
           password: item.email.trim(),
@@ -116,6 +125,19 @@ const importUsers = async (req, res) => {
           role: item.role === 'admin' ? 'user' : (item.role || 'user'),
           isActive: item.isActive !== false && item.isActive !== 'false',
         });
+        if (Array.isArray(item.addresses) && item.addresses.length > 0) {
+          const addrDocs = item.addresses.map((a, idx) => ({
+            userId: newUser._id,
+            label: a.label || 'Home',
+            street: a.street || '',
+            city: a.city || '',
+            state: a.state || '',
+            zip: a.zip || '',
+            country: a.country || 'India',
+            isDefault: idx === 0,
+          }));
+          await UserAddress.insertMany(addrDocs);
+        }
         imported++;
       } catch { skipped++; }
     }

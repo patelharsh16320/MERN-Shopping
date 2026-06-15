@@ -53,9 +53,14 @@ const validate = async (req, res) => {
     if (coupon.maxUsage > 0 && coupon.usageCount >= coupon.maxUsage) return res.status(400).json({ message: 'Coupon usage limit reached' });
     if (orderTotal < coupon.minOrderAmount) return res.status(400).json({ message: `Minimum order amount is ₹${coupon.minOrderAmount}` });
 
-    let discount = coupon.discountType === 'percentage'
-      ? Math.min((orderTotal * coupon.discountValue) / 100, orderTotal)
-      : Math.min(coupon.discountValue, orderTotal);
+    let discount;
+    if (coupon.discountType === 'percentage') {
+      discount = Math.min((orderTotal * coupon.discountValue) / 100, orderTotal);
+    } else if (coupon.discountType === 'set_price') {
+      discount = Math.max(0, orderTotal - coupon.discountValue);
+    } else {
+      discount = Math.min(coupon.discountValue, orderTotal);
+    }
 
     discount = Math.round(discount * 100) / 100;
 

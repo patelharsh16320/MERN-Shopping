@@ -1,13 +1,17 @@
-const Product  = require('../models/Product');
-const Category = require('../models/Category');
-const User     = require('../models/User');
-const Order    = require('../models/Order');
-const Invoice  = require('../models/Invoice');
-const Visit    = require('../models/Visit');
-const Contact  = require('../models/Contact');
-const Coupon   = require('../models/Coupon');
+const Product       = require('../models/Product');
+const Category      = require('../models/Category');
+const User          = require('../models/User');
+const UserAddress   = require('../models/UserAddress');
+const Order         = require('../models/Order');
+const Invoice       = require('../models/Invoice');
+const Visit         = require('../models/Visit');
+const Contact       = require('../models/Contact');
+const Coupon        = require('../models/Coupon');
+const Subscriber    = require('../models/Subscriber');
+const Changelog     = require('../models/Changelog');
+const SupportTicket = require('../models/SupportTicket');
 
-const TYPES = ['products', 'categories', 'users', 'orders', 'invoices', 'analytics', 'contacts', 'reviews', 'coupons'];
+const TYPES = ['products', 'categories', 'users', 'orders', 'invoices', 'analytics', 'contacts', 'reviews', 'coupons', 'subscribers', 'changelog', 'supportTickets'];
 
 const CSV_FIELDS = {
   products:   ['name','description','price','originalPrice','discount','category','subcategory','images','stock','totalStock','rating','numReviews','brand','tags','isActive','isFeatured','weight','freshnessDays','status'],
@@ -50,9 +54,17 @@ async function getData(type, csvMode = false) {
     }
     case 'users': {
       const rows = await User.find().select('-password').lean();
+      const allAddr = await UserAddress.find().lean();
+      const addrMap = {};
+      allAddr.forEach(a => {
+        const uid = String(a.userId);
+        if (!addrMap[uid]) addrMap[uid] = [];
+        addrMap[uid].push({ label: a.label, street: a.street, city: a.city, state: a.state, zip: a.zip, country: a.country, isDefault: a.isDefault });
+      });
       return rows.map(u => ({
         name: u.name, email: u.email, phone: u.phone || '',
         role: u.role, isActive: u.isActive, createdAt: u.createdAt,
+        addresses: addrMap[String(u._id)] || [],
       }));
     }
     case 'orders': {
@@ -115,6 +127,26 @@ async function getData(type, csvMode = false) {
         code: c.code, discountType: c.discountType, discountValue: c.discountValue,
         minOrderAmount: c.minOrderAmount, maxUsage: c.maxUsage, usageCount: c.usageCount,
         expiresAt: c.expiresAt || '', isActive: c.isActive, createdAt: c.createdAt,
+      }));
+    }
+    case 'subscribers': {
+      const rows = await Subscriber.find().lean();
+      return rows.map(s => ({ email: s.email, createdAt: s.createdAt }));
+    }
+    case 'changelog': {
+      const rows = await Changelog.find().sort({ order: 1 }).lean();
+      return rows.map(c => ({
+        icon: c.icon, tag: c.tag, title: c.title, summary: c.summary,
+        before: c.before, after: c.after, date: c.date, order: c.order,
+      }));
+    }
+    case 'supportTickets': {
+      const rows = await SupportTicket.find().populate('user', 'email').lean();
+      return rows.map(t => ({
+        userEmail: t.user?.email || '', name: t.name, email: t.email,
+        subject: t.subject, status: t.status,
+        messages: (t.messages || []).map(m => ({ sender: m.sender, text: m.text, createdAt: m.createdAt })),
+        createdAt: t.createdAt,
       }));
     }
     default:
@@ -186,6 +218,10 @@ const importData = async (req, res) => {
       } catch { skipped++; }
     }
     results.products = { imported, skipped };
+    if (imported > 0) {
+      const io = req.app.get('io');
+      if (io) io.to('public_room').emit('products_updated', { action: 'imported', count: imported });
+    }
   }
 
   // --- categories ---
@@ -217,18 +253,34 @@ const importData = async (req, res) => {
     for (const item of items) {
       if (!item.email?.trim() || item.role === 'admin') continue;
       try {
-        const exists = await User.findOne({ email: item.email.trim().toLowerCase() });
+        const emailLower = item.email.trim().toLowerCase();
+        const exists = await User.findOne({ email: emailLower });
         if (exists) {
-          if (duplicateAction === 'remove') await User.deleteOne({ _id: exists._id });
-          else { skipped++; continue; }
+          if (duplicateAction === 'remove') {
+            await UserAddress.deleteMany({ userId: exists._id });
+            await User.deleteOne({ _id: exists._id });
+          } else { skipped++; continue; }
         }
         const bcrypt = require('bcryptjs');
-        const hash = await bcrypt.hash(item.email.trim().toLowerCase(), 10);
-        await User.create({
-          name: item.name || 'Imported User', email: item.email.trim().toLowerCase(),
+        const hash = await bcrypt.hash(emailLower, 10);
+        const newUser = await User.create({
+          name: item.name || 'Imported User', email: emailLower,
           password: hash, phone: item.phone || '',
           role: 'user', isActive: item.isActive !== false,
         });
+        if (Array.isArray(item.addresses) && item.addresses.length > 0) {
+          const addrDocs = item.addresses.map((a, idx) => ({
+            userId: newUser._id,
+            label: a.label || 'Home',
+            street: a.street || '',
+            city: a.city || '',
+            state: a.state || '',
+            zip: a.zip || '',
+            country: a.country || 'India',
+            isDefault: idx === 0,
+          }));
+          await UserAddress.insertMany(addrDocs);
+        }
         imported++;
       } catch { skipped++; }
     }
@@ -307,10 +359,45 @@ const importData = async (req, res) => {
     results.coupons = { imported, skipped };
   }
 
-  // analytics + orders + invoices: read-only or complex relational — skipped with note
+  // --- subscribers ---
+  if (Array.isArray(bundle.subscribers)) {
+    let imported = 0, skipped = 0;
+    for (const item of bundle.subscribers) {
+      if (!item.email?.trim()) continue;
+      try {
+        const exists = await Subscriber.findOne({ email: item.email.trim().toLowerCase() });
+        if (exists) { if (duplicateAction === 'remove') await Subscriber.deleteOne({ _id: exists._id }); else { skipped++; continue; } }
+        await Subscriber.create({ email: item.email.trim().toLowerCase() });
+        imported++;
+      } catch { skipped++; }
+    }
+    results.subscribers = { imported, skipped };
+  }
+
+  // --- changelog ---
+  if (Array.isArray(bundle.changelog)) {
+    let imported = 0, skipped = 0;
+    for (const item of bundle.changelog) {
+      if (!item.title?.trim() || !item.tag?.trim()) continue;
+      try {
+        const exists = await Changelog.findOne({ title: item.title.trim() });
+        if (exists) { if (duplicateAction === 'remove') await Changelog.deleteOne({ _id: exists._id }); else { skipped++; continue; } }
+        await Changelog.create({
+          icon: item.icon || '✨', tag: item.tag, title: item.title,
+          summary: item.summary || '', before: item.before || {}, after: item.after || {},
+          date: item.date || '', order: item.order || 0,
+        });
+        imported++;
+      } catch { skipped++; }
+    }
+    results.changelog = { imported, skipped };
+  }
+
+  // analytics + orders + invoices + supportTickets: read-only or complex relational — skipped with note
   if (bundle.analytics) results.analytics = { note: 'Analytics is auto-generated and cannot be imported' };
   if (bundle.orders) results.orders = { note: 'Orders cannot be imported (relational data — use order management)' };
   if (bundle.invoices) results.invoices = { note: 'Invoices cannot be imported (linked to orders)' };
+  if (bundle.supportTickets) results.supportTickets = { note: 'Support tickets cannot be imported (linked to users)' };
 
   res.json({ success: true, results });
 };

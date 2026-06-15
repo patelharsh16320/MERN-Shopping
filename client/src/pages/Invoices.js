@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { invoiceAPI } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import Loader from '../components/Loader';
@@ -233,11 +233,17 @@ export function InvoiceDetail() {
 
 /* ─── Detail by order ID ───────────────────────────────────────── */
 export function InvoiceByOrder() {
-  const { orderId } = useParams();
+  const { orderId }  = useParams();
   const [invoice, setInvoice] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { user }    = useAuth();
-  const navigate    = useNavigate();
+  const [banner, setBanner]   = useState(false);
+  const { user }     = useAuth();
+  const navigate     = useNavigate();
+  const location     = useLocation();
+
+  useEffect(() => {
+    if (location.state?.fromCheckout) setBanner(true);
+  }, [location.state]);
 
   useEffect(() => {
     if (!user) { navigate('/login'); return; }
@@ -245,5 +251,24 @@ export function InvoiceByOrder() {
   }, [orderId, user, navigate]);
 
   if (loading) return <Loader />;
-  return <InvoiceView invoice={invoice} />;
+  return (
+    <>
+      {banner && (
+        <div style={{ background: 'linear-gradient(135deg,#00b894,#00cec9)', padding: '18px 24px', textAlign: 'center', position: 'relative' }}>
+          <div style={{ fontSize: 22, fontWeight: 900, color: 'white', marginBottom: 4 }}>
+            🎉 Order Placed Successfully!
+          </div>
+          <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: 14 }}>
+            Your invoice is ready below. You can print or download it anytime.
+          </div>
+          <button
+            onClick={() => setBanner(false)}
+            style={{ position: 'absolute', top: 10, right: 14, background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white', width: 28, height: 28, borderRadius: '50%', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            ✕
+          </button>
+        </div>
+      )}
+      <InvoiceView invoice={invoice} />
+    </>
+  );
 }

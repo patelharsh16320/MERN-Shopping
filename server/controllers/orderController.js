@@ -4,6 +4,7 @@ const Product = require('../models/Product');
 const User = require('../models/User');
 const XLSX = require('xlsx');
 const emailService = require('../utils/emailService');
+const { earnPoints, applyRedemption } = require('./loyaltyController');
 
 const toCSV = (rows, fields) => {
   const esc = (v) => { const s = v === null || v === undefined ? '' : String(v).replace(/"/g, '""'); return s.includes(',') || s.includes('\n') || s.includes('"') ? `"${s}"` : s; };
@@ -16,7 +17,7 @@ const generateInvoiceNumber = () => {
 
 const createOrder = async (req, res) => {
   try {
-    const { orderItems, shippingAddress, paymentMethod, itemsPrice, shippingPrice, taxPrice, totalPrice, isPaid, paymentResult } = req.body;
+    const { orderItems, shippingAddress, paymentMethod, itemsPrice, shippingPrice, taxPrice, totalPrice, isPaid, paymentResult, discountPrice, couponCode, giftPacking, loyaltyPointsUsed } = req.body;
     if (!orderItems || orderItems.length === 0) return res.status(400).json({ message: 'No order items' });
 
     const order = new Order({
@@ -28,6 +29,9 @@ const createOrder = async (req, res) => {
       shippingPrice,
       taxPrice,
       totalPrice,
+      discountPrice: discountPrice || 0,
+      couponCode: couponCode || '',
+      giftPacking: giftPacking || { enabled: false },
       isPaid: isPaid || false,
       paidAt: isPaid ? Date.now() : undefined,
       paymentResult: paymentResult || undefined
@@ -74,6 +78,47 @@ const createOrder = async (req, res) => {
           html: emailService.adminNewOrderHtml(savedOrder, customer),
         });
       }
+    }
+
+    // Award loyalty points (1 point per ₹10 spent)
+    earnPoints(req.user._id, savedOrder._id, totalPrice);
+    // Deduct points if user redeemed loyalty points
+    if (loyaltyPointsUsed > 0) applyRedemption(req.user._id, savedOrder._id, loyaltyPointsUsed);
+
+    // ── Real-time: notify admin room + send bot chat message to user ──
+    const io = req.app.get('io');
+    if (io) {
+      const orderShortId = String(savedOrder._id).slice(-8).toUpperCase();
+      // Notify all admins
+      io.to('admin_room').emit('new_order', {
+        orderId:      String(savedOrder._id),
+        orderShortId,
+        userId:       String(req.user._id),
+        userName:     req.user.name,
+        totalPrice:   savedOrder.totalPrice,
+        itemCount:    orderItems.length,
+        createdAt:    savedOrder.createdAt,
+      });
+      // Send automatic bot chat message to the user
+      try {
+        const ChatMessage = require('../models/ChatMessage');
+        const adminUser = await User.findOne({ role: 'admin' }).lean();
+        if (adminUser) {
+          const botText = `🎉 Thank you, ${req.user.name}! Your order #${orderShortId} worth ₹${savedOrder.totalPrice.toLocaleString('en-IN')} has been placed successfully. Tap 📦 My Orders to track it in real-time!`;
+          const chatMsg = await ChatMessage.create({
+            room:       String(req.user._id),
+            sender:     adminUser._id,
+            senderRole: 'admin',
+            senderName: 'Women HubClub',
+            message:    botText,
+          });
+          io.to(`user_${req.user._id}`).emit('new_message', {
+            _id: chatMsg._id, room: chatMsg.room, sender: chatMsg.sender,
+            senderRole: 'admin', senderName: 'Women HubClub',
+            message: chatMsg.message, createdAt: chatMsg.createdAt, read: false,
+          });
+        }
+      } catch (_) {}
     }
 
     res.status(201).json(savedOrder);

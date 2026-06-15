@@ -51,6 +51,18 @@ const userSchema = new mongoose.Schema({
       milestone:     { type: Number },
       earnedAt:      { type: Date, default: Date.now },
     }],
+  },
+  loyalty: {
+    points:     { type: Number, default: 0 },
+    totalEarned:{ type: Number, default: 0 },
+    tier:       { type: String, enum: ['Bronze', 'Silver', 'Gold', 'Platinum'], default: 'Bronze' },
+    history: [{
+      type:      { type: String, enum: ['earned', 'redeemed'] },
+      points:    { type: Number },
+      reason:    { type: String },
+      orderId:   { type: mongoose.Schema.Types.ObjectId, ref: 'Order' },
+      date:      { type: Date, default: Date.now },
+    }],
   }
 }, { timestamps: true });
 

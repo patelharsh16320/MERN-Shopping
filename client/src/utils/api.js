@@ -127,15 +127,19 @@ export const contactAPI = {
 };
 
 export const supportAPI = {
-  create: (data) => API.post('/support', data),
-  getMyTickets: () => API.get('/support/mine'),
-  getTicket: (id) => API.get(`/support/mine/${id}`),
-  sendMessage: (id, text) => API.post(`/support/${id}/message`, { text }),
-  getStats: () => API.get('/support/stats'),
-  getAll: (params) => API.get('/support', { params }),
-  adminReply: (id, text) => API.post(`/support/${id}/reply`, { text }),
-  updateStatus: (id, status) => API.put(`/support/${id}/status`, { status }),
-  markSeen: (id) => API.put(`/support/${id}/seen`),
+  create:       (data)           => API.post('/support', data),
+  getMine:      ()               => API.get('/support/mine'),
+  getMyTickets: ()               => API.get('/support/mine'),
+  getTicket:    (id)             => API.get(`/support/mine/${id}`),
+  sendMessage:  (id, text)       => API.post(`/support/${id}/message`, { text }),
+  closeTicket:  (id)             => API.put(`/support/${id}/close`),
+  getStats:     ()               => API.get('/support/stats'),
+  getAll:       (status)         => API.get('/support', { params: status ? { status } : {} }),
+  reply:        (id, text)       => API.post(`/support/${id}/reply`, { text }),
+  adminReply:   (id, text)       => API.post(`/support/${id}/reply`, { text }),
+  updateStatus: (id, status)     => API.put(`/support/${id}/status`, { status }),
+  updatePriority:(id, priority)  => API.put(`/support/${id}/priority`, { priority }),
+  markSeen:     (id)             => API.put(`/support/${id}/seen`),
 };
 
 export const couponAPI = {
@@ -159,6 +163,27 @@ export const subscriberAPI = {
   subscribe: (email) => API.post('/subscribers', { email }),
   getAll: () => API.get('/subscribers'),
   delete: (id) => API.delete(`/subscribers/${id}`),
+  export: () => API.get('/subscribers/export', { responseType: 'blob' }),
+};
+
+export const addressAPI = {
+  getByUser:  (userId) => API.get(`/addresses/user/${userId}`),
+  create:     (userId, data) => API.post(`/addresses/user/${userId}`, data),
+  update:     (id, data) => API.put(`/addresses/${id}`, data),
+  remove:     (id) => API.delete(`/addresses/${id}`),
+  setDefault: (id) => API.put(`/addresses/${id}/default`),
+};
+
+export const loyaltyAPI = {
+  getMyLoyalty: () => API.get('/loyalty/me'),
+  redeem: (points) => API.post('/loyalty/redeem', { points }),
+  getAll: () => API.get('/loyalty/all'),
+  adjust: (userId, points, reason) => API.post('/loyalty/adjust', { userId, points, reason }),
+};
+
+export const pageSettingAPI = {
+  getAll:  () => API.get('/page-settings'),
+  toggle:  (key, isActive) => API.put(`/page-settings/${key}`, { isActive }),
 };
 
 export const visitAPI = {

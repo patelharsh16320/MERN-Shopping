@@ -32,6 +32,8 @@ export default function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
   const coupon = location.state?.coupon || null;
+  const loyaltyPointsUsed = location.state?.loyaltyPointsUsed || 0;
+  const loyaltyDiscount   = location.state?.loyaltyDiscount || 0;
 
   const [loading, setLoading]               = useState(false);
   const [address, setAddress]               = useState(emptyAddress);
@@ -45,11 +47,14 @@ export default function Checkout() {
   const [showCvv, setShowCvv]               = useState(false);
   const [savedCards, setSavedCards]         = useState([]);
   const [selectedCard, setSelectedCard]     = useState(null);
+  const [giftPacking, setGiftPacking]       = useState({ enabled: false, size: 'Small', message: '' });
 
+  const GIFT_PRICES = { Small: 50, Medium: 100, Large: 150 };
   const shipping        = totalPrice > 999 ? 0 : 49;
   const tax             = Math.round(totalPrice * 0.18);
   const couponDiscount  = coupon?.discount || 0;
-  const total           = totalPrice + shipping + tax - couponDiscount;
+  const giftCharge      = giftPacking.enabled ? (GIFT_PRICES[giftPacking.size] || 50) : 0;
+  const total           = totalPrice + shipping + tax - couponDiscount - loyaltyDiscount + giftCharge;
 
   const isCOD        = paymentMethod === 'COD';
   const isCard       = paymentMethod === 'Credit Card' || paymentMethod === 'Debit Card';
@@ -154,9 +159,13 @@ export default function Checkout() {
       const { data } = await orderAPI.create({
         orderItems, shippingAddress: address, paymentMethod,
         itemsPrice: totalPrice, shippingPrice: shipping, taxPrice: tax,
-        discountPrice: couponDiscount, totalPrice: total,
+        discountPrice: couponDiscount + loyaltyDiscount, totalPrice: total,
         couponCode: coupon?.code || null,
         isPaid: !isCOD, paymentResult,
+        loyaltyPointsUsed: loyaltyPointsUsed || 0,
+        giftPacking: giftPacking.enabled
+          ? { enabled: true, size: giftPacking.size, price: giftCharge, message: giftPacking.message }
+          : { enabled: false },
       });
       if (coupon?.id) { couponAPI.recordUsage(coupon.id).catch(() => {}); }
       clearCart();
@@ -275,7 +284,35 @@ export default function Checkout() {
                   </div>
                 </div>
 
-                <button className="btn btn-primary btn-lg" onClick={() => setStep(2)} style={{ marginTop: 8 }}
+                {/* Gift Packing */}
+                <div style={{ marginTop: 24, padding: 20, border: '2px solid #f8bbd0', borderRadius: 16, background: '#fff9fb' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                    <input type="checkbox" checked={giftPacking.enabled} onChange={e => setGiftPacking(g => ({ ...g, enabled: e.target.checked }))}
+                      style={{ width: 18, height: 18, accentColor: '#c2185b', cursor: 'pointer' }} />
+                    <span style={{ fontWeight: 700, fontSize: 15 }}>🎁 Add Gift Packing</span>
+                    <span style={{ fontSize: 12, color: '#9e9e9e', marginLeft: 'auto' }}>Small ₹50 · Medium ₹100 · Large ₹150</span>
+                  </label>
+                  {giftPacking.enabled && (
+                    <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      <div style={{ display: 'flex', gap: 10 }}>
+                        {['Small', 'Medium', 'Large'].map(sz => (
+                          <button key={sz} onClick={() => setGiftPacking(g => ({ ...g, size: sz }))}
+                            style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: `2px solid ${giftPacking.size === sz ? '#c2185b' : '#f0c0d0'}`, background: giftPacking.size === sz ? '#fce4ec' : 'white', color: giftPacking.size === sz ? '#c2185b' : '#636e72', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s' }}>
+                            {sz}<br /><span style={{ fontSize: 12, fontWeight: 400 }}>₹{GIFT_PRICES[sz]}</span>
+                          </button>
+                        ))}
+                      </div>
+                      <div className="form-group" style={{ marginBottom: 0 }}>
+                        <label className="form-label">Gift Message (optional)</label>
+                        <textarea className="form-input" rows={2} placeholder="Write a personal message…" value={giftPacking.message}
+                          onChange={e => setGiftPacking(g => ({ ...g, message: e.target.value }))}
+                          style={{ resize: 'vertical', minHeight: 60 }} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <button className="btn btn-primary btn-lg" onClick={() => setStep(2)} style={{ marginTop: 16 }}
                   disabled={!address.street || !address.city || !address.state || !address.zip}>
                   Continue to Payment →
                 </button>
@@ -441,6 +478,18 @@ export default function Checkout() {
               <div className="summary-row" style={{ color: '#388e3c' }}>
                 <span>🎟️ Coupon ({coupon.code})</span>
                 <span>−₹{couponDiscount.toLocaleString()}</span>
+              </div>
+            )}
+            {loyaltyDiscount > 0 && (
+              <div className="summary-row" style={{ color: '#6c63ff' }}>
+                <span>⭐ Loyalty Points ({loyaltyPointsUsed} pts)</span>
+                <span>−₹{loyaltyDiscount.toLocaleString()}</span>
+              </div>
+            )}
+            {giftPacking.enabled && (
+              <div className="summary-row" style={{ color: '#c2185b' }}>
+                <span>🎁 Gift Packing ({giftPacking.size})</span>
+                <span>+₹{giftCharge}</span>
               </div>
             )}
             <div className="summary-total"><span>Total</span><span className="gradient-text">₹{total.toLocaleString()}</span></div>

@@ -6,6 +6,7 @@ import './App.css';
 
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { PageSettingProvider, usePageSettings } from './context/PageSettingContext';
 import { useAuth } from './context/AuthContext';
 import { visitAPI } from './utils/api';
 
@@ -13,6 +14,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import BubbleBackground from './components/BubbleBackground';
 import ScrollButtons from './components/ScrollButtons';
+import LiveChat from './components/LiveChat';
 
 import Home from './pages/Home';
 import Products from './pages/Products';
@@ -31,6 +33,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import RefundPolicy from './pages/RefundPolicy';
 import { InvoiceList, InvoiceDetail, InvoiceByOrder } from './pages/Invoices';
 import BeautyQuiz from './pages/BeautyQuiz';
+import TermsConditions from './pages/TermsConditions';
 
 import Dashboard from './pages/admin/Dashboard';
 import ManageProducts from './pages/admin/ManageProducts';
@@ -46,6 +49,10 @@ import SecureUserData from './pages/admin/SecureUserData';
 import ImportExport from './pages/admin/ImportExport';
 import WhatsNew from './pages/admin/WhatsNew';
 import StreakLeaderboard from './pages/admin/StreakLeaderboard';
+import ManageSupport from './pages/admin/ManageSupport';
+import ManagePages from './pages/admin/ManagePages';
+import Support from './pages/Support';
+import SpecialOffers from './pages/SpecialOffers';
 
 function VisitTracker() {
   const location = useLocation();
@@ -62,10 +69,59 @@ function MainLayout({ children }) {
     <>
       <BubbleBackground />
       <Navbar />
-      <main style={{ position: 'relative', zIndex: 1 }}>{children}</main>
+      <main style={{ position: 'relative', zIndex: 1, paddingTop: 68 }}>{children}</main>
       <Footer />
     </>
   );
+}
+
+// Wraps a page with MainLayout + guards it by pageKey
+function GuardedPage({ pageKey, children }) {
+  const { settings, loaded } = usePageSettings();
+
+  if (!loaded) return null; // wait silently — settings load fast
+
+  if (loaded && settings[pageKey] === false) {
+    return (
+      <MainLayout>
+        <div style={{
+          minHeight: '60vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          padding: '60px 20px',
+        }}>
+          <div style={{ fontSize: 72, marginBottom: 16 }}>🚧</div>
+          <h2 style={{ fontSize: 32, fontWeight: 800, marginBottom: 12 }}>
+            <span className="gradient-text">Coming Soon</span>
+          </h2>
+          <p style={{ color: '#636e72', fontSize: 16, maxWidth: 400 }}>
+            This page is currently unavailable. Check back soon!
+          </p>
+          <button
+            onClick={() => window.history.back()}
+            style={{
+              marginTop: 28,
+              padding: '12px 32px',
+              borderRadius: 30,
+              border: 'none',
+              background: 'linear-gradient(135deg,#6c63ff,#fd79a8)',
+              color: 'white',
+              fontWeight: 700,
+              fontSize: 15,
+              cursor: 'pointer',
+            }}
+          >
+            ← Go Back
+          </button>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  return <MainLayout>{children}</MainLayout>;
 }
 
 function App() {
@@ -73,58 +129,66 @@ function App() {
     <Router>
       <AuthProvider>
         <CartProvider>
-          <VisitTracker />
-          <Routes>
-            {/* Admin routes — no navbar/footer */}
-            <Route path="/admin" element={<Dashboard />} />
-            <Route path="/admin/products" element={<ManageProducts />} />
-            <Route path="/admin/users" element={<ManageUsers />} />
-            <Route path="/admin/orders" element={<ManageOrders />} />
-            <Route path="/admin/invoices" element={<ManageInvoices />} />
-            <Route path="/admin/analytics" element={<Analytics />} />
-            <Route path="/admin/categories" element={<ManageCategories />} />
-            <Route path="/admin/contacts" element={<ManageContacts />} />
-            <Route path="/admin/reviews" element={<ManageReviews />} />
-            <Route path="/admin/coupons" element={<ManageCoupons />} />
-            <Route path="/admin/secure-users" element={<SecureUserData />} />
-            <Route path="/admin/import-export" element={<ImportExport />} />
-            <Route path="/admin/whats-new" element={<WhatsNew />} />
-            <Route path="/admin/streaks" element={<StreakLeaderboard />} />
+          <PageSettingProvider>
+            <VisitTracker />
+            <Routes>
+              {/* Admin routes — no navbar/footer */}
+              <Route path="/admin" element={<Dashboard />} />
+              <Route path="/admin/products" element={<ManageProducts />} />
+              <Route path="/admin/users" element={<ManageUsers />} />
+              <Route path="/admin/orders" element={<ManageOrders />} />
+              <Route path="/admin/invoices" element={<ManageInvoices />} />
+              <Route path="/admin/analytics" element={<Analytics />} />
+              <Route path="/admin/categories" element={<ManageCategories />} />
+              <Route path="/admin/contacts" element={<ManageContacts />} />
+              <Route path="/admin/reviews" element={<ManageReviews />} />
+              <Route path="/admin/coupons" element={<ManageCoupons />} />
+              <Route path="/admin/secure-users" element={<SecureUserData />} />
+              <Route path="/admin/import-export" element={<ImportExport />} />
+              <Route path="/admin/whats-new" element={<WhatsNew />} />
+              <Route path="/admin/streaks" element={<StreakLeaderboard />} />
+              <Route path="/admin/support" element={<ManageSupport />} />
+              <Route path="/admin/pages" element={<ManagePages />} />
 
-            {/* Auth routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+              {/* Auth routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
-            {/* Main app routes */}
-            <Route path="/" element={<MainLayout><Home /></MainLayout>} />
-            <Route path="/products" element={<MainLayout><Products /></MainLayout>} />
-            <Route path="/products/:id" element={<MainLayout><ProductDetail /></MainLayout>} />
-            <Route path="/cart" element={<MainLayout><Cart /></MainLayout>} />
-            <Route path="/checkout" element={<MainLayout><Checkout /></MainLayout>} />
-            <Route path="/orders" element={<MainLayout><Orders /></MainLayout>} />
-            <Route path="/orders/:id" element={<MainLayout><OrderDetail /></MainLayout>} />
-            <Route path="/invoices" element={<MainLayout><InvoiceList /></MainLayout>} />
-            <Route path="/invoices/:id" element={<InvoiceDetail />} />
-            <Route path="/invoices/order/:orderId" element={<InvoiceByOrder />} />
-            <Route path="/profile" element={<MainLayout><Profile /></MainLayout>} />
-            <Route path="/wishlist" element={<MainLayout><Wishlist /></MainLayout>} />
-            <Route path="/about" element={<MainLayout><AboutUs /></MainLayout>} />
-            <Route path="/contact" element={<MainLayout><ContactUs /></MainLayout>} />
-            <Route path="/privacy" element={<MainLayout><PrivacyPolicy /></MainLayout>} />
-            <Route path="/refund" element={<MainLayout><RefundPolicy /></MainLayout>} />
-            <Route path="/quiz" element={<MainLayout><BeautyQuiz /></MainLayout>} />
-          </Routes>
+              {/* Guarded customer routes */}
+              <Route path="/" element={<GuardedPage pageKey="home"><Home /></GuardedPage>} />
+              <Route path="/products" element={<GuardedPage pageKey="products"><Products /></GuardedPage>} />
+              <Route path="/products/:id" element={<MainLayout><ProductDetail /></MainLayout>} />
+              <Route path="/cart" element={<MainLayout><Cart /></MainLayout>} />
+              <Route path="/checkout" element={<MainLayout><Checkout /></MainLayout>} />
+              <Route path="/orders" element={<MainLayout><Orders /></MainLayout>} />
+              <Route path="/orders/:id" element={<MainLayout><OrderDetail /></MainLayout>} />
+              <Route path="/invoices" element={<MainLayout><InvoiceList /></MainLayout>} />
+              <Route path="/invoices/:id" element={<InvoiceDetail />} />
+              <Route path="/invoices/order/:orderId" element={<InvoiceByOrder />} />
+              <Route path="/profile" element={<MainLayout><Profile /></MainLayout>} />
+              <Route path="/wishlist" element={<GuardedPage pageKey="wishlist"><Wishlist /></GuardedPage>} />
+              <Route path="/about" element={<GuardedPage pageKey="about"><AboutUs /></GuardedPage>} />
+              <Route path="/contact" element={<GuardedPage pageKey="contact"><ContactUs /></GuardedPage>} />
+              <Route path="/privacy" element={<MainLayout><PrivacyPolicy /></MainLayout>} />
+              <Route path="/refund" element={<MainLayout><RefundPolicy /></MainLayout>} />
+              <Route path="/quiz" element={<GuardedPage pageKey="quiz"><BeautyQuiz /></GuardedPage>} />
+              <Route path="/terms" element={<MainLayout><TermsConditions /></MainLayout>} />
+              <Route path="/support" element={<GuardedPage pageKey="support"><Support /></GuardedPage>} />
+              <Route path="/offers" element={<GuardedPage pageKey="offers"><SpecialOffers /></GuardedPage>} />
+            </Routes>
 
-          <ScrollButtons />
-          <ToastContainer
-            position="bottom-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop
-            closeOnClick
-            pauseOnHover
-            theme="light"
-          />
+            <ScrollButtons />
+            <LiveChat />
+            <ToastContainer
+              position="bottom-right"
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop
+              closeOnClick
+              pauseOnHover
+              theme="light"
+            />
+          </PageSettingProvider>
         </CartProvider>
       </AuthProvider>
     </Router>

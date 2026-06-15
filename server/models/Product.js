@@ -31,6 +31,12 @@ const productSchema = new mongoose.Schema({
   freshnessDays: { type: Number, default: 365 },
   status: { type: String, enum: ['published', 'draft', 'trash'], default: 'published' },
   trashedAt: { type: Date, default: null },
+  specialOffer: {
+    enabled:     { type: Boolean, default: false },
+    label:       { type: String, default: '' },
+    salePrice:   { type: Number, default: 0 },
+    endsAt:      { type: Date, default: null },
+  },
 }, { timestamps: true });
 
 // Auto-delete trashed products after 30 days

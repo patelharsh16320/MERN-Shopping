@@ -127,28 +127,6 @@ Discount & Promotion Management
 - Create and manage discount codes
 - Set codes as “active” or “inactive”
 
-<!-- !------ Checking-----!  -->
-
-- contact support button show where admin and user can contaact with each other, like support system    
-
-<!-- !------ Working-----!  -->
-
-Order Management Features
-- Add private notes to the order
-- Receive email when order is placed
-- Export orders to Excel
-
-Site Analytics
-- Store Site Analytics data in the database.
-- Admin should be able to view both the latest analytics and previously stored data upon login.
-
-Comment Management
-- Admin can manage all blog comments.
-- Comments can be set to Approved or Deleted.
-
-init 
-
-<!-- !------ Reaming-----!  -->
 
 Personalized Beauty Quiz
 - A multi-step interactive quiz available at /quiz (no login required).
@@ -160,6 +138,8 @@ Personalized Beauty Quiz
 - No backend changes needed — uses existing GET /api/products endpoint.
 - Add a "✨ Quiz" link in the Navbar and Footer Quick Links.
 
+<!--? 15-06-26 -->
+
 Daily Login Streak & Rewards
 - Logged-in users see a streak bar on the Home page with a "🔥 Check In Today" button.
 - Checking in on consecutive days grows the streak; missing a day resets it to 0.
@@ -167,6 +147,63 @@ Daily Login Streak & Rewards
 - Reward coupons are real single-use Coupon records, usable at checkout like any other code; the code is shown with a copy button + toast.
 - Week-dot progress view (7 circles), progress bar to the next milestone, and longest-streak record.
 - Backend: streak fields on the User model + GET /api/auth/streak and POST /api/auth/streak/checkin endpoints.
+
+Order Management Features
+- Add private notes to the order
+- Receive email when order is placed
+- Export orders to Excel
+
+- Set products as “active” or “inactive”
+- Export customer subscribed to email newsletter to Excel (import capabilities for 3rd party email systems)
+- contact support button show where admin and user can contaact with each other, like support system - chat store into database
+- add order gift packing extra charge as per size
+- create Loyalty Programs and Special Offers
+- Discount Codes: Ability to set percentages off, amount off, or a set price
+- address add dummy for all users with table create to store this
+- import - export for all data
+- is user buy any products, all details like pending, proces, shipped, delived, cancled all deatils user can see on chat option.  also chat button tex field and up-down page key buton over lap each other. resolved this desin issue.
+- Mobile-Friendly and App Integration make full site responsive
+
+- if user and admin got new message  on chat button, make +1 or +2, as per message qty, show number on chat button, all will show with live ajx do not refresh the page.  
+
+Ajax - Admin/ User
+- The entire site runs live with AJAX (no page reloads).
+- New products can be imported seamlessly.
+- When a user buys any product, they immediately receive a message through the chat button.
+- The admin can also send messages directly.
+- Whenever a user purchases a product, the admin gets a notification.
+- Features like “+1 like” and similar interactions update live.
+- All of these functions work in real time without requiring page refreshes, for both admin and user.
+
+- Set pages as “active” or “inactive” buy admin, admin can decide which page he want to show
+- add filter option on left side on offers page 
+
+<!-- !------ Checking-----!  -->
+
+
+<!-- !------ Working-----!  -->
+
+- user - after buy the order, it redirect to order page automatic and get notify in messge box that +1 with uy 1 product 
+
+- then create log in server, to hit and all api and which user hit api store this, also per day crete new log file create. and after 7 days last file remvoe. this alllow for
+  all files, after 7 days file is deleted.
+
+- full site live ajax run ,new product import, buy any product then got message on chat button, got adny admin messge, user buy product - admin get notification +1 like all this feature make live without page refresh for admin and user both 
+
+<!-- !------ Reaming-----!  -->
+
+-  full site live ajax run ,new product import, buy any product then got message on chat button, got adny admin messge, user buy product - admin get notification +1 like all this feature make live without page refresh for admin and user both 
+
+- admin/user order: Receive email when order is placed
+
+init 
+
+- on admin product add column filter ons status too, with also add asc, desc filter too
+
+Site Analytics
+- Store Site Analytics data in the database.
+- Admin should be able to view both the latest analytics and previously stored data upon login.
+
 
 <!-- !------ ignore-----!  -->
 

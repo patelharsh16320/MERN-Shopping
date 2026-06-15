@@ -1,4 +1,5 @@
 const Subscriber = require('../models/Subscriber');
+const XLSX = require('xlsx');
 
 const subscribe = async (req, res) => {
   try {
@@ -31,4 +32,26 @@ const deleteSubscriber = async (req, res) => {
   }
 };
 
-module.exports = { subscribe, getAll, deleteSubscriber };
+const exportSubscribers = async (req, res) => {
+  try {
+    const subscribers = await Subscriber.find().sort({ createdAt: -1 });
+    const rows = subscribers.map((s, i) => ({
+      '#': i + 1,
+      'Email': s.email,
+      'Subscribed On': new Date(s.createdAt).toLocaleDateString('en-IN'),
+      'Status': 'Subscribed',
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    ws['!cols'] = [{ wch: 5 }, { wch: 40 }, { wch: 18 }, { wch: 14 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Subscribers');
+    const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+    res.setHeader('Content-Disposition', 'attachment; filename="newsletter_subscribers.xlsx"');
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.send(buf);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { subscribe, getAll, deleteSubscriber, exportSubscribers };
