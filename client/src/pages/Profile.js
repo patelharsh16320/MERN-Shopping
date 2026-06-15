@@ -150,7 +150,7 @@ export default function Profile() {
                 </div>
               ))}
               <div className="divider" style={{ margin: '8px 0' }} />
-              {[['📦', 'My Orders', '/orders'], ['🧾', 'My Invoices', '/invoices'], ['🤍', 'Wishlist', '/wishlist'], ['🛒', 'Continue Shopping', '/products']].map(([icon, label, path]) => (
+              {[['📦', 'My Orders', '/orders'], ['🧾', 'My Invoices', '/invoices'], ['🤍', 'Wishlist', '/wishlist'], ['🎫', 'Support Tickets', '/support'], ['🛒', 'Continue Shopping', '/products']].map(([icon, label, path]) => (
                 <div key={path} onClick={() => navigate(path)}
                   style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', cursor: 'pointer', borderRadius: 12, marginBottom: 4, fontSize: 14, fontWeight: 500, transition: 'all 0.2s' }}
                   onMouseEnter={e => { e.currentTarget.style.background = '#e8f5e9'; e.currentTarget.style.color = 'var(--primary)'; }}
