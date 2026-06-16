@@ -1,0 +1,28 @@
+.pagespeed-note {
+  background: #fff8fb;
+  border: 1px solid #f8bbd0;
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: #757575;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.pagespeed-page-cell { min-width: 180px; }
+.pagespeed-page-label { font-weight: 600; font-size: 14px; }
+.pagespeed-page-path { font-size: 11px; color: #9e9e9e; font-family: monospace; margin-top: 2px; }
+
+.pagespeed-badge { padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; }
+.pagespeed-badge-fast   { background: #e8f5e9; color: #2e7d32; }
+.pagespeed-badge-ok     { background: #fff8e1; color: #e65100; }
+.pagespeed-badge-slow   { background: #ffebee; color: #c62828; }
+.pagespeed-badge-failed { background: #f5f5f5; color: #757575; }
+
+.pagespeed-actions { display: flex; gap: 10px; }
+
+/* Off-screen probe iframe used to time page loads — size is the parameter under
+   test (viewport emulation), toggled via class, never visible to the admin. */
+.pagespeed-probe-frame { position: fixed; top: -9999px; left: -9999px; border: none; visibility: hidden; }
+.pagespeed-frame-desktop { width: 1280px; height: 800px; }
+.pagespeed-frame-mobile  { width: 390px; height: 844px; }

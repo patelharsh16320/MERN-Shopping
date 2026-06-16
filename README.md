@@ -127,7 +127,6 @@ Discount & Promotion Management
 - Create and manage discount codes
 - Set codes as “active” or “inactive”
 
-
 Personalized Beauty Quiz
 - A multi-step interactive quiz available at /quiz (no login required).
 - Asks 5 questions: Skin Type, Main Concern, Routine Style, Lifestyle, Budget.
@@ -178,10 +177,14 @@ Ajax - Admin/ User
 - Set pages as “active” or “inactive” buy admin, admin can decide which page he want to show
 - add filter option on left side on offers page 
 
+<!--? 16-06-26  -->
+
 <!-- !------ Checking-----!  -->
 
 
 <!-- !------ Working-----!  -->
+- Need new menu for admin to check all pages speed check in desktop and mobile menu
+- remove inline css and create seprate file for it.
 
 - user - after buy the order, it redirect to order page automatic and get notify in messge box that +1 with uy 1 product 
 
@@ -203,6 +206,19 @@ init
 Site Analytics
 - Store Site Analytics data in the database.
 - Admin should be able to view both the latest analytics and previously stored data upon login.
+
+<!-- * Page speed improve -->
+check page speed how increse
+- Unnecessary Component Re-Renders
+- Creating Functions During Every Render
+- Forgetting to Memoize Expensive Calculations
+- Rendering Large Lists Without Virtualization
+- Overusing Global State Management
+- Missing Lazy Loading and Code Splitting
+- Shipping Large JavaScript Bundles
+- Making Excessive API Requests
+- Using Unstable Keys in Lists
+- Optimizing Without Measuring
 
 
 <!-- !------ ignore-----!  -->

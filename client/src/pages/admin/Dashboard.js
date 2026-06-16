@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AdminLayout from './AdminLayout';
 import { orderAPI, userAPI, productAPI, contactAPI, subscriberAPI } from '../../utils/api';
 import { getSocket } from '../../utils/socket';
+import './Dashboard.css';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({ orders: {}, users: {}, products: 0 });

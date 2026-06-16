@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './ScrollButtons.css';
 
 export default function ScrollButtons() {
   const [showTop, setShowTop] = useState(false);
@@ -16,23 +17,11 @@ export default function ScrollButtons() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const btnStyle = {
-    width: 42, height: 42, borderRadius: '50%', border: 'none',
-    background: 'linear-gradient(135deg, #c2185b, #e91e63)',
-    color: 'white', fontSize: 18, fontWeight: 700,
-    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-    boxShadow: '0 4px 14px rgba(194,24,91,0.35)',
-    transition: 'all 0.25s ease',
-  };
-
   return (
-    <div style={{
-      position: 'fixed', left: 20, bottom: 28,
-      display: 'flex', flexDirection: 'column', gap: 10, zIndex: 9999,
-    }}>
+    <div className="scroll-btn-wrap">
       {showTop && (
         <button
-          style={btnStyle}
+          className="scroll-btn"
           title="Scroll to top"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         >
@@ -41,7 +30,7 @@ export default function ScrollButtons() {
       )}
       {showBottom && (
         <button
-          style={btnStyle}
+          className="scroll-btn"
           title="Scroll to bottom"
           onClick={() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' })}
         >

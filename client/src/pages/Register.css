@@ -1,0 +1,8 @@
+.register-header { text-align: center; margin-bottom: 32px; }
+.register-icon { font-size: 56px; margin-bottom: 8px; animation: bounceIn 0.8s ease; }
+.register-pwd-wrap { position: relative; }
+.register-pwd-input { padding-right: 48px; }
+.register-pwd-toggle { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; }
+.register-submit-btn { width: 100%; justify-content: center; }
+.register-footer-text { text-align: center; margin-top: 20px; font-size: 14px; color: #636e72; }
+.register-footer-link { color: #6c63ff; font-weight: 600; text-decoration: none; }

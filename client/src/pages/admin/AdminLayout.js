@@ -23,6 +23,7 @@ const navItems = [
   { icon: '🔥', label: 'Streak Board', path: '/admin/streaks' },
   { icon: '🎧', label: 'Support', path: '/admin/support' },
   { icon: '🔘', label: 'Pages', path: '/admin/pages' },
+  { icon: '⚡', label: 'Page Speed', path: '/admin/page-speed' },
 ];
 
 export default function AdminLayout({ children }) {

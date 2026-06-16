@@ -51,6 +51,7 @@ import WhatsNew from './pages/admin/WhatsNew';
 import StreakLeaderboard from './pages/admin/StreakLeaderboard';
 import ManageSupport from './pages/admin/ManageSupport';
 import ManagePages from './pages/admin/ManagePages';
+import PageSpeed from './pages/admin/PageSpeed';
 import Support from './pages/Support';
 import SpecialOffers from './pages/SpecialOffers';
 
@@ -69,7 +70,7 @@ function MainLayout({ children }) {
     <>
       <BubbleBackground />
       <Navbar />
-      <main style={{ position: 'relative', zIndex: 1, paddingTop: 68 }}>{children}</main>
+      <main className="main-content">{children}</main>
       <Footer />
     </>
   );
@@ -84,35 +85,17 @@ function GuardedPage({ pageKey, children }) {
   if (loaded && settings[pageKey] === false) {
     return (
       <MainLayout>
-        <div style={{
-          minHeight: '60vh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-          padding: '60px 20px',
-        }}>
-          <div style={{ fontSize: 72, marginBottom: 16 }}>🚧</div>
-          <h2 style={{ fontSize: 32, fontWeight: 800, marginBottom: 12 }}>
+        <div className="coming-soon-wrap">
+          <div className="coming-soon-icon">🚧</div>
+          <h2 className="coming-soon-title">
             <span className="gradient-text">Coming Soon</span>
           </h2>
-          <p style={{ color: '#636e72', fontSize: 16, maxWidth: 400 }}>
+          <p className="coming-soon-text">
             This page is currently unavailable. Check back soon!
           </p>
           <button
             onClick={() => window.history.back()}
-            style={{
-              marginTop: 28,
-              padding: '12px 32px',
-              borderRadius: 30,
-              border: 'none',
-              background: 'linear-gradient(135deg,#6c63ff,#fd79a8)',
-              color: 'white',
-              fontWeight: 700,
-              fontSize: 15,
-              cursor: 'pointer',
-            }}
+            className="coming-soon-btn"
           >
             ← Go Back
           </button>
@@ -149,6 +132,7 @@ function App() {
               <Route path="/admin/streaks" element={<StreakLeaderboard />} />
               <Route path="/admin/support" element={<ManageSupport />} />
               <Route path="/admin/pages" element={<ManagePages />} />
+              <Route path="/admin/page-speed" element={<PageSpeed />} />
 
               {/* Auth routes */}
               <Route path="/login" element={<Login />} />

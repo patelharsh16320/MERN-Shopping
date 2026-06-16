@@ -1,0 +1,112 @@
+/* ── Orders tab ── */
+.livechat-orders-loading { flex: 1; display: flex; align-items: center; justify-content: center; color: #9e9e9e; font-size: 13px; }
+.livechat-orders-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #9e9e9e; padding: 20px; }
+.livechat-orders-empty-icon { font-size: 40px; margin-bottom: 10px; }
+.livechat-orders-empty-title { font-weight: 600; margin-bottom: 4px; }
+.livechat-orders-empty-sub { font-size: 12px; }
+.livechat-orders-list { flex: 1; overflow-y: auto; padding: 12px 12px 8px; }
+
+.livechat-order-card { border: 1.5px solid #f0f0f0; border-radius: 14px; margin-bottom: 10px; overflow: hidden; transition: box-shadow 0.2s; }
+.livechat-order-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
+.livechat-order-card.status-pending    { --st-bg: #fff8e1; --st-color: #f57f17; --st-dot: #ffc107; }
+.livechat-order-card.status-processing { --st-bg: #e3f2fd; --st-color: #1565c0; --st-dot: #42a5f5; }
+.livechat-order-card.status-shipped    { --st-bg: #e8f5e9; --st-color: #2e7d32; --st-dot: #66bb6a; }
+.livechat-order-card.status-delivered  { --st-bg: #f3e5f5; --st-color: #6a1b9a; --st-dot: #ab47bc; }
+.livechat-order-card.status-cancelled  { --st-bg: #ffebee; --st-color: #c62828; --st-dot: #ef5350; }
+
+.livechat-order-header { padding: 10px 12px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.livechat-order-id { font-weight: 700; font-size: 12px; color: #2d3436; }
+.livechat-order-date { font-size: 11px; color: #9e9e9e; margin-top: 1px; }
+.livechat-order-header-right { display: flex; align-items: center; gap: 8px; }
+.livechat-order-status { background: var(--st-bg); color: var(--st-color); font-weight: 700; font-size: 11px; padding: 3px 10px; border-radius: 20px; }
+.livechat-order-total { color: #9e9e9e; font-size: 12px; font-weight: 700; }
+.livechat-order-arrow { color: #bdbdbd; font-size: 12px; }
+
+.livechat-order-body { border-top: 1px solid #f5f5f5; padding: 10px 12px; background: #fafafa; }
+
+.livechat-progress-track { display: flex; align-items: center; margin-bottom: 12px; }
+.livechat-progress-step { display: flex; flex-direction: column; align-items: center; flex: 1; }
+.livechat-progress-step:last-child { flex: 0; }
+.livechat-progress-dot { width: 22px; height: 22px; border-radius: 50%; background: #e0e0e0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; font-weight: 700; transition: all 0.3s; }
+.livechat-progress-dot.done:not(.current) { background: #00b894; }
+.livechat-progress-dot.current { background: var(--st-dot); box-shadow: 0 0 0 3px var(--st-bg); }
+.livechat-progress-label { font-size: 9px; color: #9e9e9e; margin-top: 3px; font-weight: 400; white-space: nowrap; }
+.livechat-progress-label.done { color: #2d3436; }
+.livechat-progress-label.current { font-weight: 700; }
+.livechat-progress-line { flex: 1; height: 2px; background: #e0e0e0; margin: 0 2px; margin-bottom: 16px; transition: background 0.3s; }
+.livechat-progress-line.done { background: #00b894; }
+
+.livechat-cancelled-banner { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; background: #ffebee; border-radius: 10px; padding: 8px 12px; }
+.livechat-cancelled-icon { font-size: 16px; }
+.livechat-cancelled-text { color: #c62828; font-weight: 700; font-size: 12px; }
+
+.livechat-item-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.livechat-item-img { width: 30px; height: 30px; object-fit: cover; border-radius: 6px; border: 1px solid #f0f0f0; }
+.livechat-item-body { flex: 1; min-width: 0; }
+.livechat-item-name { font-size: 11px; font-weight: 600; color: #2d3436; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.livechat-item-meta { font-size: 10px; color: #9e9e9e; }
+.livechat-item-more { font-size: 11px; color: #9e9e9e; margin-bottom: 6px; }
+
+.livechat-order-footer { border-top: 1px solid #f0f0f0; margin-top: 8px; padding-top: 8px; display: flex; justify-content: space-between; font-size: 11px; color: #636e72; }
+.livechat-order-footer-total { font-weight: 700; color: #c2185b; }
+
+/* ── Widget shell ── */
+.livechat-wrap { position: fixed; bottom: 20px; right: 20px; z-index: 9998; }
+
+.livechat-panel {
+  position: absolute; bottom: 62px; right: 0;
+  width: 340px; height: 520px;
+  background: white; border-radius: 20px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  display: flex; flex-direction: column;
+  overflow: hidden; border: 1px solid #f8bbd0;
+  animation: zoomIn 0.25s ease;
+}
+
+.livechat-header { background: linear-gradient(135deg,#c2185b,#e91e63); padding: 14px 18px; }
+.livechat-header-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.livechat-header-avatar { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.livechat-header-info { flex: 1; }
+.livechat-header-title { color: white; font-weight: 700; font-size: 14px; }
+.livechat-header-status { color: rgba(255,255,255,0.75); font-size: 11px; display: flex; align-items: center; gap: 4px; }
+.livechat-status-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.livechat-status-dot.online { background: #69f0ae; }
+.livechat-status-dot.offline { background: #ffcc02; }
+.livechat-close-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+.livechat-tabs { display: flex; background: rgba(255,255,255,0.15); border-radius: 12px; padding: 3px; gap: 2px; }
+.livechat-tab { flex: 1; padding: 6px 0; border: none; border-radius: 10px; background: transparent; color: rgba(255,255,255,0.85); font-weight: 700; font-size: 12px; cursor: pointer; transition: all 0.2s; position: relative; }
+.livechat-tab.active { background: white; color: #c2185b; }
+.livechat-tab-badge { margin-left: 5px; background: #d63031; color: white; border-radius: 10px; padding: 1px 6px; font-size: 10px; font-weight: 800; }
+
+.livechat-messages { flex: 1; overflow-y: auto; padding: 14px 14px 4px; display: flex; flex-direction: column; gap: 8px; }
+.livechat-messages-empty { text-align: center; color: #9e9e9e; padding: 30px 20px; font-size: 13px; }
+.livechat-messages-empty-icon { font-size: 36px; margin-bottom: 8px; }
+.livechat-track-btn { margin-top: 10px; background: #fce4ec; border: none; color: #c2185b; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 12px; }
+
+.livechat-msg-row { display: flex; }
+.livechat-msg-row.is-me { justify-content: flex-end; }
+.livechat-msg-row.is-other { justify-content: flex-start; }
+.livechat-msg-bubble-wrap { max-width: 78%; }
+.livechat-msg-bubble { padding: 9px 13px; font-size: 13px; line-height: 1.5; word-break: break-word; }
+.livechat-msg-bubble.is-me { border-radius: 16px 16px 4px 16px; background: linear-gradient(135deg,#c2185b,#e91e63); color: white; }
+.livechat-msg-bubble.is-other { border-radius: 16px 16px 16px 4px; background: #f5f5f5; color: #212121; }
+.livechat-msg-time { font-size: 10px; color: #bdbdbd; margin-top: 2px; }
+.livechat-msg-time.is-me { text-align: right; padding-right: 4px; }
+.livechat-msg-time.is-other { text-align: left; padding-left: 4px; }
+
+.livechat-typing-row { display: flex; align-items: center; gap: 6px; }
+.livechat-typing-bubble { background: #f5f5f5; border-radius: 16px 16px 16px 4px; padding: 8px 14px; display: flex; gap: 4px; }
+.livechat-typing-dot { width: 6px; height: 6px; border-radius: 50%; background: #c2185b; display: inline-block; animation: bounce 1.2s ease-in-out infinite; }
+.livechat-typing-dot:nth-child(1) { animation-delay: 0s; }
+.livechat-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.livechat-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+.livechat-input-row { padding: 10px 12px; border-top: 1px solid #f5f5f5; display: flex; gap: 8px; align-items: flex-end; }
+.livechat-textarea { flex: 1; resize: none; border: 1.5px solid #f8bbd0; border-radius: 12px; padding: 9px 12px; font-size: 13px; font-family: inherit; outline: none; max-height: 80px; overflow-y: auto; line-height: 1.4; }
+.livechat-send-btn { width: 38px; height: 38px; border-radius: 50%; border: none; background: #f5f5f5; color: #bdbdbd; cursor: default; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+.livechat-send-btn.active { background: linear-gradient(135deg,#c2185b,#e91e63); color: white; cursor: pointer; }
+
+.livechat-fab { width: 52px; height: 52px; border-radius: 50%; border: none; background: linear-gradient(135deg,#c2185b,#e91e63); color: white; font-size: 22px; cursor: pointer; box-shadow: 0 4px 18px rgba(194,24,91,0.4); display: flex; align-items: center; justify-content: center; position: relative; transition: transform 0.2s; }
+.livechat-fab:hover { transform: scale(1.08); }
+.livechat-fab-badge { position: absolute; top: -4px; right: -4px; background: #d63031; color: white; border-radius: 50%; min-width: 20px; height: 20px; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; border: 2px solid white; padding: 0 3px; animation: pulse 1.5s ease-in-out infinite; }

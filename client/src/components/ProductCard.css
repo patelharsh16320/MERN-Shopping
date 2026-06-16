@@ -1,0 +1,22 @@
+.product-card-media { overflow: hidden; position: relative; }
+
+.discount-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #2e7d32;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+.discount-badge.featured-shift { top: 44px; }
+
+.product-review-count { color: #558b2f; margin-left: 4px; }
+
+.product-card-actions { display: flex; gap: 8px; }
+
+.btn-add-cart { flex: 1; justify-content: center; }
+
+.low-stock-warning { margin-top: 8px; font-size: 12px; color: #c62828; font-weight: 600; }

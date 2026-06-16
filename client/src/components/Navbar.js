@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import './Navbar.css';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -57,7 +58,7 @@ export default function Navbar() {
           <Link to="/" className="navbar-brand">💗 Women HubClub</Link>
 
           <form onSubmit={handleSearch} className="nav-search">
-            <span style={{ color: '#bdbdbd' }}>🔍</span>
+            <span className="nav-search-icon">🔍</span>
             <input placeholder="Search products..." value={search} onChange={e => setSearch(e.target.value)} />
           </form>
 
@@ -77,17 +78,17 @@ export default function Navbar() {
                   </button>
                   {dropOpen && (
                     <div className="user-dropdown">
-                      <div style={{ padding: '8px 14px 12px', borderBottom: '1px solid #f5f5f5' }}>
-                        <div style={{ fontWeight: 600, fontSize: '14px' }}>{user.name}</div>
-                        <div style={{ fontSize: '12px', color: '#757575' }}>{user.email}</div>
-                        <span className={`badge badge-${user.role}`} style={{ marginTop: '4px' }}>{user.role}</span>
+                      <div className="user-dropdown-info">
+                        <div className="user-dropdown-name">{user.name}</div>
+                        <div className="user-dropdown-email">{user.email}</div>
+                        <span className={`badge badge-${user.role} user-dropdown-role-badge`}>{user.role}</span>
                       </div>
                       {user.role === 'admin' && <Link to="/admin" className="dropdown-item" onClick={close}>⚙️ Admin Dashboard</Link>}
                       <Link to="/orders" className="dropdown-item" onClick={close}>📦 My Orders</Link>
                       <Link to="/invoices" className="dropdown-item" onClick={close}>🧾 My Invoices</Link>
                       <Link to="/wishlist" className="dropdown-item" onClick={close}>🤍 Wishlist</Link>
                       <Link to="/profile" className="dropdown-item" onClick={close}>👤 Profile</Link>
-                      <div className="dropdown-item" onClick={() => { logout(); close(); navigate('/'); }} style={{ color: '#c62828' }}>🚪 Logout</div>
+                      <div className="dropdown-item dropdown-item-danger" onClick={() => { logout(); close(); navigate('/'); }}>🚪 Logout</div>
                     </div>
                   )}
                 </li>
@@ -101,8 +102,8 @@ export default function Navbar() {
           </ul>
 
           {/* Mobile right side */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }} className="mobile-right">
-            <Link to="/cart" className="nav-link" style={{ position: 'relative', padding: '7px 10px' }}>
+          <div className="mobile-right">
+            <Link to="/cart" className="nav-link nav-cart-link">
               <span className="cart-badge">
                 🛒
                 {totalItems > 0 && <span className="cart-count">{totalItems}</span>}
@@ -121,7 +122,7 @@ export default function Navbar() {
       {/* Mobile nav drawer */}
       <div className={`mobile-nav ${mobileOpen ? 'open' : ''}`}>
         <form onSubmit={handleSearch} className="mobile-nav-search">
-          <span style={{ color: '#bdbdbd' }}>🔍</span>
+          <span className="nav-search-icon">🔍</span>
           <input placeholder="Search products..." value={search} onChange={e => setSearch(e.target.value)} />
         </form>
         <Link to="/" className="nav-link" onClick={close}>🏠 Home</Link>
@@ -137,12 +138,12 @@ export default function Navbar() {
             <Link to="/support" className="nav-link" onClick={close}>🎧 Support</Link>
             <Link to="/profile" className="nav-link" onClick={close}>👤 Profile ({user.name.split(' ')[0]})</Link>
             {user.role === 'admin' && <Link to="/admin" className="nav-link" onClick={close}>⚙️ Admin Panel</Link>}
-            <div className="nav-link" style={{ color: '#c62828', cursor: 'pointer' }} onClick={() => { logout(); close(); navigate('/'); }}>🚪 Logout</div>
+            <div className="nav-link nav-link-danger" onClick={() => { logout(); close(); navigate('/'); }}>🚪 Logout</div>
           </>
         ) : (
           <>
             <Link to="/login" className="nav-link" onClick={close}>🔑 Login</Link>
-            <Link to="/register" className="btn btn-primary" style={{ margin: '4px 0' }} onClick={close}>Join Now</Link>
+            <Link to="/register" className="btn btn-primary btn-mobile-cta" onClick={close}>Join Now</Link>
           </>
         )}
       </div>

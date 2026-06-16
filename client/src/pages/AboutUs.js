@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import './AboutUs.css';
 
 const team = [
   { name: 'Priya Sharma', role: 'Founder & CEO', emoji: '💗', bio: 'Women empowerment advocate with 12 years in wellness and beauty industry. Founded Women HubClub to make premium products accessible to all women.' },
@@ -25,11 +26,11 @@ export default function AboutUs() {
   const navigate = useNavigate();
   return (
     <div>
-      <div className="page-hero" style={{ textAlign: 'center', padding: '72px 24px' }}>
+      <div className="page-hero au-hero">
         <div className="container">
-          <div style={{ fontSize: 56, marginBottom: 14, animation: 'float 3s ease-in-out infinite' }}>💗</div>
-          <h1 className="section-title" style={{ fontSize: 44, color: 'var(--primary)', marginBottom: 14 }}>About Women HubClub</h1>
-          <p style={{ color: '#757575', fontSize: 17, maxWidth: 580, margin: '0 auto 28px', lineHeight: 1.8 }}>
+          <div className="au-hero-icon">💗</div>
+          <h1 className="section-title au-hero-title">About Women HubClub</h1>
+          <p className="au-hero-sub">
             We're on a mission to empower every woman with access to premium beauty, wellness and lifestyle products.
           </p>
           <button className="btn btn-primary btn-lg" onClick={() => navigate('/products')}>Explore Our Store</button>
@@ -37,13 +38,13 @@ export default function AboutUs() {
       </div>
 
       {/* Stats */}
-      <div style={{ background: 'var(--primary)', padding: '44px 24px' }}>
+      <div className="au-stats-section">
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 28, textAlign: 'center' }}>
+          <div className="au-stats-grid">
             {stats.map((s, i) => (
-              <div key={i} className="animate-fade" style={{ animationDelay: `${i * 0.1}s` }}>
-                <div style={{ fontSize: 36, fontWeight: 800, color: 'white', marginBottom: 6 }}>{s.value}</div>
-                <div style={{ color: 'rgba(255,255,255,0.75)', fontSize: 14 }}>{s.label}</div>
+              <div key={i} className="animate-fade">
+                <div className="au-stat-value">{s.value}</div>
+                <div className="au-stat-label">{s.label}</div>
               </div>
             ))}
           </div>
@@ -53,19 +54,19 @@ export default function AboutUs() {
       {/* Story */}
       <div className="section">
         <div className="container">
-          <div className="layout-two-col" style={{ gap: 56 }}>
-            <div className="animate-left" style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 110, animation: 'float 3s ease-in-out infinite' }}>🌸</div>
+          <div className="layout-two-col au-story-cols">
+            <div className="animate-left au-story-img-wrap">
+              <div className="au-story-emoji">🌸</div>
             </div>
             <div className="animate-right">
-              <h2 className="section-title" style={{ color: 'var(--primary)', marginBottom: 18 }}>Our Story</h2>
-              <p style={{ color: '#757575', lineHeight: 1.9, marginBottom: 16, fontSize: 15 }}>
+              <h2 className="section-title au-story-heading">Our Story</h2>
+              <p className="au-story-text">
                 Women HubClub was born in 2021 from a simple frustration — finding authentic, high-quality beauty and wellness products without overpaying or being misled.
               </p>
-              <p style={{ color: '#757575', lineHeight: 1.9, marginBottom: 16, fontSize: 15 }}>
+              <p className="au-story-text">
                 Our founder Priya spent years testing products and noticed a gap: most platforms didn't have women's trust at heart. So she built one that does.
               </p>
-              <p style={{ color: '#757575', lineHeight: 1.9, fontSize: 15 }}>
+              <p className="au-story-text last">
                 Today, Women HubClub is a thriving community of 50,000+ members who trust us for skincare, beauty, wellness, fashion and much more — all curated and certified.
               </p>
             </div>
@@ -76,14 +77,14 @@ export default function AboutUs() {
       {/* Values */}
       <div className="forest-section">
         <div className="container">
-          <h2 className="section-title text-center" style={{ color: 'var(--primary)', marginBottom: 6 }}>Our Values</h2>
+          <h2 className="section-title text-center au-section-heading">Our Values</h2>
           <p className="section-subtitle text-center">The principles that drive us every day</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 20 }}>
+          <div className="au-values-grid">
             {values.map((v, i) => (
-              <div key={i} className="contact-card animate-fade" style={{ animationDelay: `${i * 0.12}s` }}>
+              <div key={i} className="contact-card animate-fade">
                 <div className="contact-icon">{v.icon}</div>
-                <h3 style={{ fontWeight: 700, marginBottom: 10, fontSize: 17 }}>{v.title}</h3>
-                <p style={{ color: '#757575', fontSize: 14, lineHeight: 1.7 }}>{v.desc}</p>
+                <h3 className="au-value-title">{v.title}</h3>
+                <p className="au-value-desc">{v.desc}</p>
               </div>
             ))}
           </div>
@@ -93,15 +94,15 @@ export default function AboutUs() {
       {/* Team */}
       <div className="section">
         <div className="container">
-          <h2 className="section-title text-center" style={{ color: 'var(--primary)', marginBottom: 6 }}>Meet the Team</h2>
+          <h2 className="section-title text-center au-section-heading">Meet the Team</h2>
           <p className="section-subtitle text-center">The women behind Women HubClub</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 24 }}>
+          <div className="au-team-grid">
             {team.map((m, i) => (
-              <div key={i} className="card animate-zoom" style={{ padding: 32, textAlign: 'center', animationDelay: `${i * 0.12}s` }}>
-                <div style={{ fontSize: 64, marginBottom: 14, animation: 'float 3s ease-in-out infinite', animationDelay: `${i * 0.4}s` }}>{m.emoji}</div>
-                <h3 style={{ fontWeight: 700, fontSize: 19, marginBottom: 3 }}>{m.name}</h3>
-                <div style={{ color: 'var(--primary)', fontWeight: 600, fontSize: 13, marginBottom: 14 }}>{m.role}</div>
-                <p style={{ color: '#757575', fontSize: 14, lineHeight: 1.7 }}>{m.bio}</p>
+              <div key={i} className="card animate-zoom au-team-card">
+                <div className="au-team-emoji">{m.emoji}</div>
+                <h3 className="au-team-name">{m.name}</h3>
+                <div className="au-team-role">{m.role}</div>
+                <p className="au-team-bio">{m.bio}</p>
               </div>
             ))}
           </div>
@@ -109,11 +110,11 @@ export default function AboutUs() {
       </div>
 
       {/* CTA */}
-      <div style={{ background: '#fff0f5', padding: '72px 24px', textAlign: 'center', borderTop: '1px solid #fce4ec' }}>
+      <div className="au-cta-section">
         <div className="container">
-          <h2 style={{ fontSize: 34, fontWeight: 800, color: 'var(--primary)', marginBottom: 14 }}>Join the Sisterhood</h2>
-          <p style={{ color: '#757575', fontSize: 17, marginBottom: 28 }}>50,000+ women already love Women HubClub. What are you waiting for?</p>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <h2 className="au-cta-heading">Join the Sisterhood</h2>
+          <p className="au-cta-sub">50,000+ women already love Women HubClub. What are you waiting for?</p>
+          <div className="au-cta-buttons">
             <button className="btn btn-primary btn-lg" onClick={() => navigate('/products')}>Shop Now</button>
             <button className="btn btn-secondary btn-lg" onClick={() => navigate('/contact')}>Talk to Us</button>
           </div>

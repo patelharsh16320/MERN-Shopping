@@ -4,6 +4,7 @@ import { productAPI, categoryAPI } from '../utils/api';
 import ProductCard from '../components/ProductCard';
 import { SkeletonCard } from '../components/Loader';
 import { initPublicSocket } from '../utils/socket';
+import './Products.css';
 const sortOptions = [
   { label: 'Featured', value: '' },
   { label: 'Price: Low to High', value: 'price_asc' },
@@ -76,13 +77,13 @@ export default function Products() {
       <div className="page-hero">
         <div className="container">
           <h1 className="section-title gradient-text">✨ Shop Women HubClub</h1>
-          <p style={{ color: '#636e72', fontSize: 16 }}>
+          <p className="products-hero-subtitle">
             {total > 0 ? `Showing ${total} products` : 'Discover our curated collection'}
           </p>
         </div>
       </div>
 
-      <div className="container" style={{ paddingBottom: 60 }}>
+      <div className="container products-page-body">
         <button className="filter-toggle-btn" onClick={() => setFilterOpen(v => !v)}>
           <span>🔍 Filters {Object.values(filters).some(Boolean) ? '(active)' : ''}</span>
           <span>{filterOpen ? '▲' : '▼'}</span>
@@ -92,9 +93,9 @@ export default function Products() {
 
           {/* Filters Sidebar */}
           <div className={`filter-sidebar animate-left${filterOpen ? ' filter-open' : ''}`}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h3 className="filter-title" style={{ marginBottom: 0 }}>🔍 Filters</h3>
-              <button onClick={clearFilters} style={{ fontSize: 12, color: '#6c63ff', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Clear All</button>
+            <div className="products-filter-header">
+              <h3 className="filter-title products-filter-title">🔍 Filters</h3>
+              <button onClick={clearFilters} className="products-clear-btn">Clear All</button>
             </div>
 
             {/* Sort */}
@@ -112,14 +113,14 @@ export default function Products() {
                 <div key={cat._id} className={`filter-option ${filters.category === cat.name ? 'active' : ''}`} onClick={() => updateFilter('category', cat.name)}>
                   <input type="checkbox" checked={filters.category === cat.name} readOnly />
                   {cat.icon} {cat.name}
-                  <span style={{ marginLeft: 'auto', fontSize: 11, color: '#9e9e9e' }}>{cat.productCount}</span>
+                  <span className="products-cat-count">{cat.productCount}</span>
                 </div>
               ))}
               {categories.filter(c => c.productCount === 0).map(cat => (
-                <div key={cat._id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '7px 10px', borderRadius: 8, color: '#c8c8c8', fontSize: 13, cursor: 'not-allowed', userSelect: 'none' }}>
-                  <input type="checkbox" disabled style={{ opacity: 0.3 }} />
+                <div key={cat._id} className="products-cat-disabled">
+                  <input type="checkbox" disabled className="products-cat-disabled-checkbox" />
                   {cat.icon} {cat.name}
-                  <span style={{ marginLeft: 'auto', fontSize: 11 }}>0</span>
+                  <span className="products-cat-count">0</span>
                 </div>
               ))}
             </div>
@@ -127,13 +128,13 @@ export default function Products() {
             {/* Price Range */}
             <div className="filter-group">
               <div className="filter-group-title">Price Range</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                <input className="form-input" placeholder="Min ₹" type="number" value={filters.minPrice} onChange={e => { setFilters(f => ({ ...f, minPrice: e.target.value })); setPage(1); }} style={{ padding: '8px 12px', fontSize: 13 }} />
-                <input className="form-input" placeholder="Max ₹" type="number" value={filters.maxPrice} onChange={e => { setFilters(f => ({ ...f, maxPrice: e.target.value })); setPage(1); }} style={{ padding: '8px 12px', fontSize: 13 }} />
+              <div className="products-price-grid">
+                <input className="form-input products-price-input" placeholder="Min ₹" type="number" value={filters.minPrice} onChange={e => { setFilters(f => ({ ...f, minPrice: e.target.value })); setPage(1); }} />
+                <input className="form-input products-price-input" placeholder="Max ₹" type="number" value={filters.maxPrice} onChange={e => { setFilters(f => ({ ...f, maxPrice: e.target.value })); setPage(1); }} />
               </div>
               {[499, 999, 1499].map(p => (
                 <button key={p} onClick={() => { setFilters(f => ({ ...f, maxPrice: String(p) })); setPage(1); }}
-                  style={{ display: 'block', width: '100%', textAlign: 'left', background: filters.maxPrice === String(p) ? '#f0f0ff' : 'none', border: 'none', borderRadius: 10, padding: '8px 12px', cursor: 'pointer', fontSize: 13, marginBottom: 4, color: filters.maxPrice === String(p) ? '#6c63ff' : '#2d3436', fontFamily: 'Poppins' }}>
+                  className={`products-price-preset ${filters.maxPrice === String(p) ? 'active' : ''}`}>
                   Under ₹{p}
                 </button>
               ))}
@@ -153,14 +154,14 @@ export default function Products() {
           {/* Products Grid */}
           <div className="animate-right">
             {/* Search Bar */}
-            <div style={{ display: 'flex', gap: 12, marginBottom: 24, alignItems: 'center' }}>
-              <div className="nav-search" style={{ flex: 1, background: 'white', border: '2px solid #e0e0f0' }}>
+            <div className="products-search-row">
+              <div className="nav-search products-search-box">
                 <span>🔍</span>
                 <input placeholder="Search products..." value={filters.search}
                   onChange={e => { setFilters(f => ({ ...f, search: e.target.value })); setPage(1); }}
-                  style={{ width: '100%', padding: '4px 0' }} />
+                  className="products-search-input" />
               </div>
-              {filters.category && <span className="badge badge-shipped" style={{ padding: '8px 16px' }}>{filters.category} ✕</span>}
+              {filters.category && <span className="badge badge-shipped products-active-cat-badge">{filters.category} ✕</span>}
             </div>
 
             {loading ? (
@@ -170,13 +171,13 @@ export default function Products() {
                 <div className="empty-state-icon">🛍️</div>
                 <h3>No products found</h3>
                 <p>Try adjusting your filters</p>
-                <button className="btn btn-primary" onClick={clearFilters} style={{ marginTop: 16 }}>Clear Filters</button>
+                <button className="btn btn-primary products-empty-clear-btn" onClick={clearFilters}>Clear Filters</button>
               </div>
             ) : (
               <>
                 <div className="products-grid">
-                  {products.map((p, i) => (
-                    <div key={p._id} style={{ animation: `fadeIn ${0.2 + i * 0.05}s ease` }}>
+                  {products.map((p) => (
+                    <div key={p._id} className="products-card-wrap">
                       <ProductCard product={p} />
                     </div>
                   ))}

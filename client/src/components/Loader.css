@@ -1,0 +1,9 @@
+.loader-text { color: #636e72; font-size: 14px; }
+
+.skeleton-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(108,99,255,0.1); }
+.skeleton-card-img { height: 220px; }
+.skeleton-card-body { padding: 16px; }
+.skeleton-line-1 { height: 12px; width: 60%; margin-bottom: 8px; }
+.skeleton-line-2 { height: 16px; width: 85%; margin-bottom: 12px; }
+.skeleton-line-3 { height: 24px; width: 40%; margin-bottom: 12px; }
+.skeleton-btn { height: 38px; border-radius: 50px; }

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supportAPI } from '../utils/api';
 import { toast } from 'react-toastify';
+import './Support.css';
 
 /* ── constants ── */
 const CATEGORIES = [
@@ -37,7 +38,7 @@ function statusMeta(v)   { return STATUS_META[v] || STATUS_META['open']; }
 function PriorityBadge({ value }) {
   const m = priorityMeta(value);
   return (
-    <span style={{ fontSize: 11, fontWeight: 800, padding: '3px 9px', borderRadius: 20, background: m.bg, color: m.color, border: `1px solid ${m.color}40`, textTransform: 'uppercase', letterSpacing: '0.4px' }}>
+    <span className={`supp-priority-badge supp-priority-${value}`}>
       {value === 'urgent' ? '🔴' : value === 'high' ? '🟠' : value === 'medium' ? '🟡' : '🟢'} {m.label}
     </span>
   );
@@ -46,7 +47,7 @@ function PriorityBadge({ value }) {
 function StatusBadge({ value }) {
   const m = statusMeta(value);
   return (
-    <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: m.bg, color: m.color }}>
+    <span className={`supp-status-badge supp-status-${value}`}>
       {m.dot} {m.label}
     </span>
   );
@@ -83,50 +84,50 @@ function TicketList({ tickets, loading, onOpen, onNew, statusTab, setStatusTab, 
   return (
     <div>
       {/* Quick stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(140px,1fr))', gap: 14, marginBottom: 28 }}>
+      <div className="supp-stats-grid">
         {[
-          { label: 'Total Tickets',  value: tickets.length,                              icon: '🎫', color: '#6c63ff', bg: '#f0f0ff' },
-          { label: 'Open',           value: tickets.filter(t=>t.status==='open').length, icon: '🟣', color: '#6c63ff', bg: '#f0f0ff' },
-          { label: 'In Progress',    value: tickets.filter(t=>t.status==='in-progress').length, icon: '🟡', color: '#f39c12', bg: '#fffbf0' },
-          { label: 'Resolved',       value: tickets.filter(t=>t.status==='resolved'||t.status==='closed').length, icon: '✅', color: '#00b894', bg: '#e8fff5' },
+          { label: 'Total Tickets',  value: tickets.length,                              icon: '🎫' },
+          { label: 'Open',           value: tickets.filter(t=>t.status==='open').length, icon: '🟣' },
+          { label: 'In Progress',    value: tickets.filter(t=>t.status==='in-progress').length, icon: '🟡' },
+          { label: 'Resolved',       value: tickets.filter(t=>t.status==='resolved'||t.status==='closed').length, icon: '✅' },
         ].map(s => (
-          <div key={s.label} style={{ background: 'white', borderRadius: 14, padding: '14px 16px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)', border: `1px solid ${s.bg}` }}>
-            <div style={{ fontSize: 20, marginBottom: 6 }}>{s.icon}</div>
-            <div style={{ fontSize: 22, fontWeight: 900, color: s.color }}>{s.value}</div>
-            <div style={{ fontSize: 12, color: '#9e9e9e', fontWeight: 600 }}>{s.label}</div>
+          <div key={s.label} className="supp-stat-card">
+            <div className="supp-stat-icon">{s.icon}</div>
+            <div className="supp-stat-value">{s.value}</div>
+            <div className="supp-stat-label">{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* Search + New */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
-        <div style={{ flex: 1, position: 'relative', minWidth: 200 }}>
-          <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#bdbdbd', fontSize: 16 }}>🔍</span>
+      <div className="supp-toolbar-row">
+        <div className="supp-search-wrap">
+          <span className="supp-search-icon">🔍</span>
           <input
             value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Search by subject, ID or category…"
-            style={{ width: '100%', padding: '10px 14px 10px 38px', borderRadius: 12, border: '2px solid #e0e0e0', fontSize: 14, outline: 'none', boxSizing: 'border-box', background: 'white' }}
+            className="supp-search-input"
           />
         </div>
-        <button className="btn btn-primary" onClick={onNew} style={{ padding: '10px 24px', borderRadius: 12, whiteSpace: 'nowrap' }}>
+        <button className="btn btn-primary supp-new-btn" onClick={onNew}>
           + New Ticket
         </button>
       </div>
 
       {/* Status tabs */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 20, flexWrap: 'wrap' }}>
+      <div className="supp-status-tabs">
         {STATUS_TABS.map(tab => {
           const count = tab === 'all' ? tickets.length : tickets.filter(t => t.status === tab).length;
           const active = statusTab === tab;
           return (
             <button key={tab} onClick={() => setStatusTab(tab)}
-              style={{ padding: '6px 16px', borderRadius: 20, border: `2px solid ${active ? '#6c63ff' : '#e0e0e0'}`, background: active ? '#f0f0ff' : 'white', color: active ? '#6c63ff' : '#666', fontSize: 13, fontWeight: 700, cursor: 'pointer', textTransform: 'capitalize' }}>
+              className={`supp-status-tab${active ? ' active' : ''}`}>
               {tab === 'all' ? 'All' : STATUS_META[tab]?.label || tab} ({count})
             </button>
           );
         })}
         {unreadCount > 0 && (
-          <span style={{ padding: '6px 14px', borderRadius: 20, background: '#fce4ec', color: '#c2185b', fontSize: 13, fontWeight: 800, border: '2px solid #f48fb1' }}>
+          <span className="supp-unread-pill">
             🔔 {unreadCount} new repl{unreadCount === 1 ? 'y' : 'ies'}
           </span>
         )}
@@ -134,60 +135,58 @@ function TicketList({ tickets, loading, onOpen, onNew, statusTab, setStatusTab, 
 
       {/* List */}
       {loading ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div className="supp-skeleton-list">
           {[1,2,3].map(i => (
-            <div key={i} style={{ background: 'white', borderRadius: 16, padding: 20, height: 80, animation: 'pulse 1.5s infinite' }} />
+            <div key={i} className="supp-skeleton-row" />
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: '60px 20px', background: 'white', borderRadius: 20, boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-          <div style={{ fontSize: 56, marginBottom: 12 }}>🎧</div>
-          <h3 style={{ fontWeight: 800, marginBottom: 8, fontSize: 18 }}>
+        <div className="supp-empty">
+          <div className="supp-empty-icon">🎧</div>
+          <h3 className="supp-empty-title">
             {search ? 'No tickets match your search' : 'No tickets yet'}
           </h3>
-          <p style={{ color: '#9e9e9e', marginBottom: 20 }}>
+          <p className="supp-empty-sub">
             {search ? 'Try a different keyword' : 'Create your first support ticket and we\'ll help you out.'}
           </p>
           {!search && <button className="btn btn-primary" onClick={onNew}>Create Ticket</button>}
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div className="supp-ticket-list">
           {filtered.map(t => (
             <div key={t._id} onClick={() => onOpen(t)}
-              style={{ background: 'white', borderRadius: 16, padding: '18px 20px', border: `2px solid ${t.userUnread ? '#c2185b40' : '#f0f0f0'}`, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 16, transition: 'all 0.2s', boxShadow: t.userUnread ? '0 4px 16px rgba(194,24,91,0.1)' : '0 2px 8px rgba(0,0,0,0.04)', position: 'relative', overflow: 'hidden' }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = '#6c63ff'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(108,99,255,0.12)'; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = t.userUnread ? '#c2185b40' : '#f0f0f0'; e.currentTarget.style.boxShadow = t.userUnread ? '0 4px 16px rgba(194,24,91,0.1)' : '0 2px 8px rgba(0,0,0,0.04)'; }}>
+              className={`supp-ticket-row${t.userUnread ? ' unread' : ''}`}>
 
               {/* New-reply stripe */}
-              {t.userUnread && <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 4, background: 'linear-gradient(180deg,#c2185b,#e91e63)', borderRadius: '4px 0 0 4px' }} />}
+              {t.userUnread && <div className="supp-ticket-stripe" />}
 
               {/* Category icon */}
-              <div style={{ width: 44, height: 44, borderRadius: 14, background: '#f8f7ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0 }}>
+              <div className="supp-ticket-icon">
                 {CATEGORIES.find(c => c.value === t.category)?.icon || '💬'}
               </div>
 
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
-                  <span style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 700, color: '#9e9e9e', background: '#f5f5f5', padding: '2px 8px', borderRadius: 6 }}>
+              <div className="supp-ticket-info">
+                <div className="supp-ticket-top-row">
+                  <span className="supp-ticket-id">
                     {t.ticketId || '#—'}
                   </span>
-                  <span style={{ fontWeight: 800, fontSize: 15, color: '#212121', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.subject}</span>
-                  {t.userUnread && <span style={{ fontSize: 10, fontWeight: 800, background: '#c2185b', color: 'white', padding: '2px 8px', borderRadius: 20 }}>NEW REPLY</span>}
+                  <span className="supp-ticket-subject">{t.subject}</span>
+                  {t.userUnread && <span className="supp-ticket-newreply">NEW REPLY</span>}
                 </div>
-                <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+                <div className="supp-ticket-meta-row">
                   <PriorityBadge value={t.priority || 'medium'} />
-                  <span style={{ fontSize: 11, color: '#9e9e9e', background: '#fafafa', border: '1px solid #eee', padding: '2px 8px', borderRadius: 8, fontWeight: 600 }}>
+                  <span className="supp-ticket-category">
                     {t.category || 'Other'}
                   </span>
-                  <span style={{ fontSize: 11, color: '#bdbdbd' }}>
+                  <span className="supp-ticket-meta-text">
                     {t.messages?.length || 0} msg{t.messages?.length !== 1 ? 's' : ''} · {timeAgo(t.updatedAt)}
                   </span>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
+              <div className="supp-ticket-right">
                 <StatusBadge value={t.status} />
-                <span style={{ fontSize: 20, color: '#e0e0e0' }}>›</span>
+                <span className="supp-ticket-chevron">›</span>
               </div>
             </div>
           ))}

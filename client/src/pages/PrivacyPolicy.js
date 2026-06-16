@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import './PrivacyPolicy.css';
 
 function useInView(threshold = 0.12) {
   const ref = useRef(null);
@@ -75,72 +76,72 @@ export default function PrivacyPolicy() {
   return (
     <div>
       {/* Hero */}
-      <div className="page-hero" style={{ textAlign: 'center', padding: '68px 24px', background: 'linear-gradient(135deg,#fff0f5,#fce4ec)' }}>
+      <div className="page-hero pp-hero">
         <div className="container" ref={heroRef}>
-          <div style={{ fontSize: 52, marginBottom: 14, animation: 'bounceIn 0.7s ease' }}>🔒</div>
-          <h1 className="section-title" style={{ fontSize: 40, color: 'var(--primary)', marginBottom: 12, opacity: heroVisible ? 1 : 0, transform: heroVisible ? 'none' : 'translateY(20px)', transition: 'all 0.7s ease' }}>
+          <div className="pp-hero-icon">🔒</div>
+          <h1 className={`section-title pp-hero-title reveal ${heroVisible ? 'visible' : ''}`}>
             Privacy Policy
           </h1>
-          <p style={{ color: '#757575', fontSize: 15, maxWidth: 560, margin: '0 auto 16px', lineHeight: 1.8, opacity: heroVisible ? 1 : 0, transition: 'all 0.7s 0.15s ease' }}>
+          <p className={`pp-hero-sub reveal delay-1 ${heroVisible ? 'visible' : ''}`}>
             Your privacy matters to us. This policy explains what data we collect, how we use it, and the rights you have over it.
           </p>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'white', padding: '8px 18px', borderRadius: 20, fontSize: 13, color: '#757575', boxShadow: 'var(--shadow)' }}>
+          <div className="pp-updated-pill">
             📅 Last updated: June 2026
           </div>
         </div>
       </div>
 
       {/* Trust badges */}
-      <div style={{ background: 'white', borderBottom: '1px solid #fce4ec' }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'center', gap: 36, padding: '18px 24px', flexWrap: 'wrap' }}>
+      <div className="pp-trust-strip">
+        <div className="container pp-trust-row">
           {[['🔒', 'SSL Encrypted'], ['🚫', 'Never Sold'], ['✅', 'GDPR Aligned'], ['🛡️', 'Secure Storage']].map(([icon, label]) => (
-            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, fontWeight: 600, color: '#555' }}>
-              <span style={{ fontSize: 20 }}>{icon}</span> {label}
+            <div key={label} className="pp-trust-item">
+              <span className="pp-trust-icon">{icon}</span> {label}
             </div>
           ))}
         </div>
       </div>
 
       {/* Main content */}
-      <div className="container" style={{ paddingTop: 48, paddingBottom: 72 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 36, alignItems: 'start' }}>
+      <div className="container pp-main">
+        <div className="pp-layout">
 
           {/* Sticky Nav */}
-          <div style={{ position: 'sticky', top: 24 }}>
-            <div style={{ background: 'white', borderRadius: 16, padding: 20, boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#9e9e9e', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>Contents</div>
+          <div className="pp-sticky-nav">
+            <div className="pp-nav-card">
+              <div className="pp-nav-label">Contents</div>
               {sections.map(sec => (
                 <button key={sec.id} onClick={() => { setActive(sec.id); document.getElementById(sec.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}
-                  style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 12px', borderRadius: 10, border: 'none', background: active === sec.id ? '#fce4ec' : 'transparent', color: active === sec.id ? 'var(--primary)' : '#555', fontWeight: active === sec.id ? 700 : 500, cursor: 'pointer', textAlign: 'left', fontSize: 13, fontFamily: 'Poppins', transition: 'all 0.2s', marginBottom: 2 }}>
+                  className={`pp-nav-btn ${active === sec.id ? 'active' : ''}`}>
                   <span>{sec.icon}</span> {sec.title}
                 </button>
               ))}
             </div>
-            <div style={{ background: '#fff0f5', borderRadius: 14, padding: 18, marginTop: 16, border: '1px solid #fce4ec', textAlign: 'center' }}>
-              <div style={{ fontSize: 28, marginBottom: 8 }}>💬</div>
-              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 6, color: 'var(--primary)' }}>Questions?</div>
-              <div style={{ fontSize: 12, color: '#757575', marginBottom: 12 }}>Our privacy team is here to help.</div>
-              <Link to="/contact" className="btn btn-primary" style={{ fontSize: 12, padding: '8px 16px' }}>Contact Us</Link>
+            <div className="pp-help-box">
+              <div className="pp-help-icon">💬</div>
+              <div className="pp-help-title">Questions?</div>
+              <div className="pp-help-sub">Our privacy team is here to help.</div>
+              <Link to="/contact" className="btn btn-primary pp-help-btn">Contact Us</Link>
             </div>
           </div>
 
           {/* Sections */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-            {sections.map((sec, i) => {
+          <div className="pp-sections-wrap">
+            {sections.map((sec) => {
               // eslint-disable-next-line react-hooks/rules-of-hooks
               const [ref, visible] = useInView();
               return (
                 <div key={sec.id} id={sec.id} ref={ref}
-                  style={{ background: 'white', borderRadius: 20, padding: 36, boxShadow: 'var(--shadow)', border: '1px solid var(--border)', opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(24px)', transition: `all 0.6s ${i * 0.06}s ease` }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-                    <div style={{ width: 48, height: 48, borderRadius: 14, background: 'linear-gradient(135deg,#fce4ec,#fff0f5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, flexShrink: 0 }}>{sec.icon}</div>
-                    <h2 style={{ fontWeight: 800, fontSize: 22, color: '#212121' }}>{sec.title}</h2>
+                  className={`pp-section reveal ${visible ? 'visible' : ''}`}>
+                  <div className="pp-section-header">
+                    <div className="pp-section-icon">{sec.icon}</div>
+                    <h2 className="pp-section-title">{sec.title}</h2>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+                  <div className="pp-content-list">
                     {sec.content.map((item, j) => (
-                      <div key={j} style={{ paddingLeft: 16, borderLeft: '3px solid #f48fb1' }}>
-                        <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 5, color: '#212121' }}>{item.sub}</div>
-                        <p style={{ color: '#757575', fontSize: 14, lineHeight: 1.8 }}>{item.text}</p>
+                      <div key={j} className="pp-content-item">
+                        <div className="pp-content-sub">{item.sub}</div>
+                        <p className="pp-content-text">{item.text}</p>
                       </div>
                     ))}
                   </div>
@@ -149,15 +150,15 @@ export default function PrivacyPolicy() {
             })}
 
             {/* Contact CTA */}
-            <div style={{ background: 'linear-gradient(135deg,#c2185b,#880e4f)', borderRadius: 20, padding: 36, textAlign: 'center', color: 'white' }}>
-              <div style={{ fontSize: 36, marginBottom: 10 }}>📬</div>
-              <h3 style={{ fontWeight: 800, fontSize: 20, marginBottom: 10 }}>Privacy Questions?</h3>
-              <p style={{ color: 'rgba(255,255,255,0.8)', marginBottom: 20, fontSize: 14, lineHeight: 1.7 }}>
+            <div className="pp-cta-box">
+              <div className="pp-cta-icon">📬</div>
+              <h3 className="pp-cta-title">Privacy Questions?</h3>
+              <p className="pp-cta-text">
                 Write to us at <strong>privacy@womenhubclub.com</strong> and we will respond within 2 business days.
               </p>
-              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-                <Link to="/contact" className="btn btn-lg" style={{ background: 'white', color: 'var(--primary)', fontWeight: 700 }}>Send a Message</Link>
-                <Link to="/refund" className="btn btn-lg" style={{ background: 'transparent', border: '2px solid rgba(255,255,255,0.5)', color: 'white' }}>Refund Policy →</Link>
+              <div className="pp-cta-buttons">
+                <Link to="/contact" className="btn btn-lg pp-cta-btn-white">Send a Message</Link>
+                <Link to="/refund" className="btn btn-lg pp-cta-btn-outline">Refund Policy →</Link>
               </div>
             </div>
           </div>

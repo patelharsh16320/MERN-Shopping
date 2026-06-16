@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import './TermsConditions.css';
 
 function useInView(threshold = 0.12) {
   const ref = useRef(null);
@@ -109,75 +110,75 @@ export default function TermsConditions() {
   return (
     <div>
       {/* Hero */}
-      <div className="page-hero" style={{ textAlign: 'center', padding: '68px 24px', background: 'linear-gradient(135deg,#f3e5f5,#e8eaf6)' }}>
+      <div className="page-hero tc-hero">
         <div className="container" ref={heroRef}>
-          <div style={{ fontSize: 52, marginBottom: 14, animation: 'bounceIn 0.7s ease' }}>📜</div>
-          <h1 className="section-title" style={{ fontSize: 40, color: '#7b1fa2', marginBottom: 12, opacity: heroVisible ? 1 : 0, transform: heroVisible ? 'none' : 'translateY(20px)', transition: 'all 0.7s ease' }}>
+          <div className="tc-hero-icon">📜</div>
+          <h1 className={`section-title tc-hero-title reveal ${heroVisible ? 'visible' : ''}`}>
             Terms &amp; Conditions
           </h1>
-          <p style={{ color: '#757575', fontSize: 15, maxWidth: 560, margin: '0 auto 16px', lineHeight: 1.8, opacity: heroVisible ? 1 : 0, transition: 'all 0.7s 0.15s ease' }}>
+          <p className={`tc-hero-sub reveal delay-1 ${heroVisible ? 'visible' : ''}`}>
             Please read these terms carefully before using Women HubClub. By accessing our platform you agree to these terms.
           </p>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'white', padding: '8px 18px', borderRadius: 20, fontSize: 13, color: '#757575', boxShadow: 'var(--shadow)' }}>
+          <div className="tc-updated-pill">
             📅 Last updated: June 2026
           </div>
         </div>
       </div>
 
       {/* Trust badges */}
-      <div style={{ background: 'white', borderBottom: '1px solid #e8eaf6' }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'center', gap: 36, padding: '18px 24px', flexWrap: 'wrap' }}>
+      <div className="tc-trust-strip">
+        <div className="container tc-trust-row">
           {[['⚖️', 'Fair Terms'], ['🔒', 'Secure Platform'], ['🛡️', 'Buyer Protection'], ['✅', 'Transparent Policies']].map(([icon, label]) => (
-            <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, fontWeight: 600, color: '#555' }}>
-              <span style={{ fontSize: 20 }}>{icon}</span> {label}
+            <div key={label} className="tc-trust-item">
+              <span className="tc-trust-icon">{icon}</span> {label}
             </div>
           ))}
         </div>
       </div>
 
       {/* Main content */}
-      <div className="container" style={{ paddingTop: 48, paddingBottom: 72 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: 36, alignItems: 'start' }}>
+      <div className="container tc-main">
+        <div className="tc-layout">
 
           {/* Sticky Nav */}
-          <div style={{ position: 'sticky', top: 24 }}>
-            <div style={{ background: 'white', borderRadius: 16, padding: 20, boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#9e9e9e', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>Contents</div>
+          <div className="tc-sticky-nav">
+            <div className="tc-nav-card">
+              <div className="tc-nav-label">Contents</div>
               {sections.map(sec => (
                 <button key={sec.id} onClick={() => { setActive(sec.id); document.getElementById(sec.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }}
-                  style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '10px 12px', borderRadius: 10, border: 'none', background: active === sec.id ? '#f3e5f5' : 'transparent', color: active === sec.id ? '#7b1fa2' : '#555', fontWeight: active === sec.id ? 700 : 500, cursor: 'pointer', textAlign: 'left', fontSize: 13, fontFamily: 'Poppins', transition: 'all 0.2s', marginBottom: 2 }}>
+                  className={`tc-nav-btn ${active === sec.id ? 'active' : ''}`}>
                   <span>{sec.icon}</span> {sec.title}
                 </button>
               ))}
             </div>
-            <div style={{ background: '#f3e5f5', borderRadius: 14, padding: 18, marginTop: 16, border: '1px solid #e1bee7', textAlign: 'center' }}>
-              <div style={{ fontSize: 28, marginBottom: 8 }}>💬</div>
-              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 6, color: '#7b1fa2' }}>Have Questions?</div>
-              <div style={{ fontSize: 12, color: '#757575', marginBottom: 12 }}>Our team is happy to clarify anything.</div>
-              <Link to="/contact" className="btn btn-primary" style={{ fontSize: 12, padding: '8px 16px' }}>Contact Us</Link>
+            <div className="tc-help-box">
+              <div className="tc-help-icon">💬</div>
+              <div className="tc-help-title">Have Questions?</div>
+              <div className="tc-help-sub">Our team is happy to clarify anything.</div>
+              <Link to="/contact" className="btn btn-primary tc-help-btn">Contact Us</Link>
             </div>
-            <div style={{ marginTop: 12, textAlign: 'center' }}>
-              <Link to="/privacy" style={{ fontSize: 12, color: '#9e9e9e', textDecoration: 'none' }}>← Privacy Policy</Link>
+            <div className="tc-privacy-link-wrap">
+              <Link to="/privacy" className="tc-privacy-link">← Privacy Policy</Link>
             </div>
           </div>
 
           {/* Sections */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
-            {sections.map((sec, i) => {
+          <div className="tc-sections-wrap">
+            {sections.map((sec) => {
               // eslint-disable-next-line react-hooks/rules-of-hooks
               const [ref, visible] = useInView();
               return (
                 <div key={sec.id} id={sec.id} ref={ref}
-                  style={{ background: 'white', borderRadius: 20, padding: 36, boxShadow: 'var(--shadow)', border: '1px solid var(--border)', opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(24px)', transition: `all 0.6s ${i * 0.06}s ease` }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-                    <div style={{ width: 48, height: 48, borderRadius: 14, background: 'linear-gradient(135deg,#f3e5f5,#e8eaf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, flexShrink: 0 }}>{sec.icon}</div>
-                    <h2 style={{ fontWeight: 800, fontSize: 22, color: '#212121' }}>{sec.title}</h2>
+                  className={`tc-section reveal ${visible ? 'visible' : ''}`}>
+                  <div className="tc-section-header">
+                    <div className="tc-section-icon">{sec.icon}</div>
+                    <h2 className="tc-section-title">{sec.title}</h2>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+                  <div className="tc-content-list">
                     {sec.content.map((item, j) => (
-                      <div key={j} style={{ paddingLeft: 16, borderLeft: '3px solid #ce93d8' }}>
-                        <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 5, color: '#212121' }}>{item.sub}</div>
-                        <p style={{ color: '#757575', fontSize: 14, lineHeight: 1.8 }}>{item.text}</p>
+                      <div key={j} className="tc-content-item">
+                        <div className="tc-content-sub">{item.sub}</div>
+                        <p className="tc-content-text">{item.text}</p>
                       </div>
                     ))}
                   </div>
@@ -186,15 +187,15 @@ export default function TermsConditions() {
             })}
 
             {/* CTA */}
-            <div style={{ background: 'linear-gradient(135deg,#7b1fa2,#4a148c)', borderRadius: 20, padding: 36, textAlign: 'center', color: 'white' }}>
-              <div style={{ fontSize: 36, marginBottom: 10 }}>📬</div>
-              <h3 style={{ fontWeight: 800, fontSize: 20, marginBottom: 10 }}>Questions About These Terms?</h3>
-              <p style={{ color: 'rgba(255,255,255,0.8)', marginBottom: 20, fontSize: 14, lineHeight: 1.7 }}>
+            <div className="tc-cta-box">
+              <div className="tc-cta-icon">📬</div>
+              <h3 className="tc-cta-title">Questions About These Terms?</h3>
+              <p className="tc-cta-text">
                 Write to us at <strong>legal@womenhubclub.com</strong> and we will respond within 2 business days.
               </p>
-              <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-                <Link to="/contact" className="btn btn-lg" style={{ background: 'white', color: '#7b1fa2', fontWeight: 700 }}>Send a Message</Link>
-                <Link to="/privacy" className="btn btn-lg" style={{ background: 'transparent', border: '2px solid rgba(255,255,255,0.5)', color: 'white' }}>Privacy Policy →</Link>
+              <div className="tc-cta-buttons">
+                <Link to="/contact" className="btn btn-lg tc-cta-btn-white">Send a Message</Link>
+                <Link to="/privacy" className="btn btn-lg tc-cta-btn-outline">Privacy Policy →</Link>
               </div>
             </div>
           </div>

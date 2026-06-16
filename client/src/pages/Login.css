@@ -1,0 +1,12 @@
+.login-header { text-align: center; margin-bottom: 32px; }
+.login-icon { font-size: 56px; margin-bottom: 8px; animation: float 3s ease-in-out infinite; }
+.login-pwd-wrap { position: relative; }
+.login-pwd-input { padding-right: 48px; }
+.login-pwd-toggle { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 18px; }
+.login-submit-btn { width: 100%; justify-content: center; }
+.login-quick-section { margin-bottom: 20px; }
+.login-quick-label { font-size: 12px; color: #636e72; margin-bottom: 10px; text-align: center; font-weight: 600; }
+.login-quick-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.login-quick-btn { border-radius: 20px; }
+.login-footer-text { text-align: center; font-size: 14px; color: #636e72; }
+.login-footer-link { color: #6c63ff; font-weight: 600; text-decoration: none; }

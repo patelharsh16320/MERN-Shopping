@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import './Login.css';
 
 const quickLogins = [
   { label: 'Admin', email: 'harsh@gmail.com' },
@@ -35,8 +36,8 @@ export default function Login() {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{ fontSize: 56, marginBottom: 8, animation: 'float 3s ease-in-out infinite' }}>💗</div>
+        <div className="login-header">
+          <div className="login-icon">💗</div>
           <h1 className="auth-title gradient-text">Welcome Back!</h1>
           <p className="auth-subtitle">Sign in to your Women HubClub account</p>
         </div>
@@ -48,33 +49,33 @@ export default function Login() {
           </div>
           <div className="form-group">
             <label className="form-label">Password</label>
-            <div style={{ position: 'relative' }}>
-              <input className="form-input" type={showPwd ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required style={{ paddingRight: 48 }} />
-              <button type="button" onClick={() => setShowPwd(!showPwd)} style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 18 }}>
+            <div className="login-pwd-wrap">
+              <input className="form-input login-pwd-input" type={showPwd ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required />
+              <button type="button" onClick={() => setShowPwd(!showPwd)} className="login-pwd-toggle">
                 {showPwd ? '🙈' : '👁'}
               </button>
             </div>
           </div>
-          <button className="btn btn-primary btn-lg" style={{ width: '100%', justifyContent: 'center' }} type="submit" disabled={loading}>
+          <button className="btn btn-primary btn-lg login-submit-btn" type="submit" disabled={loading}>
             {loading ? '⏳ Signing in...' : '🔑 Sign In'}
           </button>
         </form>
 
         <div className="divider" />
 
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ fontSize: 12, color: '#636e72', marginBottom: 10, textAlign: 'center', fontWeight: 600 }}>QUICK LOGIN (email = password)</div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+        <div className="login-quick-section">
+          <div className="login-quick-label">QUICK LOGIN (email = password)</div>
+          <div className="login-quick-row">
             {quickLogins.map(q => (
-              <button key={q.email} onClick={() => quickLogin(q.email)} className="btn btn-secondary btn-sm" style={{ borderRadius: 20 }}>
+              <button key={q.email} onClick={() => quickLogin(q.email)} className="btn btn-secondary btn-sm login-quick-btn">
                 {q.label === 'Admin' ? '⚙️' : '👤'} {q.label}
               </button>
             ))}
           </div>
         </div>
 
-        <div style={{ textAlign: 'center', fontSize: 14, color: '#636e72' }}>
-          Don't have an account? <Link to="/register" style={{ color: '#6c63ff', fontWeight: 600, textDecoration: 'none' }}>Register here</Link>
+        <div className="login-footer-text">
+          Don't have an account? <Link to="/register" className="login-footer-link">Register here</Link>
         </div>
       </div>
     </div>

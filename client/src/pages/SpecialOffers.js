@@ -4,6 +4,7 @@ import { productAPI, authAPI } from '../utils/api';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import './SpecialOffers.css';
 
 /* ── helpers ── */
 function useInView(threshold = 0.15) {
@@ -27,16 +28,16 @@ function CountdownTimer({ endsAt }) {
     };
     calc(); const id = setInterval(calc, 1000); return () => clearInterval(id);
   }, [endsAt]);
-  if (t.expired) return <span style={{ color: '#d63031', fontWeight: 700, fontSize: 11 }}>Expired</span>;
+  if (t.expired) return <span className="so-countdown-expired">Expired</span>;
   const unit = (v, l) => (
-    <div style={{ textAlign: 'center' }}>
-      <div style={{ background: 'linear-gradient(135deg,#c2185b,#e91e63)', color: 'white', fontWeight: 900, fontSize: 15, lineHeight: 1, padding: '5px 8px', borderRadius: 7, minWidth: 32 }}>{String(v).padStart(2,'0')}</div>
-      <div style={{ fontSize: 9, color: '#9e9e9e', marginTop: 3, fontWeight: 600, textTransform: 'uppercase' }}>{l}</div>
+    <div className="so-countdown-unit">
+      <div className="so-countdown-value">{String(v).padStart(2,'0')}</div>
+      <div className="so-countdown-unit-label">{l}</div>
     </div>
   );
-  const sep = <div style={{ color: '#c2185b', fontWeight: 900, fontSize: 16, paddingBottom: 14 }}>:</div>;
+  const sep = <div className="so-countdown-sep">:</div>;
   return (
-    <div style={{ display: 'flex', gap: 4, alignItems: 'flex-end' }}>
+    <div className="so-countdown-row">
       {t.d > 0 && <>{unit(t.d,'day')}{sep}</>}
       {unit(t.h,'hr')}{sep}{unit(t.m,'min')}{sep}{unit(t.s,'sec')}
     </div>
@@ -50,7 +51,6 @@ function OfferCard({ product, wishlistIds, onWishlistToggle }) {
   const { user }        = useAuth();
   const [qty, setQty]   = useState(1);
   const [added, setAdded] = useState(false);
-  const [hovered, setHovered] = useState(false);
 
   const salePrice  = product.specialOffer?.salePrice || product.price;
   const savePct    = product.price > salePrice ? Math.round((1 - salePrice / product.price) * 100) : 0;
@@ -81,40 +81,26 @@ function OfferCard({ product, wishlistIds, onWishlistToggle }) {
   };
 
   return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        background: 'white',
-        borderRadius: 20,
-        overflow: 'hidden',
-        boxShadow: hovered ? '0 20px 48px rgba(194,24,91,0.22)' : '0 4px 18px rgba(0,0,0,0.08)',
-        border: `2px solid ${hovered ? '#f06292' : '#fce4ec'}`,
-        transform: hovered ? 'translateY(-6px)' : 'translateY(0)',
-        transition: 'all 0.3s cubic-bezier(0.34,1.56,0.64,1)',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
+    <div className="so-card">
       {/* ── Image ── */}
-      <div style={{ position: 'relative', overflow: 'hidden', cursor: 'pointer' }} onClick={() => navigate(url)}>
+      <div className="so-card-media" onClick={() => navigate(url)}>
         <img
           src={product.images?.[0] || '/placeholder.png'}
           alt={product.name}
-          style={{ width: '100%', height: 220, objectFit: 'cover', display: 'block', transform: hovered ? 'scale(1.06)' : 'scale(1)', transition: 'transform 0.4s ease' }}
+          className="so-card-img"
           onError={e => { e.target.src = '/placeholder.png'; }}
         />
 
         {/* Discount badge */}
         {savePct > 0 && (
-          <div style={{ position: 'absolute', top: 12, left: 12, background: 'linear-gradient(135deg,#d63031,#ff7675)', color: 'white', fontWeight: 900, padding: '5px 13px', borderRadius: 20, fontSize: 13, boxShadow: '0 2px 8px rgba(214,48,49,0.4)', letterSpacing: '-0.3px' }}>
+          <div className="so-discount-badge">
             -{savePct}% OFF
           </div>
         )}
 
         {/* Offer label */}
         {product.specialOffer?.label && (
-          <div style={{ position: 'absolute', top: savePct > 0 ? 48 : 12, left: 12, background: 'rgba(194,24,91,0.9)', backdropFilter: 'blur(4px)', color: 'white', fontWeight: 700, padding: '3px 10px', borderRadius: 8, fontSize: 11, letterSpacing: '0.3px' }}>
+          <div className={`so-offer-label ${savePct > 0 ? 'shifted' : ''}`}>
             {product.specialOffer.label}
           </div>
         )}
@@ -122,59 +108,59 @@ function OfferCard({ product, wishlistIds, onWishlistToggle }) {
         {/* Wishlist */}
         <button
           onClick={handleWishlist}
-          style={{ position: 'absolute', top: 10, right: 10, width: 36, height: 36, borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(4px)', cursor: 'pointer', fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.15)', transform: hovered ? 'scale(1.1)' : 'scale(1)', transition: 'transform 0.2s' }}
+          className="so-wishlist-btn"
         >
           {isWished ? '❤️' : '🤍'}
         </button>
 
         {/* Out of stock overlay */}
         {outOfStock && (
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ background: '#d63031', color: 'white', fontWeight: 800, fontSize: 13, padding: '8px 20px', borderRadius: 20, letterSpacing: '0.5px' }}>OUT OF STOCK</span>
+          <div className="so-oos-overlay">
+            <span className="so-oos-tag">OUT OF STOCK</span>
           </div>
         )}
 
         {/* Quick view hover overlay */}
-        <div style={{ position: 'absolute', inset: 0, background: 'rgba(194,24,91,0.08)', opacity: hovered && !outOfStock ? 1 : 0, transition: 'opacity 0.3s', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: 16 }}>
-          <span style={{ background: 'rgba(255,255,255,0.95)', color: '#c2185b', fontWeight: 700, fontSize: 12, padding: '7px 20px', borderRadius: 20, boxShadow: '0 4px 12px rgba(0,0,0,0.15)', letterSpacing: '0.3px' }}>
+        <div className={`so-quickview-overlay ${!outOfStock ? 'active' : ''}`}>
+          <span className="so-quickview-tag">
             👁 Quick View
           </span>
         </div>
       </div>
 
       {/* ── Body ── */}
-      <div style={{ padding: '16px 16px 0', flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div className="so-card-body">
 
         {/* Category */}
-        <div style={{ fontSize: 11, fontWeight: 700, color: '#c2185b', textTransform: 'uppercase', letterSpacing: '0.7px' }}>
+        <div className="so-card-category">
           {product.category || 'Beauty'}
         </div>
 
         {/* Name */}
         <div
           onClick={() => navigate(url)}
-          style={{ fontWeight: 800, fontSize: 15, color: '#212121', lineHeight: 1.35, cursor: 'pointer', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+          className="so-card-name"
         >
           {product.name}
         </div>
 
         {/* Rating */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ display: 'flex', gap: 1 }}>
+        <div className="so-rating-row">
+          <div className="so-stars">
             {[1,2,3,4,5].map(i => (
-              <span key={i} style={{ fontSize: 12, color: i <= stars ? '#f39c12' : '#e0e0e0' }}>★</span>
+              <span key={i} className={`so-star ${i <= stars ? 'filled' : ''}`}>★</span>
             ))}
           </div>
-          <span style={{ fontSize: 12, color: '#9e9e9e', fontWeight: 600 }}>({product.numReviews || 0})</span>
+          <span className="so-review-count">({product.numReviews || 0})</span>
         </div>
 
         {/* Prices */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 24, fontWeight: 900, color: '#c2185b', lineHeight: 1 }}>₹{salePrice.toLocaleString()}</span>
+        <div className="so-price-row">
+          <span className="so-sale-price">₹{salePrice.toLocaleString()}</span>
           {savePct > 0 && (
             <>
-              <span style={{ fontSize: 14, color: '#bdbdbd', textDecoration: 'line-through', fontWeight: 500 }}>₹{product.price.toLocaleString()}</span>
-              <span style={{ fontSize: 11, fontWeight: 800, color: '#00b894', background: '#e8fff5', padding: '3px 8px', borderRadius: 8, border: '1px solid #b2dfdb' }}>
+              <span className="so-orig-price">₹{product.price.toLocaleString()}</span>
+              <span className="so-save-amount">
                 Save ₹{saveAmount.toLocaleString()}
               </span>
             </>
@@ -183,41 +169,37 @@ function OfferCard({ product, wishlistIds, onWishlistToggle }) {
 
         {/* Countdown */}
         {product.specialOffer?.endsAt && (
-          <div style={{ background: 'linear-gradient(135deg,#fff5f7,#fce4ec)', borderRadius: 12, padding: '10px 12px', border: '1px solid #fce4ec' }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#9e9e9e', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.5px' }}>⏰ Deal Ends In</div>
+          <div className="so-countdown-box">
+            <div className="so-countdown-label">⏰ Deal Ends In</div>
             <CountdownTimer endsAt={product.specialOffer.endsAt} />
           </div>
         )}
 
         {/* Low stock */}
         {lowStock && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <div style={{ width: '100%', height: 4, background: '#eee', borderRadius: 4, overflow: 'hidden' }}>
-              <div style={{ width: `${Math.min((product.stock / 10) * 100, 100)}%`, height: '100%', background: 'linear-gradient(90deg,#d63031,#e17055)', borderRadius: 4 }} />
+          <div className="so-lowstock-row">
+            <div className="so-lowstock-track">
+              <div className="so-lowstock-fill" style={{ '--stock-pct': `${Math.min((product.stock / 10) * 100, 100)}%` }} />
             </div>
-            <span style={{ fontSize: 11, color: '#d63031', fontWeight: 700, whiteSpace: 'nowrap' }}>Only {product.stock} left!</span>
+            <span className="so-lowstock-text">Only {product.stock} left!</span>
           </div>
         )}
       </div>
 
       {/* ── Action bar ── */}
-      <div style={{ padding: '14px 16px 16px', display: 'flex', gap: 8, alignItems: 'center', marginTop: 'auto' }}>
+      <div className="so-action-bar">
 
         {/* Qty stepper */}
         {!outOfStock && (
-          <div style={{ display: 'flex', alignItems: 'center', border: '2px solid #fce4ec', borderRadius: 12, overflow: 'hidden', flexShrink: 0 }}>
+          <div className="so-qty-stepper">
             <button
               onClick={(e) => { e.stopPropagation(); setQty(q => Math.max(1, q - 1)); }}
-              style={{ width: 32, height: 36, border: 'none', background: 'white', color: '#c2185b', fontWeight: 900, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s' }}
-              onMouseEnter={e => e.currentTarget.style.background = '#fce4ec'}
-              onMouseLeave={e => e.currentTarget.style.background = 'white'}
+              className="so-qty-btn"
             >−</button>
-            <span style={{ width: 28, textAlign: 'center', fontWeight: 800, fontSize: 14, color: '#212121' }}>{qty}</span>
+            <span className="so-qty-value">{qty}</span>
             <button
               onClick={(e) => { e.stopPropagation(); setQty(q => Math.min(product.stock, q + 1)); }}
-              style={{ width: 32, height: 36, border: 'none', background: 'white', color: '#c2185b', fontWeight: 900, fontSize: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s' }}
-              onMouseEnter={e => e.currentTarget.style.background = '#fce4ec'}
-              onMouseLeave={e => e.currentTarget.style.background = 'white'}
+              className="so-qty-btn"
             >+</button>
           </div>
         )}
@@ -226,28 +208,7 @@ function OfferCard({ product, wishlistIds, onWishlistToggle }) {
         <button
           onClick={handleAdd}
           disabled={outOfStock}
-          style={{
-            flex: 1,
-            height: 40,
-            border: 'none',
-            borderRadius: 12,
-            fontWeight: 800,
-            fontSize: 13,
-            cursor: outOfStock ? 'not-allowed' : 'pointer',
-            background: outOfStock
-              ? '#f5f5f5'
-              : added
-                ? 'linear-gradient(135deg,#00b894,#55efc4)'
-                : 'linear-gradient(135deg,#c2185b,#e91e63)',
-            color: outOfStock ? '#bdbdbd' : 'white',
-            transition: 'all 0.25s',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-            boxShadow: outOfStock ? 'none' : added ? '0 4px 14px rgba(0,184,148,0.4)' : '0 4px 14px rgba(194,24,91,0.35)',
-            letterSpacing: '0.2px',
-          }}
+          className={`so-add-btn ${outOfStock ? 'disabled' : added ? 'added' : ''}`}
         >
           {outOfStock ? 'Out of Stock' : added ? '✓ Added!' : '🛒 Add to Cart'}
         </button>
@@ -278,38 +239,28 @@ function FilterPanel({ offers, filters, setFilters, onClear, mobile }) {
     return [...set];
   }, [offers]);
 
-  const head = { fontWeight: 800, fontSize: 11, color: '#9e9e9e', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.8px' };
-  const sec  = { marginBottom: 24, paddingBottom: 24, borderBottom: '1px solid #fce4ec' };
-  const chip = (active) => ({
-    padding: '6px 13px', borderRadius: 20, fontSize: 12, fontWeight: 700, cursor: 'pointer',
-    background: active ? '#fce4ec' : '#fafafa',
-    border: `2px solid ${active ? '#c2185b' : '#eee'}`,
-    color: active ? '#c2185b' : '#666',
-    transition: 'all 0.15s',
-  });
-
   return (
-    <div style={{ background: 'white', borderRadius: 20, padding: '22px 18px', boxShadow: '0 4px 20px rgba(0,0,0,0.07)', border: '1px solid #fce4ec', ...(mobile ? {} : { position: 'sticky', top: 88 }) }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22 }}>
-        <span style={{ fontWeight: 800, fontSize: 16, color: '#212121' }}>🔍 Filters</span>
-        <button onClick={onClear} style={{ background: 'none', border: 'none', color: '#c2185b', fontWeight: 700, fontSize: 12, cursor: 'pointer' }}>Clear all</button>
+    <div className={`so-filter-panel ${!mobile ? 'sticky' : ''}`}>
+      <div className="so-filter-header">
+        <span className="so-filter-title">🔍 Filters</span>
+        <button onClick={onClear} className="so-filter-clear">Clear all</button>
       </div>
 
       {/* Search */}
-      <div style={sec}>
-        <div style={head}>Search</div>
+      <div className="so-filter-section">
+        <div className="so-filter-head">Search</div>
         <input type="text" placeholder="Search deals..." value={filters.search}
           onChange={e => setFilters(f => ({ ...f, search: e.target.value }))}
-          style={{ width: '100%', padding: '9px 13px', borderRadius: 10, border: '2px solid #fce4ec', fontSize: 13, outline: 'none', boxSizing: 'border-box', background: '#fff8fb' }} />
+          className="so-search-input" />
       </div>
 
       {/* Sort */}
-      <div style={sec}>
-        <div style={head}>Sort By</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div className="so-filter-section">
+        <div className="so-filter-head">Sort By</div>
+        <div className="so-sort-list">
           {SORT_OPTIONS.map(o => (
             <div key={o.value} onClick={() => setFilters(f => ({ ...f, sort: o.value }))}
-              style={{ ...chip(filters.sort === o.value), display: 'block', textAlign: 'left' }}>
+              className={`so-chip block ${filters.sort === o.value ? 'active' : ''}`}>
               {o.label}
             </div>
           ))}
@@ -317,11 +268,11 @@ function FilterPanel({ offers, filters, setFilters, onClear, mobile }) {
       </div>
 
       {/* Discount */}
-      <div style={sec}>
-        <div style={head}>Discount</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
+      <div className="so-filter-section">
+        <div className="so-filter-head">Discount</div>
+        <div className="so-chip-row">
           {DISC_OPTIONS.map(o => (
-            <div key={o.value} onClick={() => setFilters(f => ({ ...f, minDiscount: o.value }))} style={chip(filters.minDiscount === o.value)}>
+            <div key={o.value} onClick={() => setFilters(f => ({ ...f, minDiscount: o.value }))} className={`so-chip ${filters.minDiscount === o.value ? 'active' : ''}`}>
               {o.label}
             </div>
           ))}
@@ -329,29 +280,29 @@ function FilterPanel({ offers, filters, setFilters, onClear, mobile }) {
       </div>
 
       {/* Price */}
-      <div style={sec}>
-        <div style={head}>Price Range</div>
-        <div style={{ display: 'flex', gap: 8 }}>
+      <div className="so-filter-section">
+        <div className="so-filter-head">Price Range</div>
+        <div className="so-price-range-row">
           <input type="number" placeholder="Min ₹" value={filters.minPrice}
             onChange={e => setFilters(f => ({ ...f, minPrice: e.target.value }))}
-            style={{ flex: 1, padding: '8px 10px', borderRadius: 10, border: '2px solid #fce4ec', fontSize: 13, outline: 'none', minWidth: 0, background: '#fff8fb' }} />
-          <span style={{ color: '#bdbdbd', fontWeight: 700, alignSelf: 'center' }}>–</span>
+            className="so-price-input" />
+          <span className="so-price-sep">–</span>
           <input type="number" placeholder="Max ₹" value={filters.maxPrice}
             onChange={e => setFilters(f => ({ ...f, maxPrice: e.target.value }))}
-            style={{ flex: 1, padding: '8px 10px', borderRadius: 10, border: '2px solid #fce4ec', fontSize: 13, outline: 'none', minWidth: 0, background: '#fff8fb' }} />
+            className="so-price-input" />
         </div>
       </div>
 
       {/* Labels */}
       {labels.length > 0 && (
-        <div style={sec}>
-          <div style={head}>Offer Type</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
+        <div className="so-filter-section">
+          <div className="so-filter-head">Offer Type</div>
+          <div className="so-chip-row">
             {labels.map(lbl => {
               const active = filters.labels.includes(lbl);
               return (
                 <div key={lbl} onClick={() => setFilters(f => ({ ...f, labels: active ? f.labels.filter(l => l !== lbl) : [...f.labels, lbl] }))}
-                  style={chip(active)}>
+                  className={`so-chip ${active ? 'active' : ''}`}>
                   {lbl}
                 </div>
               );
@@ -361,14 +312,14 @@ function FilterPanel({ offers, filters, setFilters, onClear, mobile }) {
       )}
 
       {/* In stock */}
-      <div>
-        <div style={head}>Availability</div>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', userSelect: 'none' }}>
+      <div className="so-filter-section last">
+        <div className="so-filter-head">Availability</div>
+        <label className="so-avail-label">
           <div onClick={() => setFilters(f => ({ ...f, inStock: !f.inStock }))}
-            style={{ width: 44, height: 24, borderRadius: 12, position: 'relative', cursor: 'pointer', background: filters.inStock ? 'linear-gradient(135deg,#c2185b,#e91e63)' : '#e0e0e0', transition: 'background 0.25s', flexShrink: 0 }}>
-            <span style={{ position: 'absolute', top: 2, left: filters.inStock ? 22 : 2, width: 20, height: 20, borderRadius: '50%', background: 'white', boxShadow: '0 1px 4px rgba(0,0,0,0.2)', transition: 'left 0.25s', display: 'block' }} />
+            className={`so-toggle-track ${filters.inStock ? 'on' : ''}`}>
+            <span className="so-toggle-knob" />
           </div>
-          <span style={{ fontWeight: 600, fontSize: 13, color: '#333' }}>In Stock Only</span>
+          <span className="so-avail-text">In Stock Only</span>
         </label>
       </div>
     </div>
@@ -437,85 +388,82 @@ export default function SpecialOffers() {
   };
 
   return (
-    <div style={{ minHeight: '80vh' }}>
+    <div className="so-page">
       {/* Hero */}
-      <div ref={heroRef} style={{ background: 'linear-gradient(135deg,#880e4f,#c2185b,#e91e63,#ff6090)', padding: '64px 20px 56px', textAlign: 'center', color: 'white', opacity: heroVisible?1:0, transform: heroVisible?'translateY(0)':'translateY(30px)', transition: 'all 0.7s ease', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: -40, left: -40, width: 200, height: 200, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
-        <div style={{ position: 'absolute', bottom: -60, right: -60, width: 280, height: 280, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
-        <div style={{ position: 'relative' }}>
-          <div style={{ fontSize: 52, marginBottom: 10 }}>🔥</div>
-          <h1 style={{ fontSize: 'clamp(28px,5vw,46px)', fontWeight: 900, marginBottom: 10, letterSpacing: '-1px' }}>Special Offers</h1>
-          <p style={{ fontSize: 16, opacity: 0.85, maxWidth: 480, margin: '0 auto 20px' }}>Flash deals, exclusive discounts and limited-time offers just for you</p>
+      <div ref={heroRef} className={`so-hero reveal ${heroVisible ? 'visible' : ''}`}>
+        <div className="so-hero-blob-1" />
+        <div className="so-hero-blob-2" />
+        <div className="so-hero-inner">
+          <div className="so-hero-icon">🔥</div>
+          <h1 className="so-hero-title">Special Offers</h1>
+          <p className="so-hero-sub">Flash deals, exclusive discounts and limited-time offers just for you</p>
           {!loading && offers.length > 0 && (
-            <span style={{ display: 'inline-block', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', fontWeight: 700, padding: '8px 22px', borderRadius: 30, fontSize: 14 }}>
+            <span className="so-hero-pill">
               🎁 {offers.length} active deal{offers.length!==1?'s':''} live now
             </span>
           )}
         </div>
       </div>
 
-      <div className="container" style={{ padding: '36px 20px 60px' }}>
+      <div className="container so-content">
         {loading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: 22, marginTop: 8 }}>
+          <div className="so-skel-grid">
             {[...Array(6)].map((_,i) => (
-              <div key={i} style={{ background: 'white', borderRadius: 20, overflow: 'hidden', boxShadow: '0 4px 18px rgba(0,0,0,0.07)' }}>
-                <div style={{ height: 220, background: 'linear-gradient(90deg,#f5f5f5 25%,#eeeeee 50%,#f5f5f5 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.5s infinite' }} />
-                <div style={{ padding: 16 }}>
-                  <div style={{ height: 12, background: '#f5f5f5', borderRadius: 6, marginBottom: 10, width: '60%' }} />
-                  <div style={{ height: 16, background: '#f5f5f5', borderRadius: 6, marginBottom: 8 }} />
-                  <div style={{ height: 28, background: '#f5f5f5', borderRadius: 6, width: '40%' }} />
+              <div key={i} className="so-skel-card">
+                <div className="skeleton so-skel-img" />
+                <div className="so-skel-body">
+                  <div className="skeleton so-skel-line-1" />
+                  <div className="skeleton so-skel-line-2" />
+                  <div className="skeleton so-skel-line-3" />
                 </div>
               </div>
             ))}
           </div>
         ) : offers.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '80px 20px' }}>
-            <div style={{ fontSize: 72, marginBottom: 16 }}>🎁</div>
-            <h2 style={{ fontWeight: 800, color: '#212121', marginBottom: 10, fontSize: 28 }}>No active deals right now</h2>
-            <p style={{ color: '#636e72', marginBottom: 28, fontSize: 16 }}>Check back soon — new offers drop every week!</p>
+          <div className="so-empty">
+            <div className="so-empty-icon">🎁</div>
+            <h2 className="so-empty-title">No active deals right now</h2>
+            <p className="so-empty-sub">Check back soon — new offers drop every week!</p>
             <button className="btn btn-primary" onClick={() => navigate('/products')}>Shop All Products →</button>
           </div>
         ) : (
           <>
             {/* Mobile filter toggle */}
-            <button onClick={() => setMobileFilterOpen(v => !v)} className="offers-filter-toggle"
-              style={{ display: 'none', width: '100%', padding: '13px 20px', marginBottom: 16, borderRadius: 14, border: '2px solid #f06292', background: mobileFilterOpen?'#fce4ec':'white', color: '#c2185b', fontWeight: 800, fontSize: 14, cursor: 'pointer', justifyContent: 'space-between', alignItems: 'center' }}>
+            <button onClick={() => setMobileFilterOpen(v => !v)} className={`so-filter-toggle ${mobileFilterOpen ? 'open' : ''}`}>
               <span>🔍 Filters{activeFilterCount>0?` (${activeFilterCount}  active)`:''}</span>
               <span>{mobileFilterOpen?'▲':'▼'}</span>
             </button>
-            {mobileFilterOpen && <div className="offers-filter-mobile" style={{ marginBottom: 20 }}><FilterPanel offers={offers} filters={filters} setFilters={setFilters} onClear={clearFilters} mobile /></div>}
+            {mobileFilterOpen && <div className="so-filter-mobile-wrap"><FilterPanel offers={offers} filters={filters} setFilters={setFilters} onClear={clearFilters} mobile /></div>}
 
-            <div style={{ display: 'flex', gap: 28, alignItems: 'flex-start' }}>
+            <div className="so-layout">
               {/* Sidebar */}
-              <div className="offers-filter-sidebar" style={{ width: 260, flexShrink: 0 }}>
+              <div className="so-filter-sidebar">
                 <FilterPanel offers={offers} filters={filters} setFilters={setFilters} onClear={clearFilters} />
               </div>
 
               {/* Grid */}
-              <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="so-grid-col">
                 {/* Result bar */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22, flexWrap: 'wrap', gap: 10 }}>
-                  <span style={{ background: 'linear-gradient(135deg,#fce4ec,#f8bbd0)', color: '#c2185b', fontWeight: 800, padding: '7px 18px', borderRadius: 20, fontSize: 13, border: '1px solid #f48fb1' }}>
+                <div className="so-result-bar">
+                  <span className="so-result-pill">
                     🔥 {displayed.length} deal{displayed.length!==1?'s':''} {activeFilterCount>0?'found':'available'}
                   </span>
                   {activeFilterCount > 0 && (
-                    <button onClick={clearFilters} style={{ background: 'none', border: '2px solid #e0e0e0', borderRadius: 20, padding: '7px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer', color: '#555', transition: 'all 0.2s' }}
-                      onMouseEnter={e => { e.currentTarget.style.borderColor='#c2185b'; e.currentTarget.style.color='#c2185b'; }}
-                      onMouseLeave={e => { e.currentTarget.style.borderColor='#e0e0e0'; e.currentTarget.style.color='#555'; }}>
+                    <button onClick={clearFilters} className="so-clear-btn">
                       ✕ Clear filters
                     </button>
                   )}
                 </div>
 
                 {displayed.length === 0 ? (
-                  <div style={{ textAlign: 'center', padding: '60px 20px', background: 'white', borderRadius: 20, boxShadow: '0 4px 18px rgba(0,0,0,0.06)' }}>
-                    <div style={{ fontSize: 56, marginBottom: 14 }}>😔</div>
-                    <p style={{ fontWeight: 800, color: '#212121', marginBottom: 8, fontSize: 18 }}>No deals match your filters</p>
-                    <p style={{ color: '#9e9e9e', marginBottom: 20, fontSize: 14 }}>Try adjusting or clearing your filters</p>
+                  <div className="so-no-results">
+                    <div className="so-no-results-icon">😔</div>
+                    <p className="so-no-results-title">No deals match your filters</p>
+                    <p className="so-no-results-sub">Try adjusting or clearing your filters</p>
                     <button onClick={clearFilters} className="btn btn-primary">Clear Filters</button>
                   </div>
                 ) : (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(230px,1fr))', gap: 22 }}>
+                  <div className="so-offers-grid">
                     {displayed.map(product => (
                       <OfferCard
                         key={product._id}
@@ -531,17 +479,6 @@ export default function SpecialOffers() {
           </>
         )}
       </div>
-
-      <style>{`
-        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-        @media (max-width: 768px) {
-          .offers-filter-toggle { display: flex !important; }
-          .offers-filter-sidebar { display: none !important; }
-        }
-        @media (min-width: 769px) {
-          .offers-filter-mobile { display: none !important; }
-        }
-      `}</style>
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { orderAPI } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import Loader from '../components/Loader';
+import './Orders.css';
 
 const statusColors = { Pending: 'pending', Processing: 'processing', Shipped: 'shipped', Delivered: 'delivered', Cancelled: 'cancelled', Returned: 'cancelled' };
 const ORDER_COLS = ['Items', 'Total', 'Payment', 'Status', 'Date'];
@@ -16,11 +17,11 @@ function Paginator({ page, totalPages, onPage }) {
     else if (pages[pages.length - 1] !== '...') pages.push('...');
   }
   return (
-    <div className="pagination" style={{ marginTop: 16 }}>
+    <div className="pagination pagination-tight">
       <button className="page-btn" onClick={() => onPage(page - 1)} disabled={page === 1}>‹</button>
       {pages.map((p, i) =>
         p === '...'
-          ? <span key={`e${i}`} style={{ padding: '0 6px', color: '#9e9e9e', alignSelf: 'center' }}>…</span>
+          ? <span key={`e${i}`} className="pagination-ellipsis">…</span>
           : <button key={p} className={`page-btn ${page === p ? 'active' : ''}`} onClick={() => onPage(p)}>{p}</button>
       )}
       <button className="page-btn" onClick={() => onPage(page + 1)} disabled={page === totalPages}>›</button>
@@ -82,9 +83,9 @@ export default function Orders() {
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const SortTh = ({ field, label }) => (
-    <th onClick={() => toggleSort(field)} style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' }}>
+    <th onClick={() => toggleSort(field)} className="sort-th">
       {label}&nbsp;
-      <span style={{ fontSize: 9, opacity: sortField === field ? 1 : 0.25 }}>
+      <span className={`sort-th-arrow ${sortField === field ? 'active' : ''}`}>
         {sortField === field && sortDir === 'desc' ? '▼' : '▲'}
       </span>
     </th>
@@ -98,26 +99,26 @@ export default function Orders() {
     <div>
       <div className="page-hero">
         <div className="container">
-          <button className="btn btn-secondary btn-sm" style={{ marginBottom: 16 }} onClick={() => navigate(-1)}>← Back</button>
+          <button className="btn btn-secondary btn-sm ord-back-btn" onClick={() => navigate(-1)}>← Back</button>
           <h1 className="section-title gradient-text">📦 My Orders</h1>
-          <p style={{ color: '#558b2f' }}>{orders.length} order{orders.length !== 1 ? 's' : ''} placed</p>
+          <p className="ord-subtitle">{orders.length} order{orders.length !== 1 ? 's' : ''} placed</p>
         </div>
       </div>
 
-      <div className="container" style={{ paddingBottom: 60 }}>
+      <div className="container ord-page-body">
         {/* Summary strip */}
         {orders.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 14, marginBottom: 28 }}>
+          <div className="ord-stats-grid">
             {[
               { icon: '📦', label: 'Total Orders', value: orders.length },
               { icon: '⏳', label: 'Pending', value: orders.filter(o => o.orderStatus === 'Pending').length },
               { icon: '🚚', label: 'In Transit', value: orders.filter(o => ['Processing', 'Shipped'].includes(o.orderStatus)).length },
               { icon: '✅', label: 'Delivered', value: orders.filter(o => o.orderStatus === 'Delivered').length },
-            ].map((stat, i) => (
-              <div key={stat.label} className="card animate-fade" style={{ padding: '18px 16px', textAlign: 'center', animationDelay: `${i * 0.08}s` }}>
-                <div style={{ fontSize: 26, marginBottom: 4 }}>{stat.icon}</div>
-                <div style={{ fontWeight: 800, fontSize: 22, color: 'var(--primary)' }}>{stat.value}</div>
-                <div style={{ fontSize: 12, color: '#757575' }}>{stat.label}</div>
+            ].map((stat) => (
+              <div key={stat.label} className="card animate-fade ord-stat-card">
+                <div className="ord-stat-icon">{stat.icon}</div>
+                <div className="ord-stat-value">{stat.value}</div>
+                <div className="ord-stat-label">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -128,42 +129,41 @@ export default function Orders() {
             <div className="empty-state-icon">📦</div>
             <h3>No orders yet</h3>
             <p>Start shopping to see your orders here!</p>
-            <Link to="/products" className="btn btn-primary btn-lg" style={{ marginTop: 24 }}>✨ Shop Now</Link>
+            <Link to="/products" className="btn btn-primary btn-lg ord-empty-cta">✨ Shop Now</Link>
           </div>
         ) : (
           <>
             {/* Toolbar */}
-            <div style={{ background: 'white', borderRadius: 16, padding: '16px 20px', marginBottom: 16, boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center', marginBottom: 12 }}>
-                <input className="form-input" placeholder="Search orders..." value={search}
-                  onChange={e => { setSearch(e.target.value); setPage(1); }}
-                  style={{ maxWidth: 240, padding: '8px 14px', fontSize: 13 }} />
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            <div className="ord-toolbar">
+              <div className="ord-toolbar-row">
+                <input className="form-input ord-search-input" placeholder="Search orders..." value={search}
+                  onChange={e => { setSearch(e.target.value); setPage(1); }} />
+                <div className="ord-status-filters">
                   {['', ...statuses].map(s => (
-                    <button key={s} className={`btn btn-sm ${statusFilter === s ? 'btn-primary' : 'btn-secondary'}`}
-                      onClick={() => { setStatusFilter(s); setPage(1); }} style={{ fontSize: 12 }}>
+                    <button key={s} className={`btn btn-sm ord-status-filter-btn ${statusFilter === s ? 'btn-primary' : 'btn-secondary'}`}
+                      onClick={() => { setStatusFilter(s); setPage(1); }}>
                       {s || 'All'}
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: 12, color: '#9e9e9e', fontWeight: 600 }}>Columns:</span>
+              <div className="ord-cols-row">
+                <span className="ord-cols-label">Columns:</span>
                 {ORDER_COLS.map(col => (
                   <button key={col} onClick={() => toggleCol(col)}
-                    style={{ padding: '3px 12px', borderRadius: 20, border: `2px solid ${visibleCols[col] ? '#6c63ff' : '#e0e0e0'}`, background: visibleCols[col] ? '#f0f0ff' : 'white', color: visibleCols[col] ? '#6c63ff' : '#9e9e9e', fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>
+                    className={`ord-col-btn ${visibleCols[col] ? 'active' : ''}`}>
                     {visibleCols[col] ? '✓ ' : ''}{col}
                   </button>
                 ))}
-                <span style={{ marginLeft: 'auto', fontSize: 13, color: '#9e9e9e' }}>
+                <span className="ord-count-text">
                   {filtered.length !== orders.length ? `${filtered.length} / ${orders.length}` : `${orders.length}`} orders
                 </span>
               </div>
             </div>
 
             {/* Table */}
-            <div className="table-container animate-fade" style={{ background: 'white', borderRadius: 16, boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
+            <div className="table-container animate-fade ord-table-wrap">
               <table>
                 <thead>
                   <tr>
@@ -179,38 +179,38 @@ export default function Orders() {
                 </thead>
                 <tbody>
                   {paginated.length === 0 ? (
-                    <tr><td colSpan={3 + Object.values(visibleCols).filter(Boolean).length} style={{ textAlign: 'center', padding: 40, color: '#9e9e9e' }}>No orders found.</td></tr>
+                    <tr><td colSpan={3 + Object.values(visibleCols).filter(Boolean).length} className="ord-empty-row">No orders found.</td></tr>
                   ) : paginated.map((order, i) => (
-                    <tr key={order._id} onClick={() => navigate(`/orders/${order._id}`)} style={{ cursor: 'pointer' }}>
-                      <td style={{ color: '#636e72' }}>{(page - 1) * PAGE_SIZE + i + 1}</td>
+                    <tr key={order._id} onClick={() => navigate(`/orders/${order._id}`)} className="ord-row">
+                      <td className="ord-idx-cell">{(page - 1) * PAGE_SIZE + i + 1}</td>
                       <td>
-                        <div style={{ fontWeight: 700, fontFamily: 'monospace', fontSize: 13, color: '#6c63ff' }}>
+                        <div className="ord-id-text">
                           #{order._id.slice(-8).toUpperCase()}
                         </div>
                       </td>
                       {visibleCols['Items'] && (
                         <td>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <div style={{ display: 'flex' }}>
+                          <div className="ord-items-cell">
+                            <div className="ord-items-thumbs">
                               {order.orderItems?.slice(0, 2).map((item, j) => (
                                 <img key={j} src={item.image || ''} alt={item.name}
-                                  style={{ width: 32, height: 32, borderRadius: 8, objectFit: 'cover', border: '2px solid white', marginLeft: j > 0 ? -8 : 0 }}
+                                  className={`ord-item-thumb ${j > 0 ? 'overlap' : ''}`}
                                   onError={e => e.target.style.display = 'none'} />
                               ))}
                             </div>
-                            <span style={{ fontSize: 13, color: '#636e72' }}>
+                            <span className="ord-items-name">
                               {order.orderItems?.[0]?.name?.slice(0, 16)}{order.orderItems?.length > 1 ? ` +${order.orderItems.length - 1}` : ''}
                             </span>
                           </div>
                         </td>
                       )}
                       {visibleCols['Total'] && (
-                        <td style={{ fontWeight: 700, color: '#6c63ff' }}>₹{order.totalPrice?.toLocaleString()}</td>
+                        <td className="ord-total-cell">₹{order.totalPrice?.toLocaleString()}</td>
                       )}
                       {visibleCols['Payment'] && (
                         <td>
-                          <div style={{ fontSize: 13 }}>{order.paymentMethod}</div>
-                          <div style={{ fontSize: 11, color: order.isPaid ? '#00b894' : '#d63031' }}>
+                          <div className="ord-payment-method">{order.paymentMethod}</div>
+                          <div className={`ord-payment-status ${order.isPaid ? 'paid' : 'unpaid'}`}>
                             {order.isPaid ? '✅ Paid' : '⏳ Pending'}
                           </div>
                         </td>
@@ -219,14 +219,14 @@ export default function Orders() {
                         <td><span className={`badge badge-${statusColors[order.orderStatus] || 'pending'}`}>{order.orderStatus}</span></td>
                       )}
                       {visibleCols['Date'] && (
-                        <td style={{ fontSize: 13, color: '#636e72', whiteSpace: 'nowrap' }}>
+                        <td className="ord-date-cell">
                           {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </td>
                       )}
                       <td onClick={e => e.stopPropagation()}>
-                        <div style={{ display: 'flex', gap: 6 }}>
-                          <Link to={`/orders/${order._id}`} className="btn btn-sm" style={{ background: '#f0f0ff', color: '#6c63ff', borderRadius: 20, fontSize: 12 }}>View</Link>
-                          <Link to={`/invoices/order/${order._id}`} className="btn btn-sm" style={{ background: '#e8f5e9', color: 'var(--primary)', borderRadius: 20, fontSize: 12 }}>🧾</Link>
+                        <div className="ord-actions-cell">
+                          <Link to={`/orders/${order._id}`} className="btn btn-sm ord-view-link">View</Link>
+                          <Link to={`/invoices/order/${order._id}`} className="btn btn-sm ord-invoice-link">🧾</Link>
                         </div>
                       </td>
                     </tr>
@@ -235,8 +235,8 @@ export default function Orders() {
               </table>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12, flexWrap: 'wrap', gap: 8 }}>
-              <span style={{ fontSize: 13, color: '#9e9e9e' }}>
+            <div className="ord-footer-row">
+              <span className="ord-showing-text">
                 Showing {Math.min((page - 1) * PAGE_SIZE + 1, filtered.length)}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
               </span>
               <Paginator page={page} totalPages={totalPages} onPage={setPage} />

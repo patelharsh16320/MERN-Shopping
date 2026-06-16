@@ -1,0 +1,9 @@
+.nav-search-icon { color: #bdbdbd; }
+.user-dropdown-info { padding: 8px 14px 12px; border-bottom: 1px solid #f5f5f5; }
+.user-dropdown-name { font-weight: 600; font-size: 14px; }
+.user-dropdown-email { font-size: 12px; color: #757575; }
+.user-dropdown-role-badge { margin-top: 4px; }
+.dropdown-item-danger { color: #c62828; }
+.nav-cart-link { position: relative; padding: 7px 10px; }
+.nav-link-danger { color: #c62828; cursor: pointer; }
+.btn-mobile-cta { margin: 4px 0; }

@@ -5,6 +5,7 @@ import ProductCard from '../components/ProductCard';
 import { SkeletonCard } from '../components/Loader';
 import DailyStreak from '../components/DailyStreak';
 import { toast } from 'react-toastify';
+import './Home.css';
 
 const categories = [
   { name: 'Skincare',        icon: '✨', color: '#fce4ec' },
@@ -62,11 +63,11 @@ function useCountdown(targetDate) {
 
 function CountdownBox({ value, label }) {
   return (
-    <div style={{ textAlign: 'center', minWidth: 60 }}>
-      <div style={{ background: '#c2185b', color: 'white', borderRadius: 12, padding: '12px 18px', fontSize: 28, fontWeight: 800, fontVariantNumeric: 'tabular-nums', lineHeight: 1, transition: 'all 0.3s' }}>
+    <div className="countdown-box">
+      <div className="countdown-value">
         {String(value).padStart(2, '0')}
       </div>
-      <div style={{ fontSize: 11, color: '#c2185b', fontWeight: 600, marginTop: 5, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</div>
+      <div className="countdown-label">{label}</div>
     </div>
   );
 }
@@ -135,39 +136,39 @@ export default function Home() {
   return (
     <div>
       {/* ── Hero Banner ── */}
-      <div className="banner-hero" style={{ background: b.bg, userSelect: 'none' }}
+      <div className={`banner-hero home-banner-hero banner-${banner}`}
         onMouseDown={e => onDragStart(e.clientX)}
         onMouseUp={e => onDragEnd(e.clientX)}
         onMouseLeave={() => { dragStart.current = null; }}
         onTouchStart={e => onDragStart(e.touches[0].clientX)}
         onTouchEnd={e => onDragEnd(e.changedTouches[0].clientX)}>
-        <div style={{ fontSize: 72, marginBottom: 14, animation: 'bounceIn 0.7s ease' }}>{b.emoji}</div>
-        <h1 style={{ fontSize: 'clamp(32px,5vw,60px)', fontWeight: 800, color: b.accent, marginBottom: 12, animation: 'fadeIn 0.5s ease' }}>
+        <div className="home-banner-emoji">{b.emoji}</div>
+        <h1 className="home-banner-title">
           {b.title}
         </h1>
-        <p style={{ fontSize: 'clamp(15px,2vw,20px)', color: '#757575', marginBottom: 28, animation: 'fadeIn 0.7s ease' }}>
+        <p className="home-banner-subtitle">
           {b.subtitle}
         </p>
         <div className="hero-buttons">
           <Link to="/products" className="btn btn-primary btn-lg">Shop Now →</Link>
           <Link to="/about" className="btn btn-secondary btn-lg">Our Story</Link>
         </div>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 7, marginTop: 22 }}>
+        <div className="home-banner-dots-row">
           {banners.map((_, i) => (
             <button key={i} onClick={() => setBanner(i)}
-              style={{ width: i === banner ? 22 : 7, height: 7, borderRadius: 4, border: 'none', background: i === banner ? b.accent : '#f8bbd0', cursor: 'pointer', transition: 'all 0.3s' }} />
+              className={`home-banner-dot ${i === banner ? 'active' : ''}`} />
           ))}
         </div>
       </div>
 
       {/* ── Trust Strip ── */}
-      <div style={{ background: 'white', borderBottom: '1px solid #f5f5f5' }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-around', padding: '18px 24px', flexWrap: 'wrap', gap: 14 }}>
+      <div className="home-trust-strip">
+        <div className="container home-trust-inner">
           {[['🚀', 'Free Delivery', 'On orders above ₹999'], ['💯', '100% Authentic', 'Certified products only'], ['⭐', '4.8/5 Rating', '50,000+ happy members'], ['🔄', 'Easy Returns', '7-day return policy']].map(([icon, title, sub]) => (
-            <div key={title} style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 26 }}>{icon}</div>
-              <div style={{ fontWeight: 700, fontSize: 13, color: '#212121' }}>{title}</div>
-              <div style={{ fontSize: 11, color: '#757575' }}>{sub}</div>
+            <div key={title} className="home-trust-item">
+              <div className="home-trust-icon">{icon}</div>
+              <div className="home-trust-title">{title}</div>
+              <div className="home-trust-sub">{sub}</div>
             </div>
           ))}
         </div>
@@ -177,27 +178,27 @@ export default function Home() {
       <DailyStreak />
 
       {/* ── Flash Deals Countdown ── */}
-      <div ref={dealRef} style={{ background: 'linear-gradient(135deg, #880e4f 0%, #c2185b 50%, #e91e63 100%)', padding: '52px 24px', overflow: 'hidden', position: 'relative' }}>
-        <div style={{ position: 'absolute', top: -40, right: -40, width: 200, height: 200, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: -60, left: -30, width: 260, height: 260, borderRadius: '50%', background: 'rgba(255,255,255,0.04)', pointerEvents: 'none' }} />
-        <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
-          <div style={{ fontSize: 38, marginBottom: 6, animation: 'pulse 1.5s ease-in-out infinite' }}>⚡</div>
-          <h2 style={{ color: 'white', fontSize: 'clamp(22px,4vw,34px)', fontWeight: 800, marginBottom: 6, opacity: dealVisible ? 1 : 0, transform: dealVisible ? 'none' : 'translateY(24px)', transition: 'all 0.7s ease' }}>
+      <div ref={dealRef} className="home-deals-section">
+        <div className="home-deals-blob-1" />
+        <div className="home-deals-blob-2" />
+        <div className="container home-deals-inner">
+          <div className="home-deals-icon">⚡</div>
+          <h2 className={`home-deals-title reveal ${dealVisible ? 'visible' : ''}`}>
             Flash Deals — Today Only!
           </h2>
-          <p style={{ color: 'rgba(255,255,255,0.8)', marginBottom: 28, fontSize: 15, opacity: dealVisible ? 1 : 0, transition: 'all 0.7s 0.15s ease' }}>
+          <p className={`home-deals-sub reveal delay-1 ${dealVisible ? 'visible' : ''}`}>
             Up to 40% off on selected products. Sale ends in:
           </p>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', alignItems: 'flex-start', marginBottom: 32, opacity: dealVisible ? 1 : 0, transition: 'all 0.7s 0.3s ease' }}>
+          <div className={`home-deals-countdown-row reveal delay-2 ${dealVisible ? 'visible' : ''}`}>
             <CountdownBox value={h} label="Hours" />
-            <div style={{ color: 'white', fontSize: 28, fontWeight: 800, paddingTop: 10, animation: 'pulse 1s ease-in-out infinite' }}>:</div>
+            <div className="home-deals-colon">:</div>
             <CountdownBox value={m} label="Mins" />
-            <div style={{ color: 'white', fontSize: 28, fontWeight: 800, paddingTop: 10, animation: 'pulse 1s ease-in-out infinite' }}>:</div>
+            <div className="home-deals-colon">:</div>
             <CountdownBox value={s} label="Secs" />
           </div>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', opacity: dealVisible ? 1 : 0, transition: 'all 0.7s 0.5s ease' }}>
-            <Link to="/products?sort=featured" className="btn btn-lg" style={{ background: 'white', color: '#c2185b', fontWeight: 700 }}>🛍️ Shop Flash Deals</Link>
-            <Link to="/products" className="btn btn-lg" style={{ background: 'transparent', color: 'white', border: '2px solid rgba(255,255,255,0.5)' }}>Browse All →</Link>
+          <div className={`home-deals-ctas reveal delay-3 ${dealVisible ? 'visible' : ''}`}>
+            <Link to="/products?sort=featured" className="btn btn-lg home-deals-btn-white">🛍️ Shop Flash Deals</Link>
+            <Link to="/products" className="btn btn-lg home-deals-btn-outline">Browse All →</Link>
           </div>
         </div>
       </div>
@@ -205,17 +206,15 @@ export default function Home() {
       {/* ── Categories ── */}
       <div className="section">
         <div className="container">
-          <h2 className="section-title" style={{ color: 'var(--primary)' }}>Shop by Category</h2>
+          <h2 className="section-title home-accent-title">Shop by Category</h2>
           <p className="section-subtitle">Everything a modern woman needs — all in one place</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 14 }}>
-            {categories.map((cat, i) => (
+          <div className="home-categories-grid">
+            {categories.map((cat) => (
               <div key={cat.name}
-                style={{ background: cat.color, borderRadius: 12, padding: '20px 12px', textAlign: 'center', cursor: 'pointer', transition: 'all 0.2s ease', animation: `fadeIn ${0.25 + i * 0.07}s ease`, border: '1px solid #fce4ec' }}
-                onClick={() => navigate(`/products?category=${encodeURIComponent(cat.name)}`)}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(194,24,91,0.14)'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}>
-                <div style={{ fontSize: 36, marginBottom: 7 }}>{cat.icon}</div>
-                <div style={{ fontWeight: 600, fontSize: 12, color: '#212121' }}>{cat.name}</div>
+                className="home-category-card"
+                onClick={() => navigate(`/products?category=${encodeURIComponent(cat.name)}`)}>
+                <div className="home-category-icon">{cat.icon}</div>
+                <div className="home-category-name">{cat.name}</div>
               </div>
             ))}
           </div>
@@ -223,12 +222,12 @@ export default function Home() {
       </div>
 
       {/* ── Featured Products ── */}
-      <div className="section" style={{ background: '#fff8fb', borderTop: '1px solid #fce4ec', borderBottom: '1px solid #fce4ec' }}>
+      <div className="section home-featured-section">
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 28, flexWrap: 'wrap', gap: 12 }}>
+          <div className="home-section-header-row">
             <div>
-              <h2 className="section-title" style={{ color: 'var(--primary)' }}>Featured Picks</h2>
-              <p className="section-subtitle" style={{ marginBottom: 0 }}>Handpicked by our beauty & wellness experts</p>
+              <h2 className="section-title home-accent-title">Featured Picks</h2>
+              <p className="section-subtitle home-subtitle-tight">Handpicked by our beauty & wellness experts</p>
             </div>
             <Link to="/products" className="btn btn-secondary">View All →</Link>
           </div>
@@ -239,43 +238,43 @@ export default function Home() {
       </div>
 
       {/* ── How It Works ── */}
-      <div ref={stepsRef} className="section" style={{ background: 'white' }}>
+      <div ref={stepsRef} className="section home-steps-section">
         <div className="container">
-          <h2 className="section-title text-center" style={{ color: 'var(--primary)', marginBottom: 6 }}>How It Works</h2>
+          <h2 className="section-title text-center home-accent-title home-heading-tight">How It Works</h2>
           <p className="section-subtitle text-center">Shopping with us is simple, safe and delightful</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20, marginTop: 36, position: 'relative' }}>
+          <div className="home-steps-grid">
             {steps.map((step, i) => (
               <div key={step.title}
-                style={{ background: step.color, borderRadius: 20, padding: '32px 24px', textAlign: 'center', border: '1px solid #fce4ec', position: 'relative', opacity: stepsVisible ? 1 : 0, transform: stepsVisible ? 'none' : 'translateY(32px)', transition: `all 0.6s ${i * 0.12}s ease` }}>
-                <div style={{ position: 'absolute', top: -16, left: '50%', transform: 'translateX(-50%)', width: 32, height: 32, borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14 }}>{i + 1}</div>
-                <div style={{ fontSize: 44, marginBottom: 14, marginTop: 10, animation: `float ${2.5 + i * 0.3}s ease-in-out infinite` }}>{step.icon}</div>
-                <h3 style={{ fontWeight: 700, marginBottom: 10, fontSize: 17, color: '#212121' }}>{step.title}</h3>
-                <p style={{ color: '#757575', fontSize: 13, lineHeight: 1.7 }}>{step.desc}</p>
+                className={`home-step-card ${stepsVisible ? 'visible' : ''}`}>
+                <div className="home-step-number">{i + 1}</div>
+                <div className="home-step-icon">{step.icon}</div>
+                <h3 className="home-step-title">{step.title}</h3>
+                <p className="home-step-desc">{step.desc}</p>
               </div>
             ))}
           </div>
-          <div style={{ textAlign: 'center', marginTop: 36 }}>
+          <div className="home-steps-cta">
             <Link to="/products" className="btn btn-primary btn-lg">Start Shopping →</Link>
           </div>
         </div>
       </div>
 
       {/* ── New Arrivals ── */}
-      <div className="section" style={{ background: '#fce4ec', borderTop: '1px solid #f8bbd0', borderBottom: '1px solid #f8bbd0' }}>
+      <div className="section home-newarrivals-section">
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 28, flexWrap: 'wrap', gap: 12 }}>
+          <div className="home-section-header-row">
             <div>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'white', padding: '4px 14px', borderRadius: 20, fontSize: 12, fontWeight: 700, color: 'var(--primary)', marginBottom: 8, boxShadow: '0 2px 8px rgba(194,24,91,0.12)' }}>
+              <div className="home-just-arrived-pill">
                 🆕 Just Arrived
               </div>
-              <h2 className="section-title" style={{ color: 'var(--primary)', marginBottom: 6 }}>New Arrivals</h2>
-              <p className="section-subtitle" style={{ marginBottom: 0 }}>Fresh additions to our curated collection</p>
+              <h2 className="section-title home-accent-title home-heading-tight">New Arrivals</h2>
+              <p className="section-subtitle home-subtitle-tight">Fresh additions to our curated collection</p>
             </div>
             <Link to="/products?sort=newest" className="btn btn-primary">See All New →</Link>
           </div>
           <div className="products-grid">
-            {arrivalsLoading ? Array(8).fill(0).map((_, i) => <SkeletonCard key={i} />) : newArrivals.map((p, i) => (
-              <div key={p._id} style={{ animation: `fadeIn ${0.2 + i * 0.06}s ease` }}>
+            {arrivalsLoading ? Array(8).fill(0).map((_, i) => <SkeletonCard key={i} />) : newArrivals.map((p) => (
+              <div key={p._id} className="home-arrival-card-wrap">
                 <ProductCard product={p} />
               </div>
             ))}
@@ -284,44 +283,42 @@ export default function Home() {
       </div>
 
       {/* ── Beauty & Wellness Tips ── */}
-      <div ref={tipsRef} className="section" style={{ background: 'white' }}>
+      <div ref={tipsRef} className="section home-steps-section">
         <div className="container">
-          <h2 className="section-title text-center" style={{ color: 'var(--primary)', marginBottom: 6 }}>Beauty & Wellness Tips</h2>
+          <h2 className="section-title text-center home-accent-title home-heading-tight">Beauty & Wellness Tips</h2>
           <p className="section-subtitle text-center">Expert advice to elevate your everyday self-care routine</p>
 
           {/* Spotlight tip (auto-cycles) */}
-          <div style={{ background: 'linear-gradient(135deg, #fff0f5, #fce4ec)', borderRadius: 20, padding: '32px 36px', marginBottom: 28, border: '1px solid #f8bbd0', display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap', minHeight: 120 }}>
-            <div style={{ fontSize: 56, flexShrink: 0, animation: 'bounceIn 0.5s ease' }} key={tipIdx}>{tips[tipIdx].icon}</div>
-            <div style={{ flex: 1, minWidth: 200 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8, flexWrap: 'wrap' }}>
-                <h3 style={{ fontWeight: 700, fontSize: 18, color: '#212121' }}>{tips[tipIdx].title}</h3>
-                <span style={{ background: 'var(--primary)', color: 'white', borderRadius: 20, padding: '2px 12px', fontSize: 11, fontWeight: 600 }}>{tips[tipIdx].tag}</span>
+          <div className="home-tip-spotlight">
+            <div className="home-tip-spotlight-icon" key={tipIdx}>{tips[tipIdx].icon}</div>
+            <div className="home-tip-spotlight-content">
+              <div className="home-tip-spotlight-header">
+                <h3 className="home-tip-spotlight-title">{tips[tipIdx].title}</h3>
+                <span className="home-tip-spotlight-tag">{tips[tipIdx].tag}</span>
               </div>
-              <p style={{ color: '#757575', fontSize: 14, lineHeight: 1.7 }}>{tips[tipIdx].body}</p>
+              <p className="home-tip-spotlight-body">{tips[tipIdx].body}</p>
             </div>
-            <div style={{ display: 'flex', gap: 6, alignSelf: 'flex-end', flexShrink: 0 }}>
+            <div className="home-tip-dots">
               {tips.map((_, i) => (
                 <button key={i} onClick={() => setTipIdx(i)}
-                  style={{ width: i === tipIdx ? 20 : 7, height: 7, borderRadius: 4, border: 'none', background: i === tipIdx ? 'var(--primary)' : '#f8bbd0', cursor: 'pointer', transition: 'all 0.3s' }} />
+                  className={`home-tip-dot ${i === tipIdx ? 'active' : ''}`} />
               ))}
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+          <div className="home-tips-grid">
             {tips.map((tip, i) => (
               <div key={i}
-                style={{ background: '#fff8fb', borderRadius: 16, padding: '20px 22px', border: '1px solid #fce4ec', cursor: 'pointer', transition: 'all 0.25s', opacity: tipsVisible ? 1 : 0, transform: tipsVisible ? 'none' : 'translateY(24px)', animationDelay: `${i * 0.1}s`, transitionDelay: `${i * 0.07}s` }}
-                onClick={() => setTipIdx(i)}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(194,24,91,0.12)'; e.currentTarget.style.borderColor = '#f48fb1'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.borderColor = '#fce4ec'; }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-                  <span style={{ fontSize: 28 }}>{tip.icon}</span>
+                className={`home-tip-card ${tipsVisible ? 'visible' : ''}`}
+                onClick={() => setTipIdx(i)}>
+                <div className="home-tip-card-header">
+                  <span className="home-tip-card-icon">{tip.icon}</span>
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: 14, color: '#212121' }}>{tip.title}</div>
-                    <span style={{ background: '#fce4ec', color: 'var(--primary)', borderRadius: 20, padding: '1px 10px', fontSize: 10, fontWeight: 600 }}>{tip.tag}</span>
+                    <div className="home-tip-card-title">{tip.title}</div>
+                    <span className="home-tip-card-tag">{tip.tag}</span>
                   </div>
                 </div>
-                <p style={{ color: '#757575', fontSize: 12, lineHeight: 1.6 }}>{tip.body.substring(0, 80)}…</p>
+                <p className="home-tip-card-body">{tip.body.substring(0, 80)}…</p>
               </div>
             ))}
           </div>
@@ -329,11 +326,11 @@ export default function Home() {
       </div>
 
       {/* ── Animated Stats Banner ── */}
-      <div ref={statsRef} style={{ background: 'linear-gradient(135deg, #c2185b, #880e4f)', padding: '56px 24px', overflow: 'hidden', position: 'relative' }}>
-        <div style={{ position: 'absolute', top: '50%', left: '5%', transform: 'translateY(-50%)', fontSize: 180, opacity: 0.05, pointerEvents: 'none' }}>💗</div>
-        <div style={{ position: 'absolute', top: '50%', right: '5%', transform: 'translateY(-50%)', fontSize: 180, opacity: 0.05, pointerEvents: 'none' }}>✨</div>
+      <div ref={statsRef} className="home-stats-section">
+        <div className="home-stats-blob-left">💗</div>
+        <div className="home-stats-blob-right">✨</div>
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 28, textAlign: 'center' }}>
+          <div className="home-stats-grid">
             {[
               { value: '50,000+', label: 'Happy Members', icon: '💗' },
               { value: '500+', label: 'Curated Products', icon: '🛍️' },
@@ -341,11 +338,11 @@ export default function Home() {
               { value: '3 Years', label: 'Of Excellence', icon: '🏆' },
               { value: '10+', label: 'Categories', icon: '✨' },
               { value: '24h', label: 'Customer Support', icon: '💬' },
-            ].map((stat, i) => (
-              <div key={stat.label} style={{ opacity: statsVisible ? 1 : 0, transform: statsVisible ? 'none' : 'scale(0.7)', transition: `all 0.6s ${i * 0.1}s ease` }}>
-                <div style={{ fontSize: 30, marginBottom: 6 }}>{stat.icon}</div>
-                <div style={{ fontSize: 32, fontWeight: 800, color: 'white', marginBottom: 4 }}>{stat.value}</div>
-                <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 13 }}>{stat.label}</div>
+            ].map((stat) => (
+              <div key={stat.label} className={`home-stat-item ${statsVisible ? 'visible' : ''}`}>
+                <div className="home-stat-icon">{stat.icon}</div>
+                <div className="home-stat-value">{stat.value}</div>
+                <div className="home-stat-label">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -353,18 +350,18 @@ export default function Home() {
       </div>
 
       {/* ── Promo Banner ── */}
-      <div style={{ background: '#880e4f', padding: '52px 24px', textAlign: 'center' }}>
+      <div className="home-promo-section">
         <div className="container">
-          <div style={{ fontSize: 44, marginBottom: 10 }}>🎉</div>
-          <h2 style={{ color: 'white', fontSize: 'clamp(22px,4vw,36px)', fontWeight: 800, marginBottom: 10 }}>
+          <div className="home-promo-icon">🎉</div>
+          <h2 className="home-promo-title">
             Members Get Up to 30% Off!
           </h2>
-          <p style={{ color: 'rgba(255,255,255,0.8)', marginBottom: 22, fontSize: 15 }}>
+          <p className="home-promo-sub">
             Join Women HubClub today and unlock exclusive member deals on every order.
           </p>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/register" className="btn btn-lg" style={{ background: 'white', color: 'var(--primary)', fontWeight: 700 }}>Join Now — It's Free</Link>
-            <Link to="/products" className="btn btn-lg" style={{ background: 'transparent', color: 'white', border: '2px solid rgba(255,255,255,0.6)' }}>Browse Deals</Link>
+          <div className="home-promo-ctas">
+            <Link to="/register" className="btn btn-lg home-promo-btn-white">Join Now — It's Free</Link>
+            <Link to="/products" className="btn btn-lg home-promo-btn-outline">Browse Deals</Link>
           </div>
         </div>
       </div>
@@ -372,9 +369,9 @@ export default function Home() {
       {/* ── Testimonials ── */}
       <div className="section">
         <div className="container">
-          <h2 className="section-title text-center" style={{ color: 'var(--primary)' }}>What Our Members Say</h2>
+          <h2 className="section-title text-center home-accent-title">What Our Members Say</h2>
           <p className="section-subtitle text-center">Trusted by 50,000+ women across India</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: 20 }}>
+          <div className="home-testimonials-grid">
             {[
               { name: 'Priya S.', city: 'Mumbai', review: 'The skincare products are absolutely amazing! Noticed a visible difference in just 2 weeks. My skin has never looked better.', rating: 5, tag: 'Skincare' },
               { name: 'Anjali M.', city: 'Delhi', review: 'Love the yoga mat and resistance bands. Great quality at an affordable price. Fast delivery too — same day in my city!', rating: 5, tag: 'Fitness' },
@@ -383,22 +380,19 @@ export default function Home() {
               { name: 'Meera T.', city: 'Hyderabad', review: 'Returns are truly hassle-free. Ordered 3 times and every order was perfect. Customer support is super responsive.', rating: 5, tag: 'Service' },
               { name: 'Riya K.', city: 'Chennai', review: 'I love that everything is cruelty-free certified. Finally a store that aligns with my values. 100% recommend!', rating: 5, tag: 'Clean Beauty' },
             ].map((t, i) => (
-              <div key={i} className="card"
-                style={{ padding: 24, animation: `fadeIn ${0.3 + i * 0.12}s ease`, transition: 'all 0.25s', cursor: 'default' }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 10px 28px rgba(194,24,91,0.12)'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'var(--shadow)'; }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                  <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'linear-gradient(135deg, #c2185b, #f06292)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: 15, flexShrink: 0 }}>
+              <div key={i} className="card home-testimonial-card">
+                <div className="home-testimonial-header">
+                  <div className="home-testimonial-avatar">
                     {t.name[0]}
                   </div>
                   <div>
-                    <div style={{ fontWeight: 700, color: '#212121', fontSize: 14 }}>{t.name}</div>
-                    <div style={{ fontSize: 11, color: '#9e9e9e' }}>📍 {t.city}</div>
+                    <div className="home-testimonial-name">{t.name}</div>
+                    <div className="home-testimonial-city">📍 {t.city}</div>
                   </div>
-                  <span style={{ marginLeft: 'auto', background: '#fce4ec', color: 'var(--primary)', borderRadius: 20, padding: '2px 10px', fontSize: 10, fontWeight: 600, flexShrink: 0 }}>{t.tag}</span>
+                  <span className="home-testimonial-tag">{t.tag}</span>
                 </div>
-                <div style={{ color: '#f57c00', fontSize: 16, marginBottom: 8 }}>{'⭐'.repeat(t.rating)}</div>
-                <p style={{ fontSize: 13, color: '#757575', lineHeight: 1.7 }}>"{t.review}"</p>
+                <div className="home-testimonial-stars">{'⭐'.repeat(t.rating)}</div>
+                <p className="home-testimonial-text">"{t.review}"</p>
               </div>
             ))}
           </div>
@@ -406,37 +400,36 @@ export default function Home() {
       </div>
 
       {/* ── Newsletter ── */}
-      <div ref={newsRef} style={{ background: 'linear-gradient(135deg, #fff0f5 0%, #fce4ec 50%, #fff8fb 100%)', padding: '72px 24px', borderTop: '1px solid #fce4ec', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: -60, right: -60, width: 280, height: 280, borderRadius: '50%', background: 'rgba(194,24,91,0.06)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: -80, left: -40, width: 320, height: 320, borderRadius: '50%', background: 'rgba(240,98,146,0.07)', pointerEvents: 'none' }} />
-        <div className="container" style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
-          <div style={{ fontSize: 52, marginBottom: 12, animation: 'float 3s ease-in-out infinite' }}>💌</div>
-          <h2 style={{ fontSize: 'clamp(24px,4vw,36px)', fontWeight: 800, color: 'var(--primary)', marginBottom: 10, opacity: newsVisible ? 1 : 0, transform: newsVisible ? 'none' : 'translateY(24px)', transition: 'all 0.7s ease' }}>
+      <div ref={newsRef} className="home-newsletter-section">
+        <div className="home-newsletter-blob-1" />
+        <div className="home-newsletter-blob-2" />
+        <div className="container home-newsletter-inner">
+          <div className="home-newsletter-icon">💌</div>
+          <h2 className={`home-newsletter-title reveal ${newsVisible ? 'visible' : ''}`}>
             Join Our Inner Circle
           </h2>
-          <p style={{ color: '#757575', fontSize: 15, maxWidth: 500, margin: '0 auto 28px', lineHeight: 1.8, opacity: newsVisible ? 1 : 0, transition: 'all 0.7s 0.15s ease' }}>
+          <p className={`home-newsletter-sub reveal delay-1 ${newsVisible ? 'visible' : ''}`}>
             Get exclusive deals, early access to new arrivals, and personalised beauty tips delivered straight to your inbox. No spam — ever.
           </p>
-          <form onSubmit={handleNewsletterSubmit} className="newsletter-form"
-            style={{ display: 'flex', gap: 0, maxWidth: 460, margin: '0 auto', borderRadius: 50, overflow: 'hidden', boxShadow: '0 8px 30px rgba(194,24,91,0.18)', opacity: newsVisible ? 1 : 0, transition: 'all 0.7s 0.3s ease' }}>
+          <form onSubmit={handleNewsletterSubmit} className={`newsletter-form home-newsletter-form-style reveal delay-2 ${newsVisible ? 'visible' : ''}`}>
             <input
               type="email"
               placeholder="yourname@email.com"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
-              style={{ flex: 1, padding: '14px 22px', border: 'none', outline: 'none', fontSize: 14, fontFamily: 'Poppins', background: 'white', color: '#212121', minWidth: 0 }}
+              className="home-newsletter-input"
             />
-            <button type="submit" className="btn btn-primary" style={{ borderRadius: 0, padding: '14px 24px', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <button type="submit" className="btn btn-primary home-newsletter-submit">
               Subscribe 💗
             </button>
           </form>
-          <p style={{ color: '#bdbdbd', fontSize: 11, marginTop: 14 }}>Join 50,000+ members • Unsubscribe anytime</p>
+          <p className="home-newsletter-microtext">Join 50,000+ members • Unsubscribe anytime</p>
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: 18, marginTop: 32, flexWrap: 'wrap', opacity: newsVisible ? 1 : 0, transition: 'all 0.7s 0.5s ease' }}>
+          <div className={`home-newsletter-perks reveal delay-3 ${newsVisible ? 'visible' : ''}`}>
             {[['🎁', 'Welcome Discount'], ['📰', 'Weekly Beauty Tips'], ['⚡', 'Flash Deal Alerts'], ['🆕', 'New Arrivals First']].map(([icon, label]) => (
-              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#757575', fontSize: 13 }}>
-                <span>{icon}</span> <span style={{ fontWeight: 600 }}>{label}</span>
+              <div key={label} className="home-newsletter-perk">
+                <span>{icon}</span> <span className="home-newsletter-perk-label">{label}</span>
               </div>
             ))}
           </div>

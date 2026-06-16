@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { authAPI, contactAPI, loyaltyAPI } from '../utils/api';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import './Profile.css';
 
 const MILESTONES = [
   { day: 7, reward: '10% OFF', emoji: '🎁' },
@@ -118,44 +119,42 @@ export default function Profile() {
         </div>
       </div>
 
-      <div className="container" style={{ paddingBottom: 60 }}>
+      <div className="container prof-page-body">
         <div className="layout-sidebar">
           {/* Sidebar */}
           <div className="animate-left">
-            <div style={{ background: 'white', borderRadius: 24, padding: 32, textAlign: 'center', boxShadow: 'var(--shadow)', marginBottom: 20, border: '1px solid var(--border)' }}>
-              <div style={{ width: 100, height: 100, borderRadius: '50%', background: 'linear-gradient(135deg, #6c63ff, #fd79a8)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, fontWeight: 800, color: 'white', margin: '0 auto 16px' }}>
+            <div className="prof-panel prof-sidebar-card">
+              <div className="prof-avatar-lg">
                 {avatarText}
               </div>
-              <div style={{ fontWeight: 700, fontSize: 20 }}>{user.name}</div>
-              <div style={{ color: '#558b2f', fontSize: 14, marginBottom: 12 }}>{user.email}</div>
+              <div className="prof-user-name">{user.name}</div>
+              <div className="prof-user-email">{user.email}</div>
               <span className={`badge badge-${user.role}`}>{user.role === 'admin' ? '⚙️ Admin' : '👤 Customer'}</span>
               {user.role === 'admin' && (
-                <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: 16 }} onClick={() => navigate('/admin')}>
+                <button className="btn btn-primary prof-admin-btn" onClick={() => navigate('/admin')}>
                   Go to Dashboard →
                 </button>
               )}
             </div>
 
-            <div style={{ background: 'white', borderRadius: 24, padding: 16, boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
+            <div className="prof-panel prof-nav-card">
               {[['profile', '👤', 'Profile Info'], ['addresses', '📍', 'My Addresses'], ['streak', '🔥', 'My Streak'], ['loyalty', '⭐', 'Loyalty Points'], ['messages', '💬', 'My Messages']].map(([key, icon, label]) => (
                 <div key={key} onClick={() => setTab(key)}
-                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', cursor: 'pointer', borderRadius: 12, marginBottom: 4, background: tab === key ? '#e8f5e9' : 'transparent', color: tab === key ? 'var(--primary)' : 'var(--text)', fontWeight: tab === key ? 700 : 500, fontSize: 14, transition: 'all 0.2s' }}>
+                  className={`prof-nav-item ${tab === key ? 'active' : ''}`}>
                   <span>{icon}</span>
-                  <span style={{ flex: 1 }}>{label}</span>
+                  <span className="prof-nav-label">{label}</span>
                   {key === 'messages' && unreadMsgCount > 0 && (
-                    <span style={{ background: '#d63031', color: 'white', borderRadius: 10, padding: '1px 7px', fontSize: 11, fontWeight: 700, minWidth: 18, textAlign: 'center' }}>
+                    <span className="prof-unread-badge">
                       {unreadMsgCount > 99 ? '99+' : unreadMsgCount}
                     </span>
                   )}
                 </div>
               ))}
-              <div className="divider" style={{ margin: '8px 0' }} />
+              <div className="divider prof-divider-tight" />
               {[['📦', 'My Orders', '/orders'], ['🧾', 'My Invoices', '/invoices'], ['🤍', 'Wishlist', '/wishlist'], ['🎫', 'Support Tickets', '/support'], ['🛒', 'Continue Shopping', '/products']].map(([icon, label, path]) => (
                 <div key={path} onClick={() => navigate(path)}
-                  style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', cursor: 'pointer', borderRadius: 12, marginBottom: 4, fontSize: 14, fontWeight: 500, transition: 'all 0.2s' }}
-                  onMouseEnter={e => { e.currentTarget.style.background = '#e8f5e9'; e.currentTarget.style.color = 'var(--primary)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text)'; }}>
-                  <span>{icon}</span> {label} <span style={{ marginLeft: 'auto' }}>→</span>
+                  className="prof-quick-link">
+                  <span>{icon}</span> {label} <span className="prof-quick-link-arrow">→</span>
                 </div>
               ))}
             </div>
@@ -164,17 +163,17 @@ export default function Profile() {
           {/* Main Content */}
           <div className="animate-right">
             {tab === 'profile' && (
-              <div style={{ background: 'white', borderRadius: 24, padding: 36, boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
-                <h2 style={{ fontWeight: 700, marginBottom: 28, fontSize: 22 }}>Edit Profile</h2>
+              <div className="prof-panel prof-tab-panel">
+                <h2 className="prof-tab-heading spaced">Edit Profile</h2>
                 <form onSubmit={handleSubmit}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                  <div className="prof-form-grid">
                     <div className="form-group">
                       <label className="form-label">Full Name</label>
                       <input className="form-input" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required />
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Email <span style={{ fontSize: 11, color: '#9e9e9e', fontWeight: 400 }}>(cannot be changed)</span></label>
-                      <input className="form-input" type="email" value={form.email} readOnly style={{ background: '#f5f5f5', color: '#9e9e9e', cursor: 'not-allowed' }} />
+                      <label className="form-label">Email <span className="prof-email-hint">(cannot be changed)</span></label>
+                      <input className="form-input prof-readonly-input" type="email" value={form.email} readOnly />
                     </div>
                     <div className="form-group">
                       <label className="form-label">Phone</label>
@@ -185,7 +184,7 @@ export default function Profile() {
                       <input className="form-input" type="password" placeholder="Leave blank to keep current" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
                     </div>
                   </div>
-                  <button className="btn btn-primary btn-lg" type="submit" disabled={loading} style={{ marginTop: 8 }}>
+                  <button className="btn btn-primary btn-lg prof-save-btn" type="submit" disabled={loading}>
                     {loading ? '⏳ Saving...' : '💾 Save Changes'}
                   </button>
                 </form>
@@ -193,9 +192,9 @@ export default function Profile() {
             )}
 
             {tab === 'addresses' && (
-              <div style={{ background: 'white', borderRadius: 24, padding: 36, boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>
-                  <h2 style={{ fontWeight: 700, fontSize: 22 }}>📍 My Addresses</h2>
+              <div className="prof-panel prof-tab-panel">
+                <div className="prof-addr-header">
+                  <h2 className="prof-tab-heading">📍 My Addresses</h2>
                   {!addingAddr && (
                     <button className="btn btn-primary btn-sm" onClick={() => { setNewAddr(emptyAddress); setEditingIdx(null); setAddingAddr(true); }}>
                       + Add Address
@@ -204,47 +203,47 @@ export default function Profile() {
                 </div>
 
                 {addresses.length === 0 && !addingAddr && (
-                  <div className="empty-state" style={{ padding: '40px 0' }}>
+                  <div className="empty-state prof-empty-tight">
                     <div className="empty-state-icon">📍</div>
                     <p>No addresses saved yet</p>
-                    <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={() => setAddingAddr(true)}>Add Your First Address</button>
+                    <button className="btn btn-primary prof-empty-cta" onClick={() => setAddingAddr(true)}>Add Your First Address</button>
                   </div>
                 )}
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginBottom: addresses.length > 0 && addingAddr ? 24 : 0 }}>
+                <div className={`prof-addr-list ${addresses.length > 0 && addingAddr ? 'with-form' : ''}`}>
                   {addresses.map((addr, idx) => (
                     <div key={idx} className={`address-card ${addr.isDefault ? 'default-addr' : ''}`}>
                       {addr.isDefault && (
-                        <span className="badge badge-shipped" style={{ position: 'absolute', top: 16, right: 16, fontSize: 11 }}>✓ Default</span>
+                        <span className="badge badge-shipped prof-default-badge">✓ Default</span>
                       )}
-                      <div style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'center' }}>
-                        <span style={{ fontWeight: 700, fontSize: 15 }}>
+                      <div className="prof-addr-label-row">
+                        <span className="prof-addr-label-text">
                           {addr.label === 'Home' ? '🏠' : addr.label === 'Work' ? '🏢' : '📌'} {addr.label}
                         </span>
                       </div>
-                      <div style={{ fontSize: 14, color: '#558b2f', lineHeight: 1.7 }}>
+                      <div className="prof-addr-body">
                         {addr.street}<br />
                         {addr.city}, {addr.state} - {addr.zip}<br />
                         {addr.country}
                       </div>
-                      <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
+                      <div className="prof-addr-actions">
                         {!addr.isDefault && (
                           <button className="btn btn-secondary btn-sm" onClick={() => setDefault(idx)}>Set Default</button>
                         )}
-                        <button className="btn btn-sm" style={{ background: '#e8f5e9', color: 'var(--primary)' }} onClick={() => startEdit(idx)}>✏️ Edit</button>
-                        <button className="btn btn-sm" style={{ background: '#ffebee', color: '#c62828' }} onClick={() => removeAddress(idx)}>🗑 Remove</button>
+                        <button className="btn btn-sm prof-edit-btn" onClick={() => startEdit(idx)}>✏️ Edit</button>
+                        <button className="btn btn-sm prof-remove-btn" onClick={() => removeAddress(idx)}>🗑 Remove</button>
                       </div>
                     </div>
                   ))}
                 </div>
 
-{addingAddr && (
-                  <div style={{ background: '#f1f8e9', borderRadius: 16, padding: 24, border: '1px solid var(--border)' }}>
-                    <h3 style={{ fontWeight: 600, marginBottom: 20, fontSize: 16 }}>
+                {addingAddr && (
+                  <div className="prof-add-form-box">
+                    <h3 className="prof-add-form-heading">
                       {editingIdx !== null ? '✏️ Edit Address' : '+ New Address'}
                     </h3>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-                      <div className="form-group" style={{ marginBottom: 0 }}>
+                    <div className="prof-form-grid-2">
+                      <div className="form-group prof-fg-tight">
                         <label className="form-label">Label</label>
                         <select className="form-select" value={newAddr.label} onChange={e => setNewAddr({ ...newAddr, label: e.target.value })}>
                           <option>Home</option>
@@ -252,7 +251,7 @@ export default function Profile() {
                           <option>Other</option>
                         </select>
                       </div>
-                      <div className="form-group" style={{ marginBottom: 0 }}>
+                      <div className="form-group prof-fg-tight">
                         <label className="form-label">Country</label>
                         <input className="form-input" value={newAddr.country} onChange={e => setNewAddr({ ...newAddr, country: e.target.value })} />
                       </div>
@@ -261,7 +260,7 @@ export default function Profile() {
                       <label className="form-label">Street Address</label>
                       <input className="form-input" placeholder="123 Main Street, Apt 4B" value={newAddr.street} onChange={e => setNewAddr({ ...newAddr, street: e.target.value })} />
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+                    <div className="prof-form-grid-3">
                       <div className="form-group">
                         <label className="form-label">City</label>
                         <input className="form-input" placeholder="Mumbai" value={newAddr.city} onChange={e => setNewAddr({ ...newAddr, city: e.target.value })} />
@@ -275,7 +274,7 @@ export default function Profile() {
                         <input className="form-input" placeholder="400001" value={newAddr.zip} onChange={e => setNewAddr({ ...newAddr, zip: e.target.value })} />
                       </div>
                     </div>
-                    <div style={{ display: 'flex', gap: 12 }}>
+                    <div className="prof-form-actions">
                       <button className="btn btn-primary" onClick={saveNewAddress}>
                         {editingIdx !== null ? '✓ Update Address' : '+ Save Address'}
                       </button>
@@ -285,18 +284,18 @@ export default function Profile() {
                 )}
 
                 {addresses.length > 0 && (
-                  <button className="btn btn-primary btn-lg" style={{ marginTop: 24 }} onClick={handleSubmit} disabled={loading}>
+                  <button className="btn btn-primary btn-lg prof-save-all-btn" onClick={handleSubmit} disabled={loading}>
                     {loading ? '⏳ Saving...' : '💾 Save All Addresses'}
                   </button>
                 )}
               </div>
             )}
             {tab === 'streak' && (
-              <div style={{ background: 'white', borderRadius: 24, padding: 36, boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
-                <h2 style={{ fontWeight: 700, marginBottom: 28, fontSize: 22 }}>🔥 My Daily Streak</h2>
+              <div className="prof-panel prof-tab-panel">
+                <h2 className="prof-tab-heading spaced">🔥 My Daily Streak</h2>
 
                 {!streak ? (
-                  <div style={{ textAlign: 'center', padding: 40, color: '#9e9e9e' }}>Loading streak...</div>
+                  <div className="prof-loading-text">Loading streak...</div>
                 ) : (() => {
                   const nextMilestone = MILESTONES.find(m => streak.current < m.day) || MILESTONES[MILESTONES.length - 1];
                   const progress = Math.min(100, (streak.current / nextMilestone.day) * 100);
@@ -306,34 +305,34 @@ export default function Profile() {
                   return (
                     <>
                       {/* Stat cards */}
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(160px,1fr))', gap: 16, marginBottom: 28 }}>
-                        <div style={{ background: 'linear-gradient(135deg,#fff0f5,#fce4ec)', borderRadius: 16, padding: '20px 24px', textAlign: 'center', border: '1px solid #f8bbd0' }}>
-                          <div style={{ fontSize: 36 }}>🔥</div>
-                          <div style={{ fontSize: 32, fontWeight: 800, color: '#c2185b', lineHeight: 1.1 }}>{streak.current}</div>
-                          <div style={{ fontSize: 13, color: '#9e9e9e', marginTop: 4 }}>Current Streak</div>
+                      <div className="prof-streak-stats-grid">
+                        <div className="prof-streak-stat cur">
+                          <div className="prof-streak-stat-icon">🔥</div>
+                          <div className="prof-streak-stat-value cur">{streak.current}</div>
+                          <div className="prof-streak-stat-label">Current Streak</div>
                         </div>
-                        <div style={{ background: 'linear-gradient(135deg,#f3e5f5,#e8eaf6)', borderRadius: 16, padding: '20px 24px', textAlign: 'center', border: '1px solid #e1bee7' }}>
-                          <div style={{ fontSize: 36 }}>🏆</div>
-                          <div style={{ fontSize: 32, fontWeight: 800, color: '#7b1fa2', lineHeight: 1.1 }}>{streak.longest}</div>
-                          <div style={{ fontSize: 13, color: '#9e9e9e', marginTop: 4 }}>Longest Streak</div>
+                        <div className="prof-streak-stat longest">
+                          <div className="prof-streak-stat-icon">🏆</div>
+                          <div className="prof-streak-stat-value longest">{streak.longest}</div>
+                          <div className="prof-streak-stat-label">Longest Streak</div>
                         </div>
-                        <div style={{ background: 'linear-gradient(135deg,#e8f5e9,#f1f8e9)', borderRadius: 16, padding: '20px 24px', textAlign: 'center', border: '1px solid #c8e6c9' }}>
-                          <div style={{ fontSize: 36 }}>{streak.checkedToday ? '✅' : '⏰'}</div>
-                          <div style={{ fontSize: 15, fontWeight: 700, color: streak.checkedToday ? '#2e7d32' : '#e65100', lineHeight: 1.3, marginTop: 4 }}>
+                        <div className="prof-streak-stat today">
+                          <div className="prof-streak-stat-icon">{streak.checkedToday ? '✅' : '⏰'}</div>
+                          <div className={`prof-today-status ${streak.checkedToday ? 'checked' : 'notyet'}`}>
                             {streak.checkedToday ? 'Checked In' : 'Not Yet Today'}
                           </div>
-                          <div style={{ fontSize: 13, color: '#9e9e9e', marginTop: 4 }}>Today's Status</div>
+                          <div className="prof-streak-stat-label">Today's Status</div>
                         </div>
                       </div>
 
                       {/* Week dots */}
-                      <div style={{ marginBottom: 24 }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#555', marginBottom: 12 }}>This week</div>
-                        <div style={{ display: 'flex', gap: 10 }}>
+                      <div className="prof-week-section">
+                        <div className="prof-week-heading">This week</div>
+                        <div className="prof-week-row">
                           {Array.from({ length: 7 }, (_, i) => {
                             const filled = i < weekPos;
                             return (
-                              <div key={i} style={{ width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, background: filled ? 'linear-gradient(135deg,#c2185b,#e91e63)' : 'white', color: filled ? 'white' : '#bdbdbd', border: filled ? 'none' : '2px dashed #f8bbd0', transition: 'all 0.3s' }}>
+                              <div key={i} className={`prof-week-dot ${filled ? 'filled' : ''}`}>
                                 {filled ? '✓' : i + 1}
                               </div>
                             );
@@ -342,56 +341,56 @@ export default function Profile() {
                       </div>
 
                       {/* Progress bar */}
-                      <div style={{ marginBottom: 28 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, fontWeight: 600, color: '#9e9e9e', marginBottom: 6 }}>
+                      <div className="prof-progress-section">
+                        <div className="prof-progress-labels">
                           <span>🎁 7 days = 10% OFF</span>
                           <span>👑 30 days = 25% OFF</span>
                         </div>
-                        <div style={{ background: '#f5f5f5', borderRadius: 50, height: 10, overflow: 'hidden', border: '1px solid #f8bbd0' }}>
-                          <div style={{ height: '100%', width: `${progress}%`, borderRadius: 50, background: 'linear-gradient(90deg,#c2185b,#f06292)', transition: 'width 0.6s ease' }} />
+                        <div className="prof-progress-track">
+                          <div className="prof-progress-fill" style={{ '--progress': `${progress}%` }} />
                         </div>
                         {daysLeft > 0 && (
-                          <div style={{ fontSize: 12, color: '#9e9e9e', marginTop: 6 }}>
-                            <strong style={{ color: '#c2185b' }}>{daysLeft} more days</strong> to unlock {nextMilestone.reward} {nextMilestone.emoji}
+                          <div className="prof-days-left-text">
+                            <strong className="prof-days-left-strong">{daysLeft} more days</strong> to unlock {nextMilestone.reward} {nextMilestone.emoji}
                           </div>
                         )}
                       </div>
 
                       {/* Earned coupons */}
                       <div>
-                        <div style={{ fontSize: 15, fontWeight: 700, color: '#333', marginBottom: 14 }}>🎟️ My Streak Rewards</div>
+                        <div className="prof-rewards-heading">🎟️ My Streak Rewards</div>
                         {(!streak.earnedCoupons || streak.earnedCoupons.length === 0) ? (
-                          <div style={{ padding: '24px', background: '#fafafa', borderRadius: 16, textAlign: 'center', color: '#9e9e9e', border: '1px dashed #e0e0e0' }}>
-                            <div style={{ fontSize: 32, marginBottom: 8 }}>🎁</div>
-                            <div style={{ fontWeight: 600, fontSize: 14 }}>No rewards yet</div>
-                            <div style={{ fontSize: 13, marginTop: 4 }}>Reach a 7-day streak to earn your first coupon!</div>
+                          <div className="prof-rewards-empty">
+                            <div className="prof-rewards-empty-icon">🎁</div>
+                            <div className="prof-rewards-empty-title">No rewards yet</div>
+                            <div className="prof-rewards-empty-sub">Reach a 7-day streak to earn your first coupon!</div>
                           </div>
                         ) : (
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                          <div className="prof-rewards-list">
                             {streak.earnedCoupons.map((c, i) => {
                               const expired = new Date(c.expiresAt) < new Date();
                               return (
-                                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', borderRadius: 16, background: expired ? '#fafafa' : 'linear-gradient(135deg,#fff0f5,#fce4ec)', border: `1px solid ${expired ? '#e0e0e0' : '#f8bbd0'}`, flexWrap: 'wrap' }}>
-                                  <div style={{ fontSize: 28 }}>{c.milestone >= 30 ? '👑' : '🎁'}</div>
-                                  <div style={{ flex: 1 }}>
-                                    <div style={{ fontSize: 12, color: '#9e9e9e', fontWeight: 600 }}>
+                                <div key={i} className={`prof-reward-card ${expired ? 'expired' : ''}`}>
+                                  <div className="prof-reward-icon">{c.milestone >= 30 ? '👑' : '🎁'}</div>
+                                  <div className="prof-reward-info">
+                                    <div className="prof-reward-milestone">
                                       {c.milestone}-day milestone reward
                                     </div>
-                                    <div style={{ fontSize: 16, fontWeight: 800, color: expired ? '#9e9e9e' : '#c2185b', fontFamily: 'monospace', letterSpacing: 1 }}>
+                                    <div className={`prof-reward-code ${expired ? 'expired' : ''}`}>
                                       {c.code}
                                     </div>
-                                    <div style={{ fontSize: 12, color: '#9e9e9e', marginTop: 2 }}>
+                                    <div className="prof-reward-detail">
                                       {c.discountValue}% OFF · {expired ? 'Expired' : `Expires ${new Date(c.expiresAt).toLocaleDateString('en-IN')}`}
                                     </div>
                                   </div>
                                   {!expired && (
                                     <button
                                       onClick={() => navigator.clipboard.writeText(c.code).then(() => toast.info('Coupon copied! 📋', { autoClose: 1500 }))}
-                                      style={{ padding: '8px 18px', borderRadius: 10, border: 'none', background: '#c2185b', color: 'white', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>
+                                      className="prof-reward-copy-btn">
                                       Copy 📋
                                     </button>
                                   )}
-                                  {expired && <span style={{ fontSize: 12, color: '#bdbdbd', fontWeight: 600 }}>Expired</span>}
+                                  {expired && <span className="prof-reward-expired-label">Expired</span>}
                                 </div>
                               );
                             })}
@@ -405,60 +404,60 @@ export default function Profile() {
             )}
 
             {tab === 'loyalty' && (
-              <div style={{ background: 'white', borderRadius: 24, padding: 36, boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
-                <h2 style={{ fontWeight: 700, marginBottom: 28, fontSize: 22 }}>⭐ My Loyalty Points</h2>
+              <div className="prof-panel prof-tab-panel">
+                <h2 className="prof-tab-heading spaced">⭐ My Loyalty Points</h2>
                 {!loyalty ? (
-                  <div style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</div>
+                  <div className="prof-loading-text-alt">Loading...</div>
                 ) : (() => {
-                  const TIER_COLORS = { Bronze: '#cd7f32', Silver: '#9e9e9e', Gold: '#f39c12', Platinum: '#6c63ff' };
-                  const TIER_BG    = { Bronze: '#fdf3e7', Silver: '#f5f5f5', Gold: '#fffbf0', Platinum: '#f0f0ff' };
                   const nextTier   = { Bronze: 'Silver', Silver: 'Gold', Gold: 'Platinum', Platinum: null };
                   const thresholds = loyalty.tierThresholds || { Bronze: 0, Silver: 500, Gold: 2000, Platinum: 5000 };
-                  const curColor   = TIER_COLORS[loyalty.tier];
                   const nt         = nextTier[loyalty.tier];
                   const progress   = nt ? Math.min(100, ((loyalty.totalEarned - thresholds[loyalty.tier]) / (thresholds[nt] - thresholds[loyalty.tier])) * 100) : 100;
+                  const tierClass  = `prof-tier-${loyalty.tier.toLowerCase()}`;
+                  const gradClass  = nt ? `prof-tier-grad-${loyalty.tier.toLowerCase()}-${nt.toLowerCase()}` : '';
+
                   return (
                     <>
                       {/* Tier card */}
-                      <div style={{ background: TIER_BG[loyalty.tier], border: `2px solid ${curColor}30`, borderRadius: 20, padding: 28, marginBottom: 28, display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
-                        <div style={{ width: 80, height: 80, borderRadius: '50%', background: curColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, color: 'white', fontWeight: 900, flexShrink: 0 }}>
+                      <div className={`prof-tier-card ${tierClass}`}>
+                        <div className="prof-tier-badge">
                           {loyalty.tier === 'Bronze' ? '🥉' : loyalty.tier === 'Silver' ? '🥈' : loyalty.tier === 'Gold' ? '🥇' : '💎'}
                         </div>
-                        <div style={{ flex: 1, minWidth: 180 }}>
-                          <div style={{ fontSize: 13, color: '#9e9e9e', fontWeight: 600, marginBottom: 4 }}>Your Tier</div>
-                          <div style={{ fontSize: 26, fontWeight: 900, color: curColor }}>{loyalty.tier}</div>
-                          <div style={{ fontSize: 13, color: '#636e72', marginTop: 4 }}>{loyalty.totalEarned.toLocaleString()} points earned lifetime</div>
+                        <div className="prof-tier-info">
+                          <div className="prof-tier-label">Your Tier</div>
+                          <div className="prof-tier-name">{loyalty.tier}</div>
+                          <div className="prof-tier-earned">{loyalty.totalEarned.toLocaleString()} points earned lifetime</div>
                           {nt && (
-                            <div style={{ marginTop: 12 }}>
-                              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#9e9e9e', marginBottom: 4 }}>
+                            <div className="prof-next-tier-wrap">
+                              <div className="prof-next-tier-labels">
                                 <span>{loyalty.tier}</span><span>{nt} ({(thresholds[nt] - loyalty.totalEarned).toLocaleString()} pts away)</span>
                               </div>
-                              <div style={{ height: 8, background: '#e0e0e0', borderRadius: 4, overflow: 'hidden' }}>
-                                <div style={{ height: '100%', width: `${progress}%`, background: `linear-gradient(90deg, ${curColor}, ${TIER_COLORS[nt]})`, borderRadius: 4, transition: 'width 0.5s' }} />
+                              <div className="prof-next-tier-track">
+                                <div className={`prof-next-tier-fill ${gradClass}`} style={{ '--progress': `${progress}%` }} />
                               </div>
                             </div>
                           )}
                         </div>
-                        <div style={{ textAlign: 'center' }}>
-                          <div style={{ fontSize: 36, fontWeight: 900, color: curColor }}>{loyalty.points.toLocaleString()}</div>
-                          <div style={{ fontSize: 12, color: '#9e9e9e', fontWeight: 600 }}>Available Points</div>
-                          <div style={{ fontSize: 12, color: '#636e72', marginTop: 4 }}>≈ ₹{Math.floor(loyalty.points * (loyalty.pointsToRupee || 0.5))} value</div>
+                        <div className="prof-points-display">
+                          <div className="prof-points-value">{loyalty.points.toLocaleString()}</div>
+                          <div className="prof-points-label">Available Points</div>
+                          <div className="prof-points-worth">≈ ₹{Math.floor(loyalty.points * (loyalty.pointsToRupee || 0.5))} value</div>
                         </div>
                       </div>
 
                       {/* How to earn / redeem */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 28 }}>
-                        <div style={{ background: '#f8f7ff', borderRadius: 16, padding: 20, border: '1px solid #e0e0ff' }}>
-                          <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 15 }}>🎯 How to Earn</div>
-                          <div style={{ fontSize: 13, color: '#636e72', lineHeight: 1.8 }}>
+                      <div className="prof-info-grid">
+                        <div className="prof-earn-box">
+                          <div className="prof-info-box-title">🎯 How to Earn</div>
+                          <div className="prof-info-box-body">
                             • Every ₹10 spent = <strong>1 point</strong><br />
                             • Daily login streak milestones<br />
                             • Special promotional events
                           </div>
                         </div>
-                        <div style={{ background: '#f0fdf4', borderRadius: 16, padding: 20, border: '1px solid #b2dfdb' }}>
-                          <div style={{ fontWeight: 700, marginBottom: 8, fontSize: 15 }}>💸 Redemption Rate</div>
-                          <div style={{ fontSize: 13, color: '#636e72', lineHeight: 1.8 }}>
+                        <div className="prof-redeem-box">
+                          <div className="prof-info-box-title">💸 Redemption Rate</div>
+                          <div className="prof-info-box-body">
                             • <strong>1 point = ₹{loyalty.pointsToRupee || 0.5}</strong> off<br />
                             • Use at checkout<br />
                             • No minimum points required
@@ -467,13 +466,13 @@ export default function Profile() {
                       </div>
 
                       {/* Tier benefits */}
-                      <div style={{ marginBottom: 28 }}>
-                        <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 12 }}>🏆 Tier Benefits</div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(120px,1fr))', gap: 10 }}>
+                      <div className="prof-benefits-section">
+                        <div className="prof-benefits-heading">🏆 Tier Benefits</div>
+                        <div className="prof-benefits-grid">
                           {Object.entries({ Bronze: ['Free shipping >₹999', 'Basic support'], Silver: ['Free shipping >₹499', 'Priority support', '5% bonus points'], Gold: ['Free shipping always', 'VIP support', '10% bonus points', 'Early sale access'], Platinum: ['Free shipping always', 'Dedicated support', '20% bonus points', 'Exclusive launches', 'Birthday rewards'] }).map(([tier, perks]) => (
-                            <div key={tier} style={{ background: tier === loyalty.tier ? TIER_BG[tier] : '#fafafa', border: `2px solid ${tier === loyalty.tier ? curColor : '#e0e0e0'}`, borderRadius: 14, padding: 14 }}>
-                              <div style={{ fontWeight: 700, fontSize: 13, color: TIER_COLORS[tier], marginBottom: 8 }}>{tier === 'Bronze' ? '🥉' : tier === 'Silver' ? '🥈' : tier === 'Gold' ? '🥇' : '💎'} {tier}</div>
-                              {perks.map(p => <div key={p} style={{ fontSize: 11, color: '#636e72', marginBottom: 3 }}>✓ {p}</div>)}
+                            <div key={tier} className={`prof-benefit-card prof-tier-${tier.toLowerCase()} ${tier === loyalty.tier ? 'active' : ''}`}>
+                              <div className="prof-benefit-title">{tier === 'Bronze' ? '🥉' : tier === 'Silver' ? '🥈' : tier === 'Gold' ? '🥇' : '💎'} {tier}</div>
+                              {perks.map(p => <div key={p} className="prof-benefit-perk">✓ {p}</div>)}
                             </div>
                           ))}
                         </div>
@@ -481,16 +480,16 @@ export default function Profile() {
 
                       {/* Points history */}
                       {loyalty.history && loyalty.history.length > 0 && (
-                        <div>
-                          <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 12 }}>📋 Points History</div>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <div className="prof-history-section">
+                          <div className="prof-benefits-heading">📋 Points History</div>
+                          <div className="prof-history-list">
                             {loyalty.history.map((h, i) => (
-                              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px', background: '#fafafa', borderRadius: 12, border: '1px solid #f0f0f0' }}>
+                              <div key={i} className="prof-history-row">
                                 <div>
-                                  <div style={{ fontWeight: 600, fontSize: 13 }}>{h.reason}</div>
-                                  <div style={{ fontSize: 11, color: '#9e9e9e' }}>{new Date(h.date).toLocaleDateString('en-IN', { dateStyle: 'medium' })}</div>
+                                  <div className="prof-history-reason">{h.reason}</div>
+                                  <div className="prof-history-date">{new Date(h.date).toLocaleDateString('en-IN', { dateStyle: 'medium' })}</div>
                                 </div>
-                                <div style={{ fontWeight: 800, fontSize: 15, color: h.type === 'earned' ? '#00b894' : '#d63031' }}>
+                                <div className={`prof-history-points ${h.type === 'earned' ? 'earned' : 'spent'}`}>
                                   {h.type === 'earned' ? '+' : ''}{h.points} pts
                                 </div>
                               </div>
@@ -505,27 +504,27 @@ export default function Profile() {
             )}
 
             {tab === 'messages' && (
-              <div style={{ background: 'white', borderRadius: 24, padding: 36, boxShadow: 'var(--shadow)', border: '1px solid var(--border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28, flexWrap: 'wrap', gap: 12 }}>
-                  <h2 style={{ fontWeight: 700, fontSize: 22, margin: 0 }}>💬 My Messages</h2>
+              <div className="prof-panel prof-tab-panel">
+                <div className="prof-msg-header">
+                  <h2 className="prof-tab-heading prof-msg-heading">💬 My Messages</h2>
                   {unreadMsgCount > 0 && (
-                    <div style={{ background: '#fff3e0', border: '1px solid #ffcc02', borderRadius: 12, padding: '8px 16px', fontSize: 13, color: '#e65100', fontWeight: 600 }}>
+                    <div className="prof-unread-notice">
                       🔔 You have {unreadMsgCount} unread {unreadMsgCount === 1 ? 'reply' : 'replies'}
                     </div>
                   )}
                 </div>
 
                 {msgsLoading ? (
-                  <div style={{ textAlign: 'center', padding: 40, color: '#636e72' }}>Loading...</div>
+                  <div className="prof-loading-text-alt">Loading...</div>
                 ) : myMessages.length === 0 ? (
-                  <div className="empty-state" style={{ padding: '40px 0' }}>
+                  <div className="empty-state prof-empty-tight">
                     <div className="empty-state-icon">💬</div>
                     <p>You haven't sent any messages yet.</p>
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div className="prof-msg-list">
                     {myMessages.map(msg => (
-                      <div key={msg._id} style={{ border: `2px solid ${!msg.userRead && msg.replies?.length > 0 ? '#6c63ff' : 'var(--border)'}`, borderRadius: 16, overflow: 'hidden' }}>
+                      <div key={msg._id} className={`prof-msg-card ${!msg.userRead && msg.replies?.length > 0 ? 'unread' : ''}`}>
                         {/* Message header */}
                         <div
                           onClick={() => {
@@ -537,37 +536,37 @@ export default function Profile() {
                               setUnreadMsgCount(c => Math.max(0, c - 1));
                             }
                           }}
-                          style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', cursor: 'pointer', background: expandedMsg === msg._id ? '#f8f7ff' : 'white' }}>
+                          className={`prof-msg-card-header ${expandedMsg === msg._id ? 'expanded' : ''}`}>
                           {/* Avatar */}
-                          <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg,#6c63ff,#fd79a8)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: 18, flexShrink: 0 }}>
+                          <div className="prof-msg-avatar">
                             {user.name?.[0]?.toUpperCase()}
                           </div>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 2 }}>{msg.subject}</div>
-                            <div style={{ fontSize: 12, color: '#636e72', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{msg.message}</div>
+                          <div className="prof-msg-subject-wrap">
+                            <div className="prof-msg-subject">{msg.subject}</div>
+                            <div className="prof-msg-preview">{msg.message}</div>
                           </div>
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, flexShrink: 0 }}>
-                            <div style={{ fontSize: 11, color: '#9e9e9e' }}>{new Date(msg.createdAt).toLocaleDateString('en-IN', { dateStyle: 'medium' })}</div>
+                          <div className="prof-msg-meta-col">
+                            <div className="prof-msg-date">{new Date(msg.createdAt).toLocaleDateString('en-IN', { dateStyle: 'medium' })}</div>
                             {msg.replies?.length > 0 && (
-                              <span style={{ background: !msg.userRead ? '#e8f0ff' : '#e8f5e9', color: !msg.userRead ? '#6c63ff' : '#558b2f', borderRadius: 10, padding: '2px 8px', fontSize: 11, fontWeight: 700 }}>
+                              <span className={`prof-reply-badge ${!msg.userRead ? 'new' : 'replied'}`}>
                                 {!msg.userRead ? '🔵 New reply' : `${msg.replies.length} ${msg.replies.length === 1 ? 'reply' : 'replies'}`}
                               </span>
                             )}
                           </div>
-                          <span style={{ color: '#9e9e9e', fontSize: 12, marginLeft: 8 }}>{expandedMsg === msg._id ? '▲' : '▼'}</span>
+                          <span className="prof-expand-arrow">{expandedMsg === msg._id ? '▲' : '▼'}</span>
                         </div>
 
                         {/* Expanded body */}
                         {expandedMsg === msg._id && (
-                          <div style={{ padding: '0 20px 20px', borderTop: '1px solid var(--border)' }}>
+                          <div className="prof-msg-body">
                             {/* User's original message */}
-                            <div style={{ marginTop: 16 }}>
-                              <div style={{ fontSize: 11, color: '#9e9e9e', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>Your Message</div>
-                              <div style={{ display: 'flex', gap: 12 }}>
-                                <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,#6c63ff,#fd79a8)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
+                            <div className="prof-orig-msg-wrap">
+                              <div className="prof-msg-section-label">Your Message</div>
+                              <div className="prof-msg-row">
+                                <div className="prof-msg-avatar-sm">
                                   {user.name?.[0]?.toUpperCase()}
                                 </div>
-                                <div style={{ background: '#f5f5f5', borderRadius: '0 12px 12px 12px', padding: '12px 16px', fontSize: 14, lineHeight: 1.7, color: '#2d3436', flex: 1, whiteSpace: 'pre-wrap' }}>
+                                <div className="prof-bubble-user">
                                   {msg.message}
                                 </div>
                               </div>
@@ -575,18 +574,18 @@ export default function Profile() {
 
                             {/* Admin replies */}
                             {msg.replies?.length > 0 ? (
-                              <div style={{ marginTop: 16 }}>
-                                <div style={{ fontSize: 11, color: '#9e9e9e', fontWeight: 700, textTransform: 'uppercase', marginBottom: 8 }}>Admin Replies</div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                              <div className="prof-replies-wrap">
+                                <div className="prof-msg-section-label">Admin Replies</div>
+                                <div className="prof-replies-list">
                                   {msg.replies.map((r, i) => (
-                                    <div key={i} style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-                                      <div style={{ background: '#f0f0ff', borderRadius: '12px 0 12px 12px', padding: '12px 16px', fontSize: 14, lineHeight: 1.7, color: '#2d3436', maxWidth: '85%', whiteSpace: 'pre-wrap' }}>
+                                    <div key={i} className="prof-reply-row">
+                                      <div className="prof-bubble-admin">
                                         {r.message}
-                                        <div style={{ fontSize: 11, color: '#9e9e9e', marginTop: 4 }}>
+                                        <div className="prof-bubble-time">
                                           {new Date(r.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
                                         </div>
                                       </div>
-                                      <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,#fd79a8,#6c63ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 14, flexShrink: 0 }}>
+                                      <div className="prof-msg-avatar-sm-admin">
                                         🌸
                                       </div>
                                     </div>
@@ -594,7 +593,7 @@ export default function Profile() {
                                 </div>
                               </div>
                             ) : (
-                              <div style={{ marginTop: 16, padding: '12px 16px', background: '#fffbf0', borderRadius: 12, fontSize: 13, color: '#9e9e9e', border: '1px dashed #f0e0a0' }}>
+                              <div className="prof-awaiting-box">
                                 ⏳ Awaiting admin reply...
                               </div>
                             )}

@@ -3,6 +3,7 @@ import AdminLayout from './AdminLayout';
 import { productAPI, categoryAPI, uploadAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
 import { getSocket } from '../../utils/socket';
+import './ManageProducts.css';
 
 const emptyForm = { name: '', slug: '', description: '', price: '', originalPrice: '', discount: 0, category: '', subcategory: '', images: [''], stock: '', totalStock: '', rating: 0, numReviews: 0, isFeatured: false, isActive: true, freshnessDays: 365, weight: '200g', brand: 'Women HubClub', tags: '', status: 'published', specialOffer: { enabled: false, label: '', salePrice: '', endsAt: '' } };
 
@@ -23,8 +24,8 @@ const STATUS_BG = { published: '#f0fdf4', draft: '#fffbf0', trash: '#fff0f0' };
 function SortTh({ label, field, sortField, sortDir, onSort, style }) {
   const active = sortField === field;
   return (
-    <th onClick={() => onSort(field)} style={{ cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', ...style }}>
-      {label}&nbsp;<span style={{ fontSize: 9, opacity: active ? 1 : 0.25 }}>{active && sortDir === 'desc' ? '▼' : '▲'}</span>
+    <th className="manage-products-sort-th" onClick={() => onSort(field)} style={style}>
+      {label}&nbsp;<span className="manage-products-sort-arrow" style={{ opacity: active ? 1 : 0.25 }}>{active && sortDir === 'desc' ? '▼' : '▲'}</span>
     </th>
   );
 }
@@ -41,11 +42,11 @@ function Paginator({ page, totalPages, onPage }) {
     else if (pages[pages.length - 1] !== '...') pages.push('...');
   }
   return (
-    <div className="pagination" style={{ marginTop: 16 }}>
+    <div className="pagination manage-products-pagination">
       <button className="page-btn" onClick={() => onPage(page - 1)} disabled={page === 1}>‹</button>
       {pages.map((p, i) =>
         p === '...'
-          ? <span key={`e${i}`} style={{ padding: '0 6px', color: '#9e9e9e', alignSelf: 'center' }}>…</span>
+          ? <span key={`e${i}`} className="manage-products-ellipsis">…</span>
           : <button key={p} className={`page-btn ${page === p ? 'active' : ''}`} onClick={() => onPage(p)}>{p}</button>
       )}
       <button className="page-btn" onClick={() => onPage(page + 1)} disabled={page === totalPages}>›</button>
@@ -284,8 +285,8 @@ export default function ManageProducts() {
     <AdminLayout>
       <div className="admin-header">
         <h1>🌸 <span className="gradient-text">Manage Products</span></h1>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-          <div style={{ background: '#f0f0ff', borderRadius: 12, padding: '8px 20px', fontSize: 14, fontWeight: 600, color: '#6c63ff' }}>
+        <div className="manage-products-header-right">
+          <div className="manage-products-count-badge">
             {search || statusFilter !== 'all' ? `${sortedProducts.length} / ${products.length}` : products.length} products
           </div>
           <button className="btn btn-primary" onClick={openAdd}>+ Add Product</button>
@@ -293,42 +294,43 @@ export default function ManageProducts() {
       </div>
 
       {/* Status tabs */}
-      <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: '#9e9e9e', marginRight: 4 }}>Status:</span>
+      <div className="manage-products-tabs-row">
+        <span className="manage-products-tabs-label">Status:</span>
         {STATUS_TABS.map(tab => (
           <button key={tab.key} onClick={() => { setStatusFilter(tab.key); setPage(1); setSelectedIds(new Set()); }}
-            style={{ padding: '5px 14px', borderRadius: 20, border: `2px solid ${statusFilter === tab.key ? '#6c63ff' : '#e0e0e0'}`, background: statusFilter === tab.key ? '#f0f0ff' : 'white', color: statusFilter === tab.key ? '#6c63ff' : '#636e72', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>
+            className={`manage-products-tab-btn ${statusFilter === tab.key ? 'manage-products-tab-btn-active' : ''}`}>
             {tab.label}
-            <span style={{ marginLeft: 6, padding: '1px 7px', borderRadius: 10, background: statusFilter === tab.key ? '#6c63ff' : '#f0f0f0', color: statusFilter === tab.key ? 'white' : '#9e9e9e', fontSize: 11, fontWeight: 700 }}>
+            <span className={`manage-products-tab-count ${statusFilter === tab.key ? 'manage-products-tab-count-active' : ''}`}>
               {tabCounts[tab.key] ?? 0}
             </span>
           </button>
         ))}
-        <span style={{ width: 1, height: 24, background: '#e0e0e0', margin: '0 4px' }} />
-        <span style={{ fontSize: 12, fontWeight: 700, color: '#9e9e9e', marginRight: 4 }}>Visibility:</span>
+        <span className="manage-products-divider" />
+        <span className="manage-products-tabs-label">Visibility:</span>
         {[
           { key: 'all',      label: 'All',      color: '#636e72', bg: '#f5f5f5' },
           { key: 'active',   label: '🟢 Active',   color: '#2e7d32', bg: '#e8f5e9' },
           { key: 'inactive', label: '🔴 Inactive', color: '#d63031', bg: '#fff0f0' },
         ].map(f => (
           <button key={f.key} onClick={() => { setActiveFilter(f.key); setPage(1); setSelectedIds(new Set()); }}
-            style={{ padding: '5px 14px', borderRadius: 20, border: `2px solid ${activeFilter === f.key ? f.color : '#e0e0e0'}`, background: activeFilter === f.key ? f.bg : 'white', color: activeFilter === f.key ? f.color : '#636e72', fontSize: 13, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>
+            className="manage-products-tab-btn"
+            style={{ border: `2px solid ${activeFilter === f.key ? f.color : '#e0e0e0'}`, background: activeFilter === f.key ? f.bg : 'white', color: activeFilter === f.key ? f.color : '#636e72' }}>
             {f.label}
-            <span style={{ marginLeft: 6, padding: '1px 7px', borderRadius: 10, background: activeFilter === f.key ? f.color : '#f0f0f0', color: activeFilter === f.key ? 'white' : '#9e9e9e', fontSize: 11, fontWeight: 700 }}>
+            <span className="manage-products-tab-count" style={{ background: activeFilter === f.key ? f.color : '#f0f0f0', color: activeFilter === f.key ? 'white' : '#9e9e9e' }}>
               {f.key === 'all' ? tabCounts.all : (tabCounts[f.key] ?? 0)}
             </span>
           </button>
         ))}
       </div>
 
-      <div style={{ marginBottom: 16, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
-        <input className="form-input" placeholder="Search products..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} style={{ maxWidth: 280 }} />
+      <div className="manage-products-toolbar-row">
+        <input className="form-input manage-products-search-input" placeholder="Search products..." value={search} onChange={e => { setSearch(e.target.value); setPage(1); }} />
 
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-          <span style={{ fontSize: 13, color: '#9e9e9e', fontWeight: 600 }}>Columns:</span>
+        <div className="manage-products-cols-row">
+          <span className="manage-products-cols-label">Columns:</span>
           {PROD_COLS.map(col => (
             <button key={col} onClick={() => toggleCol(col)}
-              style={{ padding: '4px 12px', borderRadius: 20, border: `2px solid ${visibleCols[col] ? '#6c63ff' : '#e0e0e0'}`, background: visibleCols[col] ? '#f0f0ff' : 'white', color: visibleCols[col] ? '#6c63ff' : '#9e9e9e', fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>
+              className={`manage-products-col-btn ${visibleCols[col] ? 'manage-products-col-btn-active' : ''}`}>
               {visibleCols[col] ? '✓ ' : ''}{col}
             </button>
           ))}
@@ -336,20 +338,20 @@ export default function ManageProducts() {
       </div>
 
       {selectedIds.size > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', background: '#fff0f0', borderRadius: 12, marginBottom: 14, border: '2px solid #ffcccc', flexWrap: 'wrap' }}>
-          <span style={{ fontWeight: 700, fontSize: 14, color: '#c62828' }}>{selectedIds.size} selected</span>
+        <div className="manage-products-bulk-bar">
+          <span className="manage-products-bulk-count">{selectedIds.size} selected</span>
           {statusFilter === 'trash' ? (
             <>
-              <button className="btn btn-sm" style={{ background: '#f0fdf4', color: '#00b894' }} onClick={handleBulkRestore}>↩ Restore Selected</button>
+              <button className="btn btn-sm manage-products-btn-restore" onClick={handleBulkRestore}>↩ Restore Selected</button>
               <button className="btn btn-sm btn-danger" onClick={handleBulkDeleteForever}>🗑 Delete Forever</button>
             </>
           ) : (
             <>
-              <button className="btn btn-sm" style={{ background: '#fff8f0', color: '#e17055', border: '1px solid #ffd5c2' }} onClick={handleBulkTrash}>🗑 Trash Selected</button>
+              <button className="btn btn-sm manage-products-btn-trash" onClick={handleBulkTrash}>🗑 Trash Selected</button>
               <button className="btn btn-sm btn-danger" onClick={handleBulkDeleteForever}>🗑 Delete Forever</button>
             </>
           )}
-          <button className="btn btn-sm" style={{ background: '#f5f5f5', color: '#636e72' }} onClick={() => setSelectedIds(new Set())}>✕ Deselect All</button>
+          <button className="btn btn-sm manage-products-btn-deselect" onClick={() => setSelectedIds(new Set())}>✕ Deselect All</button>
         </div>
       )}
 

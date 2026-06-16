@@ -1,0 +1,49 @@
+.pp-hero { text-align: center; padding: 68px 24px; background: linear-gradient(135deg,#fff0f5,#fce4ec); }
+.pp-hero-icon { font-size: 52px; margin-bottom: 14px; animation: bounceIn 0.7s ease; }
+.pp-hero-title { font-size: 40px; color: var(--primary); margin-bottom: 12px; }
+.pp-hero-sub { color: #757575; font-size: 15px; max-width: 560px; margin: 0 auto 16px; line-height: 1.8; }
+.pp-updated-pill { display: inline-flex; align-items: center; gap: 8px; background: white; padding: 8px 18px; border-radius: 20px; font-size: 13px; color: #757575; box-shadow: var(--shadow); }
+
+.pp-trust-strip { background: white; border-bottom: 1px solid #fce4ec; }
+.pp-trust-row { display: flex; justify-content: center; gap: 36px; padding: 18px 24px; flex-wrap: wrap; }
+.pp-trust-item { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; color: #555; }
+.pp-trust-icon { font-size: 20px; }
+
+.pp-main { padding-top: 48px; padding-bottom: 72px; }
+.pp-layout { display: grid; grid-template-columns: 260px 1fr; gap: 36px; align-items: start; }
+
+.pp-sticky-nav { position: sticky; top: 24px; }
+.pp-nav-card { background: white; border-radius: 16px; padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+.pp-nav-label { font-size: 13px; font-weight: 700; color: #9e9e9e; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+.pp-nav-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border-radius: 10px; border: none; background: transparent; color: #555; font-weight: 500; cursor: pointer; text-align: left; font-size: 13px; font-family: 'Poppins', sans-serif; transition: all 0.2s; margin-bottom: 2px; }
+.pp-nav-btn.active { background: #fce4ec; color: var(--primary); font-weight: 700; }
+
+.pp-help-box { background: #fff0f5; border-radius: 14px; padding: 18px; margin-top: 16px; border: 1px solid #fce4ec; text-align: center; }
+.pp-help-icon { font-size: 28px; margin-bottom: 8px; }
+.pp-help-title { font-weight: 700; font-size: 14px; margin-bottom: 6px; color: var(--primary); }
+.pp-help-sub { font-size: 12px; color: #757575; margin-bottom: 12px; }
+.pp-help-btn { font-size: 12px; padding: 8px 16px; }
+
+.pp-sections-wrap { display: flex; flex-direction: column; gap: 28px; }
+.pp-section { background: white; border-radius: 20px; padding: 36px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+.pp-section:nth-child(1) { transition-delay: 0s; }
+.pp-section:nth-child(2) { transition-delay: 0.06s; }
+.pp-section:nth-child(3) { transition-delay: 0.12s; }
+.pp-section:nth-child(4) { transition-delay: 0.18s; }
+.pp-section:nth-child(5) { transition-delay: 0.24s; }
+.pp-section:nth-child(6) { transition-delay: 0.3s; }
+.pp-section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.pp-section-icon { width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg,#fce4ec,#fff0f5); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+.pp-section-title { font-weight: 800; font-size: 22px; color: #212121; }
+.pp-content-list { display: flex; flex-direction: column; gap: 18px; }
+.pp-content-item { padding-left: 16px; border-left: 3px solid #f48fb1; }
+.pp-content-sub { font-weight: 700; font-size: 14px; margin-bottom: 5px; color: #212121; }
+.pp-content-text { color: #757575; font-size: 14px; line-height: 1.8; }
+
+.pp-cta-box { background: linear-gradient(135deg,#c2185b,#880e4f); border-radius: 20px; padding: 36px; text-align: center; color: white; }
+.pp-cta-icon { font-size: 36px; margin-bottom: 10px; }
+.pp-cta-title { font-weight: 800; font-size: 20px; margin-bottom: 10px; }
+.pp-cta-text { color: rgba(255,255,255,0.8); margin-bottom: 20px; font-size: 14px; line-height: 1.7; }
+.pp-cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.pp-cta-btn-white { background: white; color: var(--primary); font-weight: 700; }
+.pp-cta-btn-outline { background: transparent; border: 2px solid rgba(255,255,255,0.5); color: white; }

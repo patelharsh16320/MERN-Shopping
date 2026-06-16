@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { productAPI } from '../utils/api';
 import { useCart } from '../context/CartContext';
 import { toast } from 'react-toastify';
+import './BeautyQuiz.css';
 
 const QUESTIONS = [
   {
@@ -65,56 +66,56 @@ const PROFILES = [
     match: (a) => a.skinType === 'dry' && a.concern === 'hydration',
     name: 'The Dew Drop Devotee',
     emoji: '💧',
-    gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+    cls: 'bq-profile-dew',
     tags: ['Hydration Queen', 'Moisture Lover', 'Glow Hunter'],
   },
   {
     match: (a) => a.skinType === 'oily' && a.concern === 'acne',
     name: 'The Clear Skin Chaser',
     emoji: '✨',
-    gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+    cls: 'bq-profile-clear',
     tags: ['Clarity First', 'Pore Perfectionist', 'Blemish Fighter'],
   },
   {
     match: (a) => a.lifestyle === 'active',
     name: 'The Wellness Warrior',
     emoji: '🏃‍♀️',
-    gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+    cls: 'bq-profile-wellness',
     tags: ['Fitness Fanatic', 'Glow from Within', 'Active Beauty'],
   },
   {
     match: (a) => a.routine === 'dedicated' && a.budget === 'premium',
     name: 'The Radiance Ritualist',
     emoji: '👑',
-    gradient: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
+    cls: 'bq-profile-radiance',
     tags: ['Luxury Lover', 'Ritual Keeper', 'Skin Perfectionist'],
   },
   {
     match: (a) => a.concern === 'brightening',
     name: 'The Glow Seeker',
     emoji: '☀️',
-    gradient: 'linear-gradient(135deg, #f6d365 0%, #fda085 100%)',
+    cls: 'bq-profile-glow',
     tags: ['Brightening Addict', 'Sun-Kissed Goals', 'Radiance Hunter'],
   },
   {
     match: (a) => a.concern === 'antiaging',
     name: 'The Age-Defying Maven',
     emoji: '⏳',
-    gradient: 'linear-gradient(135deg, #c2185b 0%, #880e4f 100%)',
+    cls: 'bq-profile-agedefy',
     tags: ['Timeless Beauty', 'Firmness Fanatic', 'Youth Preserver'],
   },
   {
     match: (a) => a.routine === 'quick',
     name: 'The Effortless Glow',
     emoji: '⚡',
-    gradient: 'linear-gradient(135deg, #00c6fb 0%, #005bea 100%)',
+    cls: 'bq-profile-effortless',
     tags: ['Minimalist Beauty', 'Quick & Effective', 'No-Fuss Glow'],
   },
 ];
 const DEFAULT_PROFILE = {
   name: 'The Beauty Explorer',
   emoji: '🌸',
-  gradient: 'linear-gradient(135deg, #c2185b 0%, #f06292 100%)',
+  cls: 'bq-profile-default',
   tags: ['Versatile Beauty', 'Open to Everything', 'All-Around Glam'],
 };
 
@@ -150,29 +151,15 @@ function QuizOption({ option, selected, onSelect }) {
   return (
     <button
       onClick={() => onSelect(option.value)}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        padding: '14px 18px',
-        borderRadius: 16,
-        border: selected ? '2px solid #c2185b' : '2px solid #f0f0f0',
-        background: selected ? '#fff0f5' : 'white',
-        cursor: 'pointer',
-        textAlign: 'left',
-        transition: 'all 0.2s',
-        transform: selected ? 'scale(1.02)' : 'scale(1)',
-        boxShadow: selected ? '0 4px 16px rgba(194,24,91,0.15)' : '0 2px 8px rgba(0,0,0,0.05)',
-        width: '100%',
-      }}
+      className={`bq-option ${selected ? 'selected' : ''}`}
     >
-      <span style={{ fontSize: 28, flexShrink: 0 }}>{option.emoji}</span>
+      <span className="bq-option-emoji">{option.emoji}</span>
       <div>
-        <div style={{ fontWeight: 700, fontSize: 15, color: selected ? '#c2185b' : '#212121' }}>{option.label}</div>
-        <div style={{ fontSize: 12, color: '#9e9e9e', marginTop: 2 }}>{option.desc}</div>
+        <div className={`bq-option-label ${selected ? 'selected' : ''}`}>{option.label}</div>
+        <div className="bq-option-desc">{option.desc}</div>
       </div>
       {selected && (
-        <span style={{ marginLeft: 'auto', color: '#c2185b', fontSize: 20, flexShrink: 0 }}>✓</span>
+        <span className="bq-option-check">✓</span>
       )}
     </button>
   );
@@ -192,60 +179,37 @@ function ProductResultCard({ product }) {
   return (
     <div
       onClick={() => navigate(url)}
-      style={{
-        background: 'white',
-        borderRadius: 20,
-        overflow: 'hidden',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-        cursor: 'pointer',
-        transition: 'transform 0.2s, box-shadow 0.2s',
-        border: '1px solid #fce4ec',
-      }}
-      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(194,24,91,0.15)'; }}
-      onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)'; }}
+      className="bq-result-card"
     >
-      <div style={{ position: 'relative', height: 180, overflow: 'hidden' }}>
+      <div className="bq-result-img-wrap">
         <img
           src={product.images?.[0] || 'https://images.unsplash.com/photo-1520412099551-62b6bafeb5bb?w=400'}
           alt={product.name}
           onError={e => e.target.src = 'https://images.unsplash.com/photo-1520412099551-62b6bafeb5bb?w=400'}
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          className="bq-result-img"
         />
-        <div style={{ position: 'absolute', top: 10, left: 10, background: '#fff0f5', color: '#c2185b', fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 20 }}>
+        <div className="bq-result-category">
           {product.category}
         </div>
       </div>
-      <div style={{ padding: '14px 16px 16px' }}>
-        <div style={{ fontWeight: 700, fontSize: 14, color: '#212121', marginBottom: 4, lineHeight: 1.4, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+      <div className="bq-result-body">
+        <div className="bq-result-name">
           {product.name}
         </div>
-        <div style={{ fontSize: 12, color: '#f39c12', marginBottom: 8 }}>
+        <div className="bq-result-stars">
           {'⭐'.repeat(Math.round(product.rating || 4))}
-          <span style={{ color: '#9e9e9e', marginLeft: 4 }}>({product.numReviews || 0})</span>
+          <span className="bq-result-reviews">({product.numReviews || 0})</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-          <span style={{ fontWeight: 800, fontSize: 16, color: '#c2185b' }}>₹{product.price}</span>
+        <div className="bq-result-price-row">
+          <span className="bq-result-price">₹{product.price}</span>
           {product.originalPrice > product.price && (
-            <span style={{ fontSize: 12, color: '#9e9e9e', textDecoration: 'line-through' }}>₹{product.originalPrice}</span>
+            <span className="bq-result-orig-price">₹{product.originalPrice}</span>
           )}
         </div>
         <button
           onClick={handleAdd}
           disabled={product.stock === 0}
-          style={{
-            width: '100%',
-            padding: '9px 0',
-            background: product.stock === 0 ? '#e0e0e0' : 'linear-gradient(135deg, #c2185b, #e91e63)',
-            color: product.stock === 0 ? '#9e9e9e' : 'white',
-            border: 'none',
-            borderRadius: 12,
-            fontWeight: 700,
-            fontSize: 13,
-            cursor: product.stock === 0 ? 'not-allowed' : 'pointer',
-            transition: 'opacity 0.2s',
-          }}
-          onMouseEnter={e => { if (product.stock > 0) e.target.style.opacity = '0.9'; }}
-          onMouseLeave={e => { e.target.style.opacity = '1'; }}
+          className={`bq-result-add-btn ${product.stock === 0 ? 'disabled' : ''}`}
         >
           {product.stock === 0 ? '❌ Out of Stock' : '🛒 Add to Cart'}
         </button>
@@ -321,20 +285,16 @@ export default function BeautyQuiz() {
 
   if (phase === 'loading') {
     return (
-      <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 72, marginBottom: 24, animation: 'float 2s ease-in-out infinite' }}>🔮</div>
-          <h2 style={{ fontSize: 26, fontWeight: 800, background: 'linear-gradient(135deg, #c2185b, #f06292)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: 12 }}>
+      <div className="bq-loading-wrap">
+        <div className="bq-loading-inner">
+          <div className="bq-loading-icon">🔮</div>
+          <h2 className="bq-loading-title">
             Analyzing your Beauty Profile...
           </h2>
-          <p style={{ color: '#9e9e9e', fontSize: 15 }}>Handpicking products just for you ✨</p>
-          <div style={{ marginTop: 32, display: 'flex', gap: 8, justifyContent: 'center' }}>
+          <p className="bq-loading-sub">Handpicking products just for you ✨</p>
+          <div className="bq-loading-dots">
             {[0, 1, 2].map(i => (
-              <div key={i} style={{
-                width: 12, height: 12, borderRadius: '50%', background: '#c2185b',
-                animation: 'pulse 1s ease-in-out infinite',
-                animationDelay: `${i * 0.3}s`,
-              }} />
+              <div key={i} className="bq-loading-dot" />
             ))}
           </div>
         </div>
@@ -344,41 +304,24 @@ export default function BeautyQuiz() {
 
   if (phase === 'results' && profile) {
     return (
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '48px 20px 80px' }} className="animate-fade">
+      <div className="bq-results-wrap animate-fade">
         {/* Profile card */}
-        <div style={{
-          borderRadius: 28,
-          background: profile.gradient,
-          padding: '40px 36px',
-          textAlign: 'center',
-          marginBottom: 48,
-          boxShadow: '0 12px 48px rgba(0,0,0,0.15)',
-          position: 'relative',
-          overflow: 'hidden',
-        }}>
-          <div style={{ position: 'absolute', top: -30, right: -30, fontSize: 120, opacity: 0.08 }}>
+        <div className={`bq-profile-card ${profile.cls}`}>
+          <div className="bq-profile-watermark">
             {profile.emoji}
           </div>
-          <div style={{ fontSize: 64, marginBottom: 12, animation: 'bounceIn 0.6s ease-out' }}>
+          <div className="bq-profile-emoji">
             {profile.emoji}
           </div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: 2, marginBottom: 8, textTransform: 'uppercase' }}>
+          <div className="bq-profile-kicker">
             Your Beauty Profile
           </div>
-          <h1 style={{ fontSize: 32, fontWeight: 900, color: 'white', marginBottom: 20, textShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
+          <h1 className="bq-profile-name">
             {profile.name}
           </h1>
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div className="bq-profile-tags">
             {profile.tags.map(tag => (
-              <span key={tag} style={{
-                background: 'rgba(255,255,255,0.25)',
-                color: 'white',
-                padding: '6px 16px',
-                borderRadius: 20,
-                fontSize: 13,
-                fontWeight: 600,
-                backdropFilter: 'blur(4px)',
-              }}>
+              <span key={tag} className="bq-profile-tag">
                 {tag}
               </span>
             ))}
@@ -386,55 +329,41 @@ export default function BeautyQuiz() {
         </div>
 
         {/* Recommended products */}
-        <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <h2 style={{ fontSize: 26, fontWeight: 800, color: '#212121', marginBottom: 8 }}>
+        <div className="bq-results-heading-wrap">
+          <h2 className="bq-results-heading">
             ✨ Your Recommended Products
           </h2>
-          <p style={{ color: '#9e9e9e', fontSize: 15 }}>
+          <p className="bq-results-sub">
             Handpicked based on your beauty profile
           </p>
         </div>
 
         {products.length > 0 ? (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-            gap: 24,
-            marginBottom: 48,
-          }}>
-            {products.map((p, i) => (
-              <div key={p._id} style={{ animation: `fadeIn 0.4s ease-out ${i * 0.08}s both` }}>
+          <div className="bq-results-grid">
+            {products.map((p) => (
+              <div key={p._id}>
                 <ProductResultCard product={p} />
               </div>
             ))}
           </div>
         ) : (
-          <div style={{ textAlign: 'center', padding: '48px 20px', color: '#9e9e9e' }}>
-            <div style={{ fontSize: 48, marginBottom: 12 }}>🌸</div>
+          <div className="bq-no-results">
+            <div className="bq-no-results-icon">🌸</div>
             <p>No products matched your profile right now. Browse all products!</p>
           </div>
         )}
 
         {/* Actions */}
-        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+        <div className="bq-results-actions">
           <button
             onClick={retake}
-            style={{
-              padding: '14px 32px', borderRadius: 50, border: '2px solid #c2185b', background: 'transparent',
-              color: '#c2185b', fontWeight: 700, fontSize: 15, cursor: 'pointer', transition: 'all 0.2s',
-            }}
-            onMouseEnter={e => { e.target.style.background = '#fff0f5'; }}
-            onMouseLeave={e => { e.target.style.background = 'transparent'; }}
+            className="bq-retake-btn"
           >
             🔄 Retake Quiz
           </button>
           <Link
             to="/products"
-            style={{
-              padding: '14px 32px', borderRadius: 50, background: 'linear-gradient(135deg, #c2185b, #e91e63)',
-              color: 'white', fontWeight: 700, fontSize: 15, textDecoration: 'none', display: 'inline-block',
-              boxShadow: '0 4px 16px rgba(194,24,91,0.3)', transition: 'opacity 0.2s',
-            }}
+            className="bq-shop-link"
           >
             🛍️ Shop All Products
           </Link>
@@ -444,30 +373,25 @@ export default function BeautyQuiz() {
   }
 
   return (
-    <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
-      <div style={{ width: '100%', maxWidth: 580 }}>
+    <div className="bq-quiz-wrap">
+      <div className="bq-quiz-inner">
 
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <div style={{ fontSize: 52, marginBottom: 10, animation: 'float 3s ease-in-out infinite' }}>💄</div>
-          <h1 style={{ fontSize: 28, fontWeight: 900, background: 'linear-gradient(135deg, #c2185b, #f06292)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: 6 }}>
+        <div className="bq-quiz-header">
+          <div className="bq-quiz-header-icon">💄</div>
+          <h1 className="bq-quiz-title">
             Beauty Advisor Quiz
           </h1>
-          <p style={{ color: '#9e9e9e', fontSize: 14 }}>
+          <p className="bq-quiz-sub">
             Answer 5 quick questions — we'll build your Beauty Profile
           </p>
         </div>
 
         {/* Progress bar */}
-        <div style={{ background: '#f5f5f5', borderRadius: 50, height: 6, marginBottom: 8, overflow: 'hidden' }}>
-          <div style={{
-            height: '100%', borderRadius: 50,
-            background: 'linear-gradient(90deg, #c2185b, #f06292)',
-            width: `${progress}%`,
-            transition: 'width 0.4s ease',
-          }} />
+        <div className="bq-progress-track">
+          <div className="bq-progress-fill" style={{ '--progress': `${progress}%` }} />
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#bdbdbd', marginBottom: 28 }}>
+        <div className="bq-progress-meta">
           <span>Step {step + 1} of {QUESTIONS.length}</span>
           <span>{Math.round(progress)}% complete</span>
         </div>
@@ -475,23 +399,16 @@ export default function BeautyQuiz() {
         {/* Question card */}
         <div
           key={animKey}
-          className="animate-fade"
-          style={{
-            background: 'white',
-            borderRadius: 24,
-            padding: '32px 28px',
-            boxShadow: '0 8px 40px rgba(0,0,0,0.10)',
-            border: '1px solid #fce4ec',
-          }}
+          className="animate-fade bq-question-card"
         >
-          <div style={{ textAlign: 'center', marginBottom: 28 }}>
-            <span style={{ fontSize: 40 }}>{currentQ.emoji}</span>
-            <h2 style={{ fontSize: 20, fontWeight: 800, color: '#212121', marginTop: 10 }}>
+          <div className="bq-question-header">
+            <span className="bq-question-emoji">{currentQ.emoji}</span>
+            <h2 className="bq-question-text">
               {currentQ.question}
             </h2>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div className="bq-options-list">
             {currentQ.options.map(opt => (
               <QuizOption
                 key={opt.value}
@@ -502,17 +419,11 @@ export default function BeautyQuiz() {
             ))}
           </div>
 
-          <div style={{ display: 'flex', gap: 12, marginTop: 28 }}>
+          <div className="bq-nav-row">
             {step > 0 && (
               <button
                 onClick={handleBack}
-                style={{
-                  flex: 1, padding: '13px 0', borderRadius: 50, border: '2px solid #e0e0e0',
-                  background: 'transparent', color: '#757575', fontWeight: 700, fontSize: 14,
-                  cursor: 'pointer', transition: 'all 0.2s',
-                }}
-                onMouseEnter={e => { e.target.style.borderColor = '#c2185b'; e.target.style.color = '#c2185b'; }}
-                onMouseLeave={e => { e.target.style.borderColor = '#e0e0e0'; e.target.style.color = '#757575'; }}
+                className="bq-back-btn"
               >
                 ← Back
               </button>
@@ -520,22 +431,15 @@ export default function BeautyQuiz() {
             <button
               onClick={handleNext}
               disabled={!selected}
-              style={{
-                flex: 2, padding: '13px 0', borderRadius: 50, border: 'none',
-                background: selected ? 'linear-gradient(135deg, #c2185b, #e91e63)' : '#e0e0e0',
-                color: selected ? 'white' : '#9e9e9e',
-                fontWeight: 700, fontSize: 14, cursor: selected ? 'pointer' : 'not-allowed',
-                boxShadow: selected ? '0 4px 16px rgba(194,24,91,0.3)' : 'none',
-                transition: 'all 0.2s',
-              }}
+              className={`bq-next-btn ${selected ? 'active' : ''}`}
             >
               {step === QUESTIONS.length - 1 ? '✨ See My Profile' : 'Next →'}
             </button>
           </div>
         </div>
 
-        <div style={{ textAlign: 'center', marginTop: 20 }}>
-          <Link to="/products" style={{ fontSize: 13, color: '#bdbdbd', textDecoration: 'none' }}>
+        <div className="bq-skip-wrap">
+          <Link to="/products" className="bq-skip-link">
             Skip quiz — Browse all products
           </Link>
         </div>

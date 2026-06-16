@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../utils/api';
 import { toast } from 'react-toastify';
+import './ProductCard.css';
 
 export default function ProductCard({ product, wishlistIds = [], onWishlistToggle }) {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ export default function ProductCard({ product, wishlistIds = [], onWishlistToggl
 
   return (
     <div className="product-card animate-fade" onClick={() => navigate(url)}>
-      <div style={{ overflow: 'hidden', position: 'relative' }}>
+      <div className="product-card-media">
         <img
           src={product.images?.[0] || 'https://images.unsplash.com/photo-1520412099551-62b6bafeb5bb?w=400'}
           alt={product.name}
@@ -40,7 +41,7 @@ export default function ProductCard({ product, wishlistIds = [], onWishlistToggl
         />
         {product.isFeatured && <div className="product-badge">⭐ Featured</div>}
         {product.discount > 0 && (
-          <div style={{ position: 'absolute', top: 12, left: product.isFeatured ? 'auto' : 12, right: product.isFeatured ? 'auto' : 'auto', background: '#2e7d32', color: 'white', fontSize: 11, fontWeight: 700, padding: '4px 10px', borderRadius: 20, top: product.isFeatured ? 44 : 12, left: 12 }}>
+          <div className={`discount-badge ${product.isFeatured ? 'featured-shift' : ''}`}>
             -{product.discount}%
           </div>
         )}
@@ -57,7 +58,7 @@ export default function ProductCard({ product, wishlistIds = [], onWishlistToggl
         <div className="product-name">{product.name}</div>
         <div className="product-rating">
           {'⭐'.repeat(Math.round(product.rating || 4))}
-          <span style={{ color: '#558b2f', marginLeft: 4 }}>({product.numReviews || 0})</span>
+          <span className="product-review-count">({product.numReviews || 0})</span>
         </div>
         <div className="product-price-section">
           <span className="product-price">₹{product.price}</span>
@@ -66,14 +67,14 @@ export default function ProductCard({ product, wishlistIds = [], onWishlistToggl
           )}
           {product.discount > 0 && <span className="product-discount">{product.discount}% off</span>}
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button className="btn btn-primary" style={{ flex: 1, justifyContent: 'center' }} onClick={handleAddToCart}
+        <div className="product-card-actions">
+          <button className="btn btn-primary btn-add-cart" onClick={handleAddToCart}
             disabled={product.stock === 0}>
             {product.stock === 0 ? '❌ Out of Stock' : '🛒 Add to Cart'}
           </button>
         </div>
         {product.stock < 10 && product.stock > 0 && (
-          <div style={{ marginTop: 8, fontSize: 12, color: '#c62828', fontWeight: 600 }}>⚡ Only {product.stock} left!</div>
+          <div className="low-stock-warning">⚡ Only {product.stock} left!</div>
         )}
       </div>
     </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import './RefundPolicy.css';
 
 function useInView(threshold = 0.12) {
   const ref = useRef(null);
@@ -50,18 +51,18 @@ export default function RefundPolicy() {
   return (
     <div>
       {/* Hero */}
-      <div className="page-hero" style={{ textAlign: 'center', padding: '68px 24px', background: 'linear-gradient(135deg,#fff0f5,#fce4ec)' }}>
+      <div className="page-hero rfp-hero">
         <div className="container">
-          <div style={{ fontSize: 52, marginBottom: 14, animation: 'bounceIn 0.7s ease' }}>🔄</div>
-          <h1 className="section-title" style={{ fontSize: 40, color: 'var(--primary)', marginBottom: 12 }}>Refund & Return Policy</h1>
-          <p style={{ color: '#757575', fontSize: 15, maxWidth: 580, margin: '0 auto 20px', lineHeight: 1.8 }}>
+          <div className="rfp-hero-icon">🔄</div>
+          <h1 className="section-title rfp-hero-title">Refund & Return Policy</h1>
+          <p className="rfp-hero-sub">
             We want every Women HubClub order to delight you. If something goes wrong, our hassle-free return process makes it right.
           </p>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+          <div className="rfp-hero-stats">
             {[['7 Days', 'Return Window'], ['Free', 'Pickup'], ['5-7 Days', 'Refund Time'], ['100%', 'Hassle-Free']].map(([value, label]) => (
-              <div key={label} style={{ background: 'white', borderRadius: 14, padding: '14px 22px', textAlign: 'center', boxShadow: 'var(--shadow)' }}>
-                <div style={{ fontWeight: 800, fontSize: 22, color: 'var(--primary)' }}>{value}</div>
-                <div style={{ fontSize: 12, color: '#757575', fontWeight: 600 }}>{label}</div>
+              <div key={label} className="rfp-hero-stat">
+                <div className="rfp-hero-stat-value">{value}</div>
+                <div className="rfp-hero-stat-label">{label}</div>
               </div>
             ))}
           </div>
@@ -69,18 +70,18 @@ export default function RefundPolicy() {
       </div>
 
       {/* How It Works */}
-      <div className="section" style={{ background: 'white' }}>
+      <div className="section rfp-section-white">
         <div className="container">
-          <h2 className="section-title text-center" style={{ color: 'var(--primary)', marginBottom: 6 }}>How to Return</h2>
+          <h2 className="section-title text-center rfp-section-heading">How to Return</h2>
           <p className="section-subtitle text-center">4 simple steps to get your refund</p>
-          <div ref={stepsRef} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20, marginTop: 36 }}>
-            {steps.map((step, i) => (
+          <div ref={stepsRef} className="rfp-steps-grid">
+            {steps.map((step) => (
               <div key={step.step}
-                style={{ background: '#fff8fb', borderRadius: 20, padding: '28px 22px', textAlign: 'center', border: '1px solid #fce4ec', position: 'relative', opacity: stepsVisible ? 1 : 0, transform: stepsVisible ? 'none' : 'translateY(32px)', transition: `all 0.6s ${i * 0.12}s ease` }}>
-                <div style={{ position: 'absolute', top: -16, left: '50%', transform: 'translateX(-50%)', width: 32, height: 32, borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 14 }}>{step.step}</div>
-                <div style={{ fontSize: 44, marginTop: 12, marginBottom: 14, animation: `float ${2.5 + i * 0.4}s ease-in-out infinite` }}>{step.icon}</div>
-                <h3 style={{ fontWeight: 700, fontSize: 16, marginBottom: 10 }}>{step.title}</h3>
-                <p style={{ color: '#757575', fontSize: 13, lineHeight: 1.7 }}>{step.desc}</p>
+                className={`rfp-step-card ${stepsVisible ? 'visible' : ''}`}>
+                <div className="rfp-step-number">{step.step}</div>
+                <div className="rfp-step-icon">{step.icon}</div>
+                <h3 className="rfp-step-title">{step.title}</h3>
+                <p className="rfp-step-desc">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -88,33 +89,33 @@ export default function RefundPolicy() {
       </div>
 
       {/* Eligibility */}
-      <div className="section" style={{ background: '#fff8fb', borderTop: '1px solid #fce4ec' }}>
+      <div className="section rfp-elig-section">
         <div className="container">
-          <div ref={eligRef} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 28 }}>
+          <div ref={eligRef} className="rfp-elig-grid">
             {/* Eligible */}
-            <div style={{ background: 'white', borderRadius: 20, padding: 32, boxShadow: 'var(--shadow)', border: '1px solid var(--border)', opacity: eligVisible ? 1 : 0, transform: eligVisible ? 'none' : 'translateX(-24px)', transition: 'all 0.7s ease' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: '#e8f5e9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>✅</div>
-                <h3 style={{ fontWeight: 800, fontSize: 18, color: '#388e3c' }}>Eligible for Return</h3>
+            <div className={`rfp-elig-card ok ${eligVisible ? 'visible' : ''}`}>
+              <div className="rfp-elig-header">
+                <div className="rfp-elig-icon ok">✅</div>
+                <h3 className="rfp-elig-title ok">Eligible for Return</h3>
               </div>
               {eligibility.filter(e => e.ok).map((e, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12, opacity: eligVisible ? 1 : 0, transition: `all 0.5s ${0.2 + i * 0.07}s ease` }}>
-                  <span style={{ color: '#388e3c', fontWeight: 800, fontSize: 16, flexShrink: 0, marginTop: 2 }}>✓</span>
-                  <span style={{ fontSize: 14, color: '#555', lineHeight: 1.6 }}>{e.text}</span>
+                <div key={i} className="rfp-elig-item">
+                  <span className="rfp-elig-mark ok">✓</span>
+                  <span className="rfp-elig-text">{e.text}</span>
                 </div>
               ))}
             </div>
 
             {/* Not Eligible */}
-            <div style={{ background: 'white', borderRadius: 20, padding: 32, boxShadow: 'var(--shadow)', border: '1px solid var(--border)', opacity: eligVisible ? 1 : 0, transform: eligVisible ? 'none' : 'translateX(24px)', transition: 'all 0.7s 0.15s ease' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: '#ffebee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>❌</div>
-                <h3 style={{ fontWeight: 800, fontSize: 18, color: '#c62828' }}>Not Eligible</h3>
+            <div className={`rfp-elig-card no ${eligVisible ? 'visible' : ''}`}>
+              <div className="rfp-elig-header">
+                <div className="rfp-elig-icon no">❌</div>
+                <h3 className="rfp-elig-title no">Not Eligible</h3>
               </div>
               {eligibility.filter(e => !e.ok).map((e, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 12, opacity: eligVisible ? 1 : 0, transition: `all 0.5s ${0.35 + i * 0.07}s ease` }}>
-                  <span style={{ color: '#c62828', fontWeight: 800, fontSize: 16, flexShrink: 0, marginTop: 2 }}>✗</span>
-                  <span style={{ fontSize: 14, color: '#757575', lineHeight: 1.6 }}>{e.text}</span>
+                <div key={i} className="rfp-elig-item">
+                  <span className="rfp-elig-mark no">✗</span>
+                  <span className="rfp-elig-text no">{e.text}</span>
                 </div>
               ))}
             </div>
@@ -123,11 +124,11 @@ export default function RefundPolicy() {
       </div>
 
       {/* Refund Timeline */}
-      <div className="section" style={{ background: 'white' }}>
-        <div className="container" style={{ maxWidth: 720 }}>
-          <h2 className="section-title text-center" style={{ color: 'var(--primary)', marginBottom: 6 }}>Refund Timeline</h2>
+      <div className="section rfp-section-white">
+        <div className="container rfp-timeline-container">
+          <h2 className="section-title text-center rfp-section-heading">Refund Timeline</h2>
           <p className="section-subtitle text-center">Expected time for your money back</p>
-          <div style={{ marginTop: 32, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div className="rfp-timeline-list">
             {[
               { method: 'UPI / PhonePe / GPay', time: '2-3 business days', icon: '📱' },
               { method: 'Credit / Debit Card', time: '5-7 business days', icon: '💳' },
@@ -135,10 +136,10 @@ export default function RefundPolicy() {
               { method: 'Wallet (Paytm etc.)', time: '1-2 business days', icon: '👛' },
               { method: 'Cash on Delivery', time: '7-10 business days (bank transfer)', icon: '💵' },
             ].map((item, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 16, background: '#fff8fb', borderRadius: 14, padding: '16px 20px', border: '1px solid #fce4ec' }}>
-                <span style={{ fontSize: 28 }}>{item.icon}</span>
-                <span style={{ flex: 1, fontWeight: 600, fontSize: 14 }}>{item.method}</span>
-                <span style={{ color: 'var(--primary)', fontWeight: 700, fontSize: 14 }}>{item.time}</span>
+              <div key={i} className="rfp-timeline-item">
+                <span className="rfp-timeline-icon">{item.icon}</span>
+                <span className="rfp-timeline-method">{item.method}</span>
+                <span className="rfp-timeline-time">{item.time}</span>
               </div>
             ))}
           </div>
@@ -148,18 +149,18 @@ export default function RefundPolicy() {
       {/* FAQ */}
       <div className="forest-section">
         <div className="container">
-          <h2 className="section-title text-center" style={{ color: 'var(--primary)', marginBottom: 6 }}>Frequently Asked Questions</h2>
+          <h2 className="section-title text-center rfp-section-heading">Frequently Asked Questions</h2>
           <p className="section-subtitle text-center">Everything you need to know about returns</p>
-          <div ref={faqRef} style={{ maxWidth: 700, margin: '32px auto 0', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div ref={faqRef} className="rfp-faq-list">
             {faqs.map((faq, i) => (
-              <div key={i} style={{ background: 'white', borderRadius: 12, overflow: 'hidden', border: '1px solid var(--border)', boxShadow: 'var(--shadow)', opacity: faqVisible ? 1 : 0, transform: faqVisible ? 'none' : 'translateY(16px)', transition: `all 0.5s ${i * 0.08}s ease` }}>
+              <div key={i} className={`rfp-faq-item ${faqVisible ? 'visible' : ''}`}>
                 <div onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  style={{ padding: '16px 22px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 600, fontSize: 14 }}>
+                  className="rfp-faq-question">
                   <span>{faq.q}</span>
-                  <span style={{ fontSize: 18, color: 'var(--primary)', transition: 'transform 0.25s', transform: openFaq === i ? 'rotate(45deg)' : 'none', flexShrink: 0 }}>+</span>
+                  <span className={`rfp-faq-toggle ${openFaq === i ? 'open' : ''}`}>+</span>
                 </div>
                 {openFaq === i && (
-                  <div style={{ padding: '0 22px 16px', color: '#757575', fontSize: 14, lineHeight: 1.8, borderTop: '1px solid #f5f5f5', paddingTop: 14 }}>
+                  <div className="rfp-faq-answer">
                     {faq.a}
                   </div>
                 )}
@@ -170,14 +171,14 @@ export default function RefundPolicy() {
       </div>
 
       {/* CTA */}
-      <div style={{ background: 'var(--primary)', padding: '56px 24px', textAlign: 'center' }}>
+      <div className="rfp-cta">
         <div className="container">
-          <div style={{ fontSize: 40, marginBottom: 12 }}>💗</div>
-          <h2 style={{ color: 'white', fontSize: 28, fontWeight: 800, marginBottom: 12 }}>Still have questions?</h2>
-          <p style={{ color: 'rgba(255,255,255,0.8)', marginBottom: 24, fontSize: 15 }}>Our support team is available 7 days a week, 9AM to 9PM.</p>
-          <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/contact" className="btn btn-lg" style={{ background: 'white', color: 'var(--primary)', fontWeight: 700 }}>Contact Support</Link>
-            <Link to="/orders" className="btn btn-lg" style={{ background: 'transparent', border: '2px solid rgba(255,255,255,0.5)', color: 'white' }}>My Orders →</Link>
+          <div className="rfp-cta-icon">💗</div>
+          <h2 className="rfp-cta-title">Still have questions?</h2>
+          <p className="rfp-cta-sub">Our support team is available 7 days a week, 9AM to 9PM.</p>
+          <div className="rfp-cta-buttons">
+            <Link to="/contact" className="btn btn-lg rfp-cta-btn-white">Contact Support</Link>
+            <Link to="/orders" className="btn btn-lg rfp-cta-btn-outline">My Orders →</Link>
           </div>
         </div>
       </div>

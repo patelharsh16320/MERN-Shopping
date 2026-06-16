@@ -448,8 +448,29 @@ tbody tr:hover { background: #fff8fb; }
 .invoice-container { background: white; border-radius: 16px; padding: 44px; max-width: 800px; margin: 0 auto; box-shadow: var(--shadow); border: 1px solid var(--border); }
 .invoice-header { display: flex; justify-content: space-between; margin-bottom: 36px; }
 
+/* ── Generic scroll-reveal (IntersectionObserver-driven fade-in) ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition-property: opacity, transform;
+  transition-duration: 0.7s;
+  transition-timing-function: ease;
+  transition-delay: 0s;
+}
+.reveal.visible { opacity: 1; transform: none; }
+.reveal.delay-1 { transition-delay: 0.15s; }
+.reveal.delay-2 { transition-delay: 0.3s; }
+.reveal.delay-3 { transition-delay: 0.5s; }
+
+/* ── Sortable table headers (reused across admin/order tables) ── */
+.sort-th { cursor: pointer; user-select: none; white-space: nowrap; }
+.sort-th-arrow { font-size: 9px; opacity: 0.25; }
+.sort-th-arrow.active { opacity: 1; }
+
 /* ── Pagination ── */
 .pagination { display: flex; gap: 7px; justify-content: center; margin-top: 28px; }
+.pagination-tight { margin-top: 16px; }
+.pagination-ellipsis { padding: 0 6px; color: #9e9e9e; align-self: center; }
 .page-btn { width: 38px; height: 38px; border: 1px solid var(--border); background: white; border-radius: 8px; cursor: pointer; font-family: 'Poppins', sans-serif; font-weight: 600; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; font-size: 14px; }
 .page-btn:hover, .page-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
@@ -534,7 +555,7 @@ tbody tr:hover { background: #fff8fb; }
 .layout-two-col        { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: center; }
 
 /* Hide mobile-right on desktop, navbar-nav on mobile handled below */
-.mobile-right { display: none; }
+.mobile-right { display: none; align-items: center; gap: 8px; }
 
 /* ── Mobile hamburger ── */
 .mobile-menu-btn {
@@ -806,7 +827,7 @@ tbody tr:hover { background: #fff8fb; }
 
 /* Touch targets — minimum 44px for all interactive elements */
 button, .btn, a.nav-link, .sidebar-item { min-height: 44px; }
-
+button[class*="-dot"] { min-height: 7px !important; }
 /* Checkout & forms */
 @media (max-width: 640px) {
   .checkout-layout { flex-direction: column; }
@@ -903,3 +924,11 @@ img, video, svg { max-width: 100%; height: auto; }
 @media (min-width: 769px) {
   .mobile-only { display: none !important; }
 }
+
+/* ── App layout ── */
+.main-content { position: relative; z-index: 1; padding-top: 68px; }
+.coming-soon-wrap { min-height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 60px 20px; }
+.coming-soon-icon { font-size: 72px; margin-bottom: 16px; }
+.coming-soon-title { font-size: 32px; font-weight: 800; margin-bottom: 12px; }
+.coming-soon-text { color: #636e72; font-size: 16px; max-width: 400px; }
+.coming-soon-btn { margin-top: 28px; padding: 12px 32px; border-radius: 30px; border: none; background: linear-gradient(135deg,#6c63ff,#fd79a8); color: white; font-weight: 700; font-size: 15px; cursor: pointer; }

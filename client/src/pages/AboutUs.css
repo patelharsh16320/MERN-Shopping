@@ -1,0 +1,48 @@
+.au-hero { text-align: center; padding: 72px 24px; }
+.au-hero-icon { font-size: 56px; margin-bottom: 14px; animation: float 3s ease-in-out infinite; }
+.au-hero-title { font-size: 44px; color: var(--primary); margin-bottom: 14px; }
+.au-hero-sub { color: #757575; font-size: 17px; max-width: 580px; margin: 0 auto 28px; line-height: 1.8; }
+
+.au-stats-section { background: var(--primary); padding: 44px 24px; }
+.au-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 28px; text-align: center; }
+.au-stats-grid > div:nth-child(1) { animation-delay: 0s; }
+.au-stats-grid > div:nth-child(2) { animation-delay: 0.1s; }
+.au-stats-grid > div:nth-child(3) { animation-delay: 0.2s; }
+.au-stats-grid > div:nth-child(4) { animation-delay: 0.3s; }
+.au-stat-value { font-size: 36px; font-weight: 800; color: white; margin-bottom: 6px; }
+.au-stat-label { color: rgba(255,255,255,0.75); font-size: 14px; }
+
+.au-story-cols { gap: 56px; }
+.au-story-img-wrap { text-align: center; }
+.au-story-emoji { font-size: 110px; animation: float 3s ease-in-out infinite; }
+.au-story-heading { color: var(--primary); margin-bottom: 18px; }
+.au-story-text { color: #757575; line-height: 1.9; margin-bottom: 16px; font-size: 15px; }
+.au-story-text.last { margin-bottom: 0; }
+
+.au-section-heading { color: var(--primary); margin-bottom: 6px; }
+
+.au-values-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px; }
+.au-values-grid .contact-card:nth-child(1) { animation-delay: 0s; }
+.au-values-grid .contact-card:nth-child(2) { animation-delay: 0.12s; }
+.au-values-grid .contact-card:nth-child(3) { animation-delay: 0.24s; }
+.au-values-grid .contact-card:nth-child(4) { animation-delay: 0.36s; }
+.au-value-title { font-weight: 700; margin-bottom: 10px; font-size: 17px; }
+.au-value-desc { color: #757575; font-size: 14px; line-height: 1.7; }
+
+.au-team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; }
+.au-team-card { padding: 32px; text-align: center; }
+.au-team-card:nth-child(1) { animation-delay: 0s; }
+.au-team-card:nth-child(2) { animation-delay: 0.12s; }
+.au-team-card:nth-child(3) { animation-delay: 0.24s; }
+.au-team-emoji { font-size: 64px; margin-bottom: 14px; animation: float 3s ease-in-out infinite; }
+.au-team-card:nth-child(1) .au-team-emoji { animation-delay: 0s; }
+.au-team-card:nth-child(2) .au-team-emoji { animation-delay: 0.4s; }
+.au-team-card:nth-child(3) .au-team-emoji { animation-delay: 0.8s; }
+.au-team-name { font-weight: 700; font-size: 19px; margin-bottom: 3px; }
+.au-team-role { color: var(--primary); font-weight: 600; font-size: 13px; margin-bottom: 14px; }
+.au-team-bio { color: #757575; font-size: 14px; line-height: 1.7; }
+
+.au-cta-section { background: #fff0f5; padding: 72px 24px; text-align: center; border-top: 1px solid #fce4ec; }
+.au-cta-heading { font-size: 34px; font-weight: 800; color: var(--primary); margin-bottom: 14px; }
+.au-cta-sub { color: #757575; font-size: 17px; margin-bottom: 28px; }
+.au-cta-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }

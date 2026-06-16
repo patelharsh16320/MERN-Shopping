@@ -1,0 +1,65 @@
+.od-confirm-banner { background: linear-gradient(135deg, #6c63ff, #c2185b); padding: 20px 24px; text-align: center; animation: fadeIn 0.5s ease; }
+.od-confirm-inner { display: flex; align-items: center; justify-content: center; gap: 14px; flex-wrap: wrap; }
+.od-confirm-emoji { font-size: 32px; }
+.od-confirm-text { color: white; }
+.od-confirm-title { font-weight: 800; font-size: 20px; }
+.od-confirm-sub { font-size: 14px; opacity: 0.85; }
+
+.od-header-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
+.od-title { margin-bottom: 4px; }
+.od-meta { color: #636e72; font-size: 14px; }
+.od-status-badge { font-size: 14px; padding: 10px 20px; }
+
+.od-page-body { padding-bottom: 60px; }
+
+.od-progress-panel { background: white; border-radius: 24px; padding: 32px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(108,99,255,0.1); animation: fadeIn 0.5s ease; }
+.od-progress-heading { margin-bottom: 28px; font-weight: 700; }
+.od-progress-track { display: flex; align-items: center; }
+.od-step-wrap { display: flex; flex-direction: column; align-items: center; flex: 1; }
+.od-step-circle { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; transition: all 0.5s; background: #f0f0f0; color: #bdbdbd; z-index: 1; }
+.od-step-circle.reached { background: linear-gradient(135deg,#6c63ff,#fd79a8); color: white; box-shadow: 0 4px 14px rgba(108,99,255,0.35); }
+.od-step-circle.checked { font-size: 20px; }
+.od-step-label { margin-top: 10px; font-size: 12px; font-weight: 400; color: #9e9e9e; text-align: center; }
+.od-step-label.reached { font-weight: 700; color: #6c63ff; }
+.od-step-current { font-size: 10px; color: #c2185b; font-weight: 600; margin-top: 2px; }
+.od-step-line { flex: 1; height: 4px; background: #f0f0f0; border-radius: 2px; transition: all 0.5s; margin-bottom: 28px; }
+.od-step-line.done { background: linear-gradient(90deg,#6c63ff,#fd79a8); }
+
+.od-tracking-box { margin-top: 20px; padding: 12px 18px; background: #f0f4ff; border-radius: 12px; display: flex; align-items: center; gap: 10px; }
+.od-tracking-icon { font-size: 20px; }
+.od-tracking-label { font-size: 12px; color: #9e9e9e; font-weight: 600; }
+.od-tracking-number { font-family: monospace; font-weight: 700; color: #6c63ff; font-size: 15px; }
+
+.od-card { background: white; border-radius: 24px; padding: 28px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(108,99,255,0.1); }
+.od-card.last { margin-bottom: 0; }
+.od-card-heading { font-weight: 700; margin-bottom: 20px; }
+.od-card-heading.tight { margin-bottom: 16px; }
+
+.od-item-row { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px dashed #f0f0f0; align-items: center; }
+.od-item-row.no-border { border-bottom: none; }
+.od-item-img { width: 72px; height: 72px; border-radius: 14px; object-fit: cover; background: #fce4ec; flex-shrink: 0; }
+.od-item-info { flex: 1; }
+.od-item-name { font-weight: 600; font-size: 15px; margin-bottom: 3px; }
+.od-item-meta { font-size: 13px; color: #9e9e9e; }
+.od-item-subtotal { font-weight: 700; font-size: 16px; color: #6c63ff; }
+
+.od-address-text { color: #636e72; line-height: 2; font-size: 14px; }
+.od-address-name { font-weight: 600; color: #212121; font-size: 15px; }
+
+.od-payment-rows { display: flex; flex-direction: column; gap: 12px; }
+.od-payment-row { display: flex; justify-content: space-between; font-size: 14px; }
+.od-payment-label { color: #9e9e9e; }
+.od-payment-value { font-weight: 600; }
+.od-payment-value.mono { font-family: monospace; }
+.od-payment-status-pill { padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+.od-payment-status-pill.paid { background: #e8f5e9; color: #2e7d32; }
+.od-payment-status-pill.unpaid { background: #fff8e1; color: #f57f17; }
+.od-txn-id { font-family: monospace; font-size: 12px; color: #6c63ff; }
+
+.od-summary-card { margin-bottom: 20px; }
+.od-free-text { color: #00b894; }
+.od-total-amount { font-size: 22px; }
+.od-received-banner { margin-top: 14px; padding: 10px 14px; background: #e8f5e9; border-radius: 12px; font-size: 13px; color: #2e7d32; font-weight: 600; text-align: center; }
+
+.od-actions-wrap { display: flex; flex-direction: column; gap: 12px; }
+.od-action-btn { justify-content: center; width: 100%; }

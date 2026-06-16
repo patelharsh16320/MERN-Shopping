@@ -1,8 +1,27 @@
 const fs   = require('fs');
 const path = require('path');
+const User = require('../models/User');
 
 const LOGS_DIR   = path.join(__dirname, '..', 'logs');
 const MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+// Cache user email/name lookups briefly so we don't hit the DB on every single request
+const USER_CACHE_TTL_MS = 5 * 60 * 1000;
+const userCache = new Map(); // id -> { email, name, ts }
+
+async function getUserInfo(userId) {
+  if (!userId) return null;
+  const cached = userCache.get(userId);
+  if (cached && Date.now() - cached.ts < USER_CACHE_TTL_MS) return cached;
+  try {
+    const user = await User.findById(userId).select('email name').lean();
+    const info = { email: user?.email || '?', name: user?.name || '?', ts: Date.now() };
+    userCache.set(userId, info);
+    return info;
+  } catch {
+    return null;
+  }
+}
 
 function ensureLogsDir() {
   if (!fs.existsSync(LOGS_DIR)) fs.mkdirSync(LOGS_DIR, { recursive: true });
@@ -70,7 +89,7 @@ module.exports = function requestLogger(req, res, next) {
   // Capture body for event detection (body is already parsed by express.json())
   const body = req.body;
 
-  res.on('finish', () => {
+  res.on('finish', async () => {
     const ms  = Date.now() - start;
     const ip  = (req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '-').split(',')[0].trim();
     const tag = res.statusCode < 400 ? eventTag(req, body) : '';
@@ -81,10 +100,13 @@ module.exports = function requestLogger(req, res, next) {
     if (tag === '[EMAIL_CHANGE]')                    extra = `  new_email=${body?.email || '?'}`;
     if (tag === '[PROFILE_UPDATE]' && body?.name)    extra = `  name=${body.name}`;
 
+    const userInfo = await getUserInfo(userId);
+    const userLabel = userInfo ? `${userInfo.email} (${userInfo.name})` : 'guest';
+
     const line = [
       formatTime(new Date()),
       ip.padEnd(20),
-      (userId || 'guest').padEnd(28),
+      userLabel.padEnd(40),
       req.method.padEnd(7),
       String(res.statusCode).padEnd(4),
       `${ms}ms`.padEnd(8),

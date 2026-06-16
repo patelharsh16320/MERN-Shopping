@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import './Register.css';
 
 export default function Register() {
   const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
@@ -21,8 +22,8 @@ export default function Register() {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{ fontSize: 56, marginBottom: 8, animation: 'bounceIn 0.8s ease' }}>💗</div>
+        <div className="register-header">
+          <div className="register-icon">💗</div>
           <h1 className="auth-title gradient-text">Create Account</h1>
           <p className="auth-subtitle">Join the Women HubClub sisterhood today</p>
         </div>
@@ -38,9 +39,9 @@ export default function Register() {
           </div>
           <div className="form-group">
             <label className="form-label">Password</label>
-            <div style={{ position: 'relative' }}>
-              <input className="form-input" type={showPwd ? 'text' : 'password'} placeholder="Min 6 characters" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} required style={{ paddingRight: 48 }} />
-              <button type="button" onClick={() => setShowPwd(!showPwd)} style={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 18 }}>
+            <div className="register-pwd-wrap">
+              <input className="form-input register-pwd-input" type={showPwd ? 'text' : 'password'} placeholder="Min 6 characters" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} required />
+              <button type="button" onClick={() => setShowPwd(!showPwd)} className="register-pwd-toggle">
                 {showPwd ? '🙈' : '👁'}
               </button>
             </div>
@@ -49,13 +50,13 @@ export default function Register() {
             <label className="form-label">Confirm Password</label>
             <input className="form-input" type="password" placeholder="Repeat password" value={form.confirm} onChange={e => setForm({ ...form, confirm: e.target.value })} required />
           </div>
-          <button className="btn btn-primary btn-lg" style={{ width: '100%', justifyContent: 'center' }} type="submit" disabled={loading}>
+          <button className="btn btn-primary btn-lg register-submit-btn" type="submit" disabled={loading}>
             {loading ? '⏳ Creating...' : '🌸 Create Account'}
           </button>
         </form>
 
-        <div style={{ textAlign: 'center', marginTop: 20, fontSize: 14, color: '#636e72' }}>
-          Already have an account? <Link to="/login" style={{ color: '#6c63ff', fontWeight: 600, textDecoration: 'none' }}>Sign in</Link>
+        <div className="register-footer-text">
+          Already have an account? <Link to="/login" className="register-footer-link">Sign in</Link>
         </div>
       </div>
     </div>

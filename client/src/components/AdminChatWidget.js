@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { initSocket } from '../utils/socket';
 import API from '../utils/api';
 import { toast } from 'react-toastify';
+import './AdminChatWidget.css';
 
 const fmt = (d) => new Date(d).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 const fmtDate = (d) => {
@@ -144,69 +145,59 @@ export default function AdminChatWidget() {
   };
 
   return (
-    <div style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 9998 }}>
+    <div className="admin-chat-wrap">
       {open && (
-        <div style={{
-          position: 'absolute', bottom: 62, right: 0,
-          width: 340, height: 500,
-          background: 'white', borderRadius: 20,
-          boxShadow: '0 8px 40px rgba(0,0,0,0.18)',
-          display: 'flex', flexDirection: 'column',
-          overflow: 'hidden', border: '1px solid #e0e0e0',
-          animation: 'zoomIn 0.25s ease',
-        }}>
+        <div className="admin-chat-panel">
           {/* Header */}
-          <div style={{ background: 'linear-gradient(135deg,#6c63ff,#a29bfe)', padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div className="admin-chat-header">
             {view === 'chat' && (
-              <button onClick={backToList} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white', width: 28, height: 28, borderRadius: '50%', cursor: 'pointer', fontSize: 14, flexShrink: 0 }}>←</button>
+              <button onClick={backToList} className="admin-chat-back-btn">←</button>
             )}
-            <div style={{ flex: 1 }}>
-              <div style={{ color: 'white', fontWeight: 700, fontSize: 14 }}>
+            <div className="admin-chat-header-info">
+              <div className="admin-chat-header-title">
                 {view === 'chat' ? activeRoom?.userName : 'Support Chats'}
               </div>
-              <div style={{ color: 'rgba(255,255,255,0.75)', fontSize: 11 }}>
+              <div className="admin-chat-header-sub">
                 {view === 'list'
                   ? `${sessions.length} conversation${sessions.length !== 1 ? 's' : ''}`
                   : onlineUsers.has(activeRoom?.userId) ? '🟢 Online' : '⚫ Offline'}
               </div>
             </div>
-            <button onClick={() => setOpen(false)} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', color: 'white', width: 28, height: 28, borderRadius: '50%', cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>✕</button>
+            <button onClick={() => setOpen(false)} className="admin-chat-close-btn">✕</button>
           </div>
 
           {/* List view */}
           {view === 'list' && (
-            <div style={{ flex: 1, overflowY: 'auto' }}>
+            <div className="admin-chat-list">
               {sessions.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9e9e9e' }}>
-                  <div style={{ fontSize: 36, marginBottom: 8 }}>💬</div>
-                  <div style={{ fontWeight: 600, fontSize: 14 }}>No chats yet</div>
-                  <div style={{ fontSize: 12, marginTop: 4 }}>Users will appear here when they start a chat</div>
+                <div className="admin-chat-empty">
+                  <div className="admin-chat-empty-icon">💬</div>
+                  <div className="admin-chat-empty-title">No chats yet</div>
+                  <div className="admin-chat-empty-sub">Users will appear here when they start a chat</div>
                 </div>
               ) : sessions.map(s => {
                 const isOnline = onlineUsers.has(s._id);
                 return (
                   <div key={s._id} onClick={() => openRoom(s._id, s.user?.name || 'User')}
-                    style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid #f5f5f5', transition: 'background 0.15s' }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#f8f7ff'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'white'}>
-                    <div style={{ position: 'relative', flexShrink: 0 }}>
-                      <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'linear-gradient(135deg,#6c63ff,#fd79a8)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: 16 }}>
+                    className="admin-chat-session">
+                    <div className="admin-chat-avatar-wrap">
+                      <div className="admin-chat-avatar">
                         {(s.user?.name || '?')[0].toUpperCase()}
                       </div>
-                      {isOnline && <span style={{ position: 'absolute', bottom: 1, right: 1, width: 11, height: 11, borderRadius: '50%', background: '#69f0ae', border: '2px solid white' }} />}
+                      {isOnline && <span className="admin-chat-online-dot" />}
                     </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                        <span style={{ fontWeight: 700, fontSize: 13, color: '#212121' }}>{s.user?.name || 'Unknown'}</span>
-                        <span style={{ fontSize: 10, color: '#bdbdbd' }}>{fmtDate(s.lastMessage?.createdAt)}</span>
+                    <div className="admin-chat-session-body">
+                      <div className="admin-chat-session-top">
+                        <span className="admin-chat-session-name">{s.user?.name || 'Unknown'}</span>
+                        <span className="admin-chat-session-time">{fmtDate(s.lastMessage?.createdAt)}</span>
                       </div>
-                      <div style={{ fontSize: 12, color: '#9e9e9e', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 2 }}>
-                        {s.lastMessage?.senderRole === 'admin' && <span style={{ color: '#6c63ff' }}>You: </span>}
+                      <div className="admin-chat-session-preview">
+                        {s.lastMessage?.senderRole === 'admin' && <span className="admin-chat-session-you">You: </span>}
                         {s.lastMessage?.message}
                       </div>
                     </div>
                     {s.unread > 0 && (
-                      <span style={{ background: '#d63031', color: 'white', borderRadius: '50%', width: 20, height: 20, fontSize: 11, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <span className="admin-chat-session-unread">
                         {s.unread}
                       </span>
                     )}
@@ -219,21 +210,22 @@ export default function AdminChatWidget() {
           {/* Chat view */}
           {view === 'chat' && (
             <>
-              <div style={{ flex: 1, overflowY: 'auto', padding: '14px 14px 4px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div className="admin-chat-messages">
                 {messages.length === 0 && (
-                  <div style={{ textAlign: 'center', color: '#9e9e9e', padding: '30px 20px', fontSize: 13 }}>
+                  <div className="admin-chat-messages-empty">
                     Start the conversation with {activeRoom?.userName}
                   </div>
                 )}
                 {messages.map((m, i) => {
                   const isAdmin = m.senderRole === 'admin';
+                  const side = isAdmin ? 'is-admin' : 'is-user';
                   return (
-                    <div key={m._id || i} style={{ display: 'flex', justifyContent: isAdmin ? 'flex-end' : 'flex-start' }}>
-                      <div style={{ maxWidth: '78%' }}>
-                        <div style={{ padding: '9px 13px', borderRadius: isAdmin ? '16px 16px 4px 16px' : '16px 16px 16px 4px', background: isAdmin ? 'linear-gradient(135deg,#6c63ff,#a29bfe)' : '#f5f5f5', color: isAdmin ? 'white' : '#212121', fontSize: 13, lineHeight: 1.5, wordBreak: 'break-word' }}>
+                    <div key={m._id || i} className={`admin-chat-msg-row ${side}`}>
+                      <div className="admin-chat-msg-bubble-wrap">
+                        <div className={`admin-chat-msg-bubble ${side}`}>
                           {m.message}
                         </div>
-                        <div style={{ fontSize: 10, color: '#bdbdbd', marginTop: 2, textAlign: isAdmin ? 'right' : 'left', paddingLeft: isAdmin ? 0 : 4, paddingRight: isAdmin ? 4 : 0 }}>
+                        <div className={`admin-chat-msg-time ${side}`}>
                           {fmt(m.createdAt)}
                         </div>
                       </div>
@@ -241,19 +233,19 @@ export default function AdminChatWidget() {
                   );
                 })}
                 {userTyping && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <div style={{ background: '#f5f5f5', borderRadius: '16px 16px 16px 4px', padding: '8px 14px', display: 'flex', gap: 4 }}>
-                      {[0,1,2].map(i => <span key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#6c63ff', display: 'inline-block', animation: `bounce 1.2s ${i * 0.2}s ease-in-out infinite` }} />)}
+                  <div className="admin-chat-typing-row">
+                    <div className="admin-chat-typing-bubble">
+                      {[0,1,2].map(i => <span key={i} className="admin-chat-typing-dot" />)}
                     </div>
                   </div>
                 )}
                 <div ref={bottomRef} />
               </div>
-              <div style={{ padding: '10px 12px', borderTop: '1px solid #f5f5f5', display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+              <div className="admin-chat-input-row">
                 <textarea value={input} onChange={handleInputChange} onKeyDown={handleKey} placeholder="Reply… (Enter to send)" rows={1}
-                  style={{ flex: 1, resize: 'none', border: '1.5px solid #e0e0e0', borderRadius: 12, padding: '9px 12px', fontSize: 13, fontFamily: 'inherit', outline: 'none', maxHeight: 80, overflowY: 'auto', lineHeight: 1.4 }} />
+                  className="admin-chat-textarea" />
                 <button onClick={sendMessage} disabled={!input.trim()}
-                  style={{ width: 38, height: 38, borderRadius: '50%', border: 'none', background: input.trim() ? 'linear-gradient(135deg,#6c63ff,#a29bfe)' : '#f5f5f5', color: input.trim() ? 'white' : '#bdbdbd', cursor: input.trim() ? 'pointer' : 'default', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'all 0.2s' }}>
+                  className={`admin-chat-send-btn ${input.trim() ? 'active' : ''}`}>
                   ➤
                 </button>
               </div>
@@ -264,12 +256,10 @@ export default function AdminChatWidget() {
 
       {/* Floating button — badge always visible while there are unread messages */}
       <button onClick={() => { setOpen(v => !v); if (!open) loadSessions(); }}
-        style={{ width: 52, height: 52, borderRadius: '50%', border: 'none', background: 'linear-gradient(135deg,#6c63ff,#a29bfe)', color: 'white', fontSize: 22, cursor: 'pointer', boxShadow: '0 4px 18px rgba(108,99,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', transition: 'transform 0.2s' }}
-        onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.08)'}
-        onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}>
+        className="admin-chat-fab">
         {open ? '✕' : '💬'}
         {unread > 0 && (
-          <span style={{ position: 'absolute', top: -4, right: -4, background: '#d63031', color: 'white', borderRadius: '50%', minWidth: 20, height: 20, fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid white', padding: '0 3px', animation: 'pulse 1.5s ease-in-out infinite' }}>
+          <span className="admin-chat-fab-badge">
             {unread > 99 ? '99+' : unread}
           </span>
         )}

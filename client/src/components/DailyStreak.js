@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { authAPI } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'react-toastify';
+import './DailyStreak.css';
 
 const MILESTONES = [
   { day: 7, reward: '10% OFF', emoji: '🎁' },
@@ -51,40 +52,29 @@ export default function DailyStreak() {
   const weekPos = streak.current === 0 ? 0 : ((streak.current - 1) % 7) + 1;
 
   return (
-    <div style={{ background: 'linear-gradient(135deg, #fff0f5 0%, #fce4ec 100%)', borderTop: '1px solid #f8bbd0', borderBottom: '1px solid #f8bbd0' }}>
-      <div className="container" style={{ padding: '22px 24px' }}>
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap',
-          justifyContent: 'space-between',
-        }}>
+    <div className="streak-banner">
+      <div className="container streak-inner">
+        <div className="streak-row">
           {/* Streak count */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ fontSize: 40, animation: streak.checkedToday ? 'pulse 1.5s ease-in-out infinite' : 'none' }}>🔥</div>
+          <div className="streak-count-wrap">
+            <div className={`streak-fire ${streak.checkedToday ? 'checked-today' : ''}`}>🔥</div>
             <div>
-              <div style={{ fontWeight: 800, fontSize: 20, color: '#c2185b', lineHeight: 1 }}>
+              <div className="streak-count-text">
                 {streak.current}-day streak
               </div>
-              <div style={{ fontSize: 12, color: '#9e9e9e', marginTop: 4 }}>
+              <div className="streak-longest-text">
                 Longest: {streak.longest} days
-                {daysLeft > 0 && <> · <strong style={{ color: '#c2185b' }}>{daysLeft} days</strong> to {nextMilestone.reward} {nextMilestone.emoji}</>}
+                {daysLeft > 0 && <> · <strong className="streak-days-left">{daysLeft} days</strong> to {nextMilestone.reward} {nextMilestone.emoji}</>}
               </div>
             </div>
           </div>
 
           {/* Week dots */}
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          <div className="streak-week-dots">
             {Array.from({ length: 7 }, (_, i) => {
               const filled = i < weekPos;
               return (
-                <div key={i} style={{
-                  width: 30, height: 30, borderRadius: '50%',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 13, fontWeight: 700,
-                  background: filled ? 'linear-gradient(135deg, #c2185b, #e91e63)' : 'white',
-                  color: filled ? 'white' : '#bdbdbd',
-                  border: filled ? 'none' : '2px dashed #f8bbd0',
-                  transition: 'all 0.3s',
-                }}>
+                <div key={i} className={`streak-dot ${filled ? 'filled' : ''}`}>
                   {filled ? '✓' : i + 1}
                 </div>
               );
@@ -92,17 +82,13 @@ export default function DailyStreak() {
           </div>
 
           {/* Progress to milestone */}
-          <div style={{ flex: '1 1 180px', minWidth: 160, maxWidth: 260 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, fontWeight: 600, color: '#9e9e9e', marginBottom: 5 }}>
+          <div className="streak-progress-wrap">
+            <div className="streak-progress-labels">
               <span>🎁 7d = 10% OFF</span>
               <span>👑 30d = 25% OFF</span>
             </div>
-            <div style={{ background: 'white', borderRadius: 50, height: 8, overflow: 'hidden', border: '1px solid #f8bbd0' }}>
-              <div style={{
-                height: '100%', width: `${progress}%`, borderRadius: 50,
-                background: 'linear-gradient(90deg, #c2185b, #f06292)',
-                transition: 'width 0.5s ease',
-              }} />
+            <div className="streak-progress-track">
+              <div className="streak-progress-fill" style={{ '--progress': `${progress}%` }} />
             </div>
           </div>
 
@@ -110,15 +96,7 @@ export default function DailyStreak() {
           <button
             onClick={handleCheckIn}
             disabled={streak.checkedToday || checking}
-            style={{
-              padding: '12px 26px', borderRadius: 50, border: 'none',
-              background: streak.checkedToday ? '#e8f5e9' : 'linear-gradient(135deg, #c2185b, #e91e63)',
-              color: streak.checkedToday ? '#388e3c' : 'white',
-              fontWeight: 700, fontSize: 14,
-              cursor: streak.checkedToday ? 'default' : 'pointer',
-              boxShadow: streak.checkedToday ? 'none' : '0 4px 16px rgba(194,24,91,0.3)',
-              whiteSpace: 'nowrap',
-            }}
+            className={`streak-checkin-btn ${streak.checkedToday ? 'checked' : ''}`}
           >
             {streak.checkedToday ? '✅ Checked in today' : checking ? '⏳ Checking in...' : '🔥 Check In Today'}
           </button>
@@ -126,27 +104,19 @@ export default function DailyStreak() {
 
         {/* Earned reward banner */}
         {earned && (
-          <div className="animate-fade" style={{
-            marginTop: 16, padding: '14px 20px', borderRadius: 16,
-            background: 'linear-gradient(135deg, #c2185b, #880e4f)',
-            display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', justifyContent: 'center',
-          }}>
-            <span style={{ fontSize: 26 }}>🎉</span>
-            <span style={{ color: 'white', fontWeight: 700, fontSize: 15 }}>
+          <div className="animate-fade streak-earned-banner">
+            <span className="streak-earned-emoji">🎉</span>
+            <span className="streak-earned-text">
               You earned {earned.discountValue}% OFF!
             </span>
             <button
               onClick={() => copyCode(earned.code)}
-              style={{
-                background: 'white', color: '#c2185b', border: 'none', borderRadius: 10,
-                padding: '8px 18px', fontWeight: 800, fontSize: 14, cursor: 'pointer',
-                fontFamily: 'monospace', letterSpacing: 1,
-              }}
+              className="streak-copy-btn"
               title="Click to copy"
             >
               {earned.code} 📋
             </button>
-            <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>
+            <span className="streak-expiry-text">
               Use at checkout · expires {new Date(earned.expiresAt).toLocaleDateString()}
             </span>
           </div>

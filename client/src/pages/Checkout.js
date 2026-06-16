@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { orderAPI, authAPI, couponAPI } from '../utils/api';
 import { toast } from 'react-toastify';
+import './Checkout.css';
 
 const paymentMethods = [
   { value: 'COD',          label: 'Cash on Delivery', icon: '💵' },
@@ -190,46 +191,46 @@ export default function Checkout() {
       <div className="page-hero">
         <div className="container">
           <h1 className="section-title gradient-text">🔒 Checkout</h1>
-          <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+          <div className="co-steps-row">
             {['Address', 'Payment', 'Review'].map((s, i) => (
-              <div key={s} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{ width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 14, background: step > i + 1 ? '#00b894' : step === i + 1 ? 'linear-gradient(135deg,#6c63ff,#fd79a8)' : '#e0e0f0', color: step >= i + 1 ? 'white' : '#636e72' }}>{step > i + 1 ? '✓' : i + 1}</div>
-                <span style={{ fontSize: 14, fontWeight: step === i + 1 ? 700 : 400, color: step === i + 1 ? '#6c63ff' : '#636e72' }}>{s}</span>
-                {i < 2 && <div style={{ width: 40, height: 2, background: step > i + 1 ? '#00b894' : '#e0e0f0' }} />}
+              <div key={s} className="co-step-item">
+                <div className={`co-step-circle ${step > i + 1 ? 'done' : step === i + 1 ? 'current' : ''}`}>{step > i + 1 ? '✓' : i + 1}</div>
+                <span className={`co-step-label ${step === i + 1 ? 'current' : ''}`}>{s}</span>
+                {i < 2 && <div className={`co-step-line ${step > i + 1 ? 'done' : ''}`} />}
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="container" style={{ paddingBottom: 60 }}>
+      <div className="container co-page-body">
         <div className="layout-cart">
           <div className="animate-left">
 
             {/* ── Step 1: Address ── */}
             {step === 1 && (
-              <div style={{ background: 'white', borderRadius: 24, padding: 32, boxShadow: '0 4px 20px rgba(108,99,255,0.1)' }}>
-                <h2 style={{ marginBottom: 24, fontWeight: 700 }}>📍 Delivery Address</h2>
+              <div className="co-panel">
+                <h2 className="co-panel-heading">📍 Delivery Address</h2>
 
                 {/* Saved address cards */}
                 {profileLoaded && savedAddresses.length > 0 && (
-                  <div style={{ marginBottom: 24 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#9e9e9e', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 }}>Saved Addresses</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div className="co-saved-section">
+                    <div className="co-section-label">Saved Addresses</div>
+                    <div className="co-addr-list">
                       {savedAddresses.map(addr => {
                         const isSelected = selectedAddressId === addr._id;
                         return (
                           <div key={addr._id} onClick={() => selectSavedAddress(addr)}
-                            style={{ padding: '14px 18px', border: `2px solid ${isSelected ? '#6c63ff' : '#e0e0f0'}`, borderRadius: 16, cursor: 'pointer', display: 'flex', alignItems: 'flex-start', gap: 14, transition: 'all 0.2s', background: isSelected ? '#f0f0ff' : 'white' }}>
-                            <div style={{ width: 20, height: 20, borderRadius: '50%', border: `6px solid ${isSelected ? '#6c63ff' : '#e0e0e0'}`, flexShrink: 0, marginTop: 2, transition: 'all 0.2s' }} />
-                            <div style={{ flex: 1 }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
-                                <span style={{ fontWeight: 700, fontSize: 14 }}>{addr.label || 'Address'}</span>
+                            className={`co-addr-card ${isSelected ? 'selected' : ''}`}>
+                            <div className={`co-radio-dot ${isSelected ? 'selected' : ''}`} />
+                            <div className="co-addr-card-body">
+                              <div className="co-addr-name-row">
+                                <span className="co-addr-name">{addr.label || 'Address'}</span>
                                 {addr.isDefault && (
-                                  <span style={{ padding: '2px 8px', background: '#e8f5e9', color: '#2e7d32', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>Default</span>
+                                  <span className="co-default-badge">Default</span>
                                 )}
                               </div>
-                              <div style={{ fontSize: 13, color: '#636e72', lineHeight: 1.6 }}>
+                              <div className="co-addr-detail">
                                 {addr.street}<br />
                                 {addr.city}, {addr.state} — {addr.zip}
                               </div>
@@ -240,29 +241,29 @@ export default function Checkout() {
 
                       {/* New address option */}
                       <div onClick={selectNewAddress}
-                        style={{ padding: '14px 18px', border: `2px dashed ${selectedAddressId === 'new' ? '#6c63ff' : '#e0e0f0'}`, borderRadius: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 14, transition: 'all 0.2s', background: selectedAddressId === 'new' ? '#f0f0ff' : '#fafafa' }}>
-                        <div style={{ width: 28, height: 28, borderRadius: '50%', background: selectedAddressId === 'new' ? '#6c63ff' : '#e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 18, flexShrink: 0, transition: 'all 0.2s' }}>+</div>
-                        <span style={{ fontWeight: 600, fontSize: 14, color: selectedAddressId === 'new' ? '#6c63ff' : '#636e72' }}>Use a different / new address</span>
+                        className={`co-new-addr-card ${selectedAddressId === 'new' ? 'selected' : ''}`}>
+                        <div className={`co-new-addr-icon ${selectedAddressId === 'new' ? 'selected' : ''}`}>+</div>
+                        <span className={`co-new-addr-label ${selectedAddressId === 'new' ? 'selected' : ''}`}>Use a different / new address</span>
                       </div>
                     </div>
 
                     {savedAddresses.length > 0 && selectedAddressId !== 'new' && (
-                      <div style={{ margin: '20px 0 4px', display: 'flex', alignItems: 'center', gap: 10, color: '#bdbdbd', fontSize: 13 }}>
-                        <div style={{ flex: 1, height: 1, background: '#e0e0e0' }} />
+                      <div className="co-divider-row">
+                        <div className="co-divider-line" />
                         Edit delivery details below
-                        <div style={{ flex: 1, height: 1, background: '#e0e0e0' }} />
+                        <div className="co-divider-line" />
                       </div>
                     )}
                   </div>
                 )}
 
                 {/* Address form — always shown; auto-filled when saved address is selected */}
-                <div style={{ marginTop: savedAddresses.length > 0 ? 8 : 0 }}>
+                <div className={`co-addr-form ${savedAddresses.length > 0 ? 'with-saved' : ''}`}>
                   <div className="form-group">
                     <label className="form-label">Street Address *</label>
                     <input className="form-input" placeholder="123 Main Street, Area" value={address.street} onChange={e => { setAddress({ ...address, street: e.target.value }); setSelectedAddressId('new'); }} />
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div className="co-form-grid-2">
                     <div className="form-group">
                       <label className="form-label">City *</label>
                       <input className="form-input" placeholder="Mumbai" value={address.city} onChange={e => { setAddress({ ...address, city: e.target.value }); setSelectedAddressId('new'); }} />
@@ -272,47 +273,46 @@ export default function Checkout() {
                       <input className="form-input" placeholder="Maharashtra" value={address.state} onChange={e => { setAddress({ ...address, state: e.target.value }); setSelectedAddressId('new'); }} />
                     </div>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div className="co-form-grid-2">
                     <div className="form-group">
                       <label className="form-label">ZIP Code *</label>
                       <input className="form-input" placeholder="400001" value={address.zip} onChange={e => { setAddress({ ...address, zip: e.target.value }); setSelectedAddressId('new'); }} />
                     </div>
                     <div className="form-group">
                       <label className="form-label">Country</label>
-                      <input className="form-input" value="India" readOnly style={{ background: '#f8f7ff' }} />
+                      <input className="form-input co-readonly-input" value="India" readOnly />
                     </div>
                   </div>
                 </div>
 
                 {/* Gift Packing */}
-                <div style={{ marginTop: 24, padding: 20, border: '2px solid #f8bbd0', borderRadius: 16, background: '#fff9fb' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer' }}>
+                <div className="co-gift-box">
+                  <label className="co-gift-label-row">
                     <input type="checkbox" checked={giftPacking.enabled} onChange={e => setGiftPacking(g => ({ ...g, enabled: e.target.checked }))}
-                      style={{ width: 18, height: 18, accentColor: '#c2185b', cursor: 'pointer' }} />
-                    <span style={{ fontWeight: 700, fontSize: 15 }}>🎁 Add Gift Packing</span>
-                    <span style={{ fontSize: 12, color: '#9e9e9e', marginLeft: 'auto' }}>Small ₹50 · Medium ₹100 · Large ₹150</span>
+                      className="co-gift-checkbox" />
+                    <span className="co-gift-title">🎁 Add Gift Packing</span>
+                    <span className="co-gift-hint">Small ₹50 · Medium ₹100 · Large ₹150</span>
                   </label>
                   {giftPacking.enabled && (
-                    <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-                      <div style={{ display: 'flex', gap: 10 }}>
+                    <div className="co-gift-options">
+                      <div className="co-gift-size-row">
                         {['Small', 'Medium', 'Large'].map(sz => (
                           <button key={sz} onClick={() => setGiftPacking(g => ({ ...g, size: sz }))}
-                            style={{ flex: 1, padding: '10px 0', borderRadius: 12, border: `2px solid ${giftPacking.size === sz ? '#c2185b' : '#f0c0d0'}`, background: giftPacking.size === sz ? '#fce4ec' : 'white', color: giftPacking.size === sz ? '#c2185b' : '#636e72', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s' }}>
-                            {sz}<br /><span style={{ fontSize: 12, fontWeight: 400 }}>₹{GIFT_PRICES[sz]}</span>
+                            className={`co-gift-size-btn ${giftPacking.size === sz ? 'selected' : ''}`}>
+                            {sz}<br /><span className="co-gift-size-price">₹{GIFT_PRICES[sz]}</span>
                           </button>
                         ))}
                       </div>
-                      <div className="form-group" style={{ marginBottom: 0 }}>
+                      <div className="form-group co-gift-message-field">
                         <label className="form-label">Gift Message (optional)</label>
-                        <textarea className="form-input" rows={2} placeholder="Write a personal message…" value={giftPacking.message}
-                          onChange={e => setGiftPacking(g => ({ ...g, message: e.target.value }))}
-                          style={{ resize: 'vertical', minHeight: 60 }} />
+                        <textarea className="form-input co-gift-textarea" rows={2} placeholder="Write a personal message…" value={giftPacking.message}
+                          onChange={e => setGiftPacking(g => ({ ...g, message: e.target.value }))} />
                       </div>
                     </div>
                   )}
                 </div>
 
-                <button className="btn btn-primary btn-lg" onClick={() => setStep(2)} style={{ marginTop: 16 }}
+                <button className="btn btn-primary btn-lg co-continue-btn" onClick={() => setStep(2)}
                   disabled={!address.street || !address.city || !address.state || !address.zip}>
                   Continue to Payment →
                 </button>
@@ -321,33 +321,33 @@ export default function Checkout() {
 
             {/* ── Step 2: Payment ── */}
             {step === 2 && (
-              <div style={{ background: 'white', borderRadius: 24, padding: 32, boxShadow: '0 4px 20px rgba(108,99,255,0.1)' }}>
-                <h2 style={{ marginBottom: 24, fontWeight: 700 }}>💳 Payment Method</h2>
+              <div className="co-panel">
+                <h2 className="co-panel-heading">💳 Payment Method</h2>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
+                <div className="co-pm-list">
                   {paymentMethods.map(pm => (
                     <div key={pm.value}
                       onClick={() => { setPaymentMethod(pm.value); setSelectedCard(null); setDetails(emptyCard); }}
-                      style={{ padding: '16px 20px', border: `2px solid ${paymentMethod === pm.value ? '#6c63ff' : '#e0e0f0'}`, borderRadius: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 16, transition: 'all 0.3s', background: paymentMethod === pm.value ? '#f0f0ff' : 'white' }}>
-                      <div style={{ width: 20, height: 20, borderRadius: '50%', border: `6px solid ${paymentMethod === pm.value ? '#6c63ff' : '#e0e0f0'}`, transition: 'all 0.3s', flexShrink: 0 }} />
-                      <span style={{ fontSize: 24 }}>{pm.icon}</span>
-                      <span style={{ fontWeight: 600, fontSize: 15 }}>{pm.label}</span>
-                      {pm.value === 'COD' && <span style={{ marginLeft: 'auto', fontSize: 12, color: '#00b894', fontWeight: 600 }}>No details needed</span>}
+                      className={`co-pm-card ${paymentMethod === pm.value ? 'selected' : ''}`}>
+                      <div className={`co-radio-dot ${paymentMethod === pm.value ? 'selected' : ''}`} />
+                      <span className="co-pm-icon">{pm.icon}</span>
+                      <span className="co-pm-label">{pm.label}</span>
+                      {pm.value === 'COD' && <span className="co-pm-hint">No details needed</span>}
                     </div>
                   ))}
                 </div>
 
                 {!isCOD && (
-                  <div style={{ borderTop: '1px solid #e0e0f0', paddingTop: 24 }}>
+                  <div className="co-payment-details">
                     {matchingSavedCards.length > 0 && (
-                      <div style={{ marginBottom: 20 }}>
-                        <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 12, color: '#424242' }}>💾 Saved Payment Methods</div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <div className="co-saved-cards-section">
+                        <div className="co-saved-cards-label">💾 Saved Payment Methods</div>
+                        <div className="co-saved-cards-list">
                           {matchingSavedCards.map(card => (
                             <div key={card._id} onClick={() => setSelectedCard(selectedCard?._id === card._id ? null : card)}
-                              style={{ padding: '12px 16px', border: `2px solid ${selectedCard?._id === card._id ? '#6c63ff' : '#e0e0f0'}`, borderRadius: 12, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, background: selectedCard?._id === card._id ? '#f0f0ff' : '#fafafa', transition: 'all 0.2s' }}>
-                              <div style={{ width: 16, height: 16, borderRadius: '50%', border: `5px solid ${selectedCard?._id === card._id ? '#6c63ff' : '#ccc'}`, flexShrink: 0 }} />
-                              <div style={{ fontSize: 13 }}>
+                              className={`co-saved-card ${selectedCard?._id === card._id ? 'selected' : ''}`}>
+                              <div className={`co-radio-dot-sm ${selectedCard?._id === card._id ? 'selected' : ''}`} />
+                              <div className="co-saved-card-text">
                                 {isCard       && <span>💳 **** **** **** {card.last4} &nbsp;·&nbsp; {card.cardHolder} &nbsp;·&nbsp; {card.expiry}</span>}
                                 {isUPI        && <span>📱 {card.upiId}</span>}
                                 {isNetBanking && <span>🌐 {card.bankName}</span>}
@@ -355,8 +355,8 @@ export default function Checkout() {
                             </div>
                           ))}
                         </div>
-                        <div style={{ margin: '14px 0', display: 'flex', alignItems: 'center', gap: 10, color: '#bdbdbd', fontSize: 13 }}>
-                          <div style={{ flex: 1, height: 1, background: '#e0e0e0' }} />or add new<div style={{ flex: 1, height: 1, background: '#e0e0e0' }} />
+                        <div className="co-divider-row">
+                          <div className="co-divider-line" />or add new<div className="co-divider-line" />
                         </div>
                       </div>
                     )}
@@ -367,25 +367,24 @@ export default function Checkout() {
                           <div>
                             <div className="form-group">
                               <label className="form-label">Card Number *</label>
-                              <input className="form-input" placeholder="1234 5678 9012 3456" maxLength={19}
+                              <input className="form-input co-card-number-input" placeholder="1234 5678 9012 3456" maxLength={19}
                                 value={details.cardNumber}
-                                onChange={e => setDetails(d => ({ ...d, cardNumber: formatCardNumber(e.target.value) }))}
-                                style={{ letterSpacing: '0.1em', fontFamily: 'monospace', fontSize: 16 }} />
+                                onChange={e => setDetails(d => ({ ...d, cardNumber: formatCardNumber(e.target.value) }))} />
                             </div>
                             <div className="form-group">
                               <label className="form-label">Cardholder Name *</label>
                               <input className="form-input" placeholder="Name on card" value={details.cardHolder} onChange={e => setDetails(d => ({ ...d, cardHolder: e.target.value }))} />
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                            <div className="co-form-grid-2">
                               <div className="form-group">
                                 <label className="form-label">Expiry (MM/YY) *</label>
                                 <input className="form-input" placeholder="MM/YY" maxLength={5} value={details.expiry} onChange={e => setDetails(d => ({ ...d, expiry: formatExpiry(e.target.value) }))} />
                               </div>
                               <div className="form-group">
                                 <label className="form-label">CVV *</label>
-                                <div style={{ position: 'relative' }}>
-                                  <input className="form-input" placeholder="•••" maxLength={4} type={showCvv ? 'text' : 'password'} value={details.cvv} onChange={e => setDetails(d => ({ ...d, cvv: e.target.value.replace(/\D/g, '').slice(0, 4) }))} style={{ paddingRight: 44 }} />
-                                  <button type="button" onClick={() => setShowCvv(v => !v)} style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 16 }}>{showCvv ? '🙈' : '👁'}</button>
+                                <div className="co-cvv-wrap">
+                                  <input className="form-input co-cvv-input" placeholder="•••" maxLength={4} type={showCvv ? 'text' : 'password'} value={details.cvv} onChange={e => setDetails(d => ({ ...d, cvv: e.target.value.replace(/\D/g, '').slice(0, 4) }))} />
+                                  <button type="button" onClick={() => setShowCvv(v => !v)} className="co-cvv-toggle">{showCvv ? '🙈' : '👁'}</button>
                                 </div>
                               </div>
                             </div>
@@ -395,7 +394,7 @@ export default function Checkout() {
                           <div className="form-group">
                             <label className="form-label">UPI ID *</label>
                             <input className="form-input" placeholder="yourname@upi" value={details.upiId} onChange={e => setDetails(d => ({ ...d, upiId: e.target.value }))} />
-                            <div style={{ fontSize: 12, color: '#9e9e9e', marginTop: 6 }}>e.g. name@okaxis, name@paytm, name@ybl</div>
+                            <div className="co-upi-hint">e.g. name@okaxis, name@paytm, name@ybl</div>
                           </div>
                         )}
                         {isNetBanking && (
@@ -406,24 +405,24 @@ export default function Checkout() {
                             </select>
                           </div>
                         )}
-                        <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', marginTop: 8, fontSize: 14, color: '#424242' }}>
-                          <input type="checkbox" checked={details.saveCard} onChange={e => setDetails(d => ({ ...d, saveCard: e.target.checked }))} style={{ width: 16, height: 16, accentColor: '#6c63ff' }} />
+                        <label className="co-save-method-label">
+                          <input type="checkbox" checked={details.saveCard} onChange={e => setDetails(d => ({ ...d, saveCard: e.target.checked }))} className="co-save-method-checkbox" />
                           Save this payment method for future orders
                         </label>
                       </div>
                     )}
 
                     {selectedCard && (
-                      <button onClick={() => setSelectedCard(null)} style={{ fontSize: 13, color: '#6c63ff', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>
+                      <button onClick={() => setSelectedCard(null)} className="co-use-different-btn">
                         + Use a different {isUPI ? 'UPI ID' : isNetBanking ? 'bank' : 'card'}
                       </button>
                     )}
                   </div>
                 )}
 
-                <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+                <div className="co-step-actions">
                   <button className="btn btn-secondary" onClick={() => setStep(1)}>← Back</button>
-                  <button className="btn btn-primary btn-lg" onClick={handlePaymentContinue} disabled={!paymentValid} style={{ opacity: paymentValid ? 1 : 0.5 }}>
+                  <button className={`btn btn-primary btn-lg co-review-btn ${paymentValid ? 'valid' : ''}`} onClick={handlePaymentContinue} disabled={!paymentValid}>
                     Review Order →
                   </button>
                 </div>
@@ -432,29 +431,29 @@ export default function Checkout() {
 
             {/* ── Step 3: Review ── */}
             {step === 3 && (
-              <div style={{ background: 'white', borderRadius: 24, padding: 32, boxShadow: '0 4px 20px rgba(108,99,255,0.1)' }}>
-                <h2 style={{ marginBottom: 24, fontWeight: 700 }}>📋 Order Review</h2>
-                <div style={{ marginBottom: 20, padding: '16px 20px', background: '#f8f7ff', borderRadius: 16 }}>
-                  <div style={{ fontWeight: 600, marginBottom: 6 }}>📍 Delivering to</div>
-                  <div style={{ fontSize: 14, color: '#636e72' }}>{address.street}, {address.city}, {address.state} — {address.zip}</div>
+              <div className="co-panel">
+                <h2 className="co-panel-heading">📋 Order Review</h2>
+                <div className="co-review-box">
+                  <div className="co-review-box-title">📍 Delivering to</div>
+                  <div className="co-review-text">{address.street}, {address.city}, {address.state} — {address.zip}</div>
                 </div>
-                <div style={{ marginBottom: 20, padding: '16px 20px', background: '#f8f7ff', borderRadius: 16 }}>
-                  <div style={{ fontWeight: 600, marginBottom: 6 }}>
+                <div className="co-review-box">
+                  <div className="co-review-box-title">
                     {paymentMethods.find(p => p.value === paymentMethod)?.icon} {paymentMethods.find(p => p.value === paymentMethod)?.label}
                   </div>
-                  {!isCOD && <div style={{ fontSize: 13, color: '#636e72' }}>{paymentSummaryLabel()}</div>}
-                  {!isCOD && <span style={{ display: 'inline-block', marginTop: 6, padding: '2px 10px', background: '#e8f5e9', color: '#2e7d32', borderRadius: 20, fontSize: 12, fontWeight: 600 }}>✓ Payment confirmed</span>}
+                  {!isCOD && <div className="co-review-text">{paymentSummaryLabel()}</div>}
+                  {!isCOD && <span className="co-confirmed-badge">✓ Payment confirmed</span>}
                 </div>
                 {cartItems.map(item => (
-                  <div key={item._id} style={{ display: 'flex', gap: 12, padding: '12px 0', borderBottom: '1px dashed #e0e0f0' }}>
-                    <img src={item.images?.[0] || ''} alt={item.name} style={{ width: 60, height: 60, borderRadius: 12, objectFit: 'cover' }} />
-                    <div style={{ flex: 1 }}><div style={{ fontWeight: 600, fontSize: 14 }}>{item.name}</div><div style={{ fontSize: 13, color: '#636e72' }}>Qty: {item.quantity}</div></div>
-                    <div style={{ fontWeight: 700 }}>₹{(item.price * item.quantity).toLocaleString()}</div>
+                  <div key={item._id} className="co-review-item">
+                    <img src={item.images?.[0] || ''} alt={item.name} className="co-review-item-img" />
+                    <div className="co-review-item-info"><div className="co-review-item-name">{item.name}</div><div className="co-review-item-qty">Qty: {item.quantity}</div></div>
+                    <div className="co-review-item-price">₹{(item.price * item.quantity).toLocaleString()}</div>
                   </div>
                 ))}
-                <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+                <div className="co-step-actions">
                   <button className="btn btn-secondary" onClick={() => setStep(2)}>← Back</button>
-                  <button className="btn btn-primary btn-lg" onClick={handlePlaceOrder} disabled={loading} style={{ flex: 1, justifyContent: 'center' }}>
+                  <button className="btn btn-primary btn-lg co-place-order-btn" onClick={handlePlaceOrder} disabled={loading}>
                     {loading ? '⏳ Placing Order...' : '🎉 Place Order — ₹' + total.toLocaleString()}
                   </button>
                 </div>
@@ -464,36 +463,36 @@ export default function Checkout() {
 
           {/* ── Order Summary sidebar ── */}
           <div className="order-summary animate-right">
-            <h3 style={{ fontWeight: 700, marginBottom: 20 }}>Order Summary</h3>
+            <h3 className="co-summary-heading">Order Summary</h3>
             {cartItems.map(item => (
-              <div key={item._id} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', fontSize: 14, borderBottom: '1px dashed #f0f0f0' }}>
+              <div key={item._id} className="co-summary-item-row">
                 <span>{item.name} × {item.quantity}</span>
-                <span style={{ fontWeight: 600 }}>₹{(item.price * item.quantity).toLocaleString()}</span>
+                <span className="co-summary-item-price">₹{(item.price * item.quantity).toLocaleString()}</span>
               </div>
             ))}
-            <div className="summary-row" style={{ marginTop: 8 }}><span>Subtotal</span><span>₹{totalPrice.toLocaleString()}</span></div>
-            <div className="summary-row"><span>Shipping</span><span style={{ color: shipping === 0 ? '#00b894' : 'inherit' }}>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span></div>
+            <div className="summary-row co-summary-first"><span>Subtotal</span><span>₹{totalPrice.toLocaleString()}</span></div>
+            <div className="summary-row"><span>Shipping</span><span className={shipping === 0 ? 'co-free-text' : ''}>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span></div>
             <div className="summary-row"><span>GST (18%)</span><span>₹{tax}</span></div>
             {coupon && (
-              <div className="summary-row" style={{ color: '#388e3c' }}>
+              <div className="summary-row co-row-coupon">
                 <span>🎟️ Coupon ({coupon.code})</span>
                 <span>−₹{couponDiscount.toLocaleString()}</span>
               </div>
             )}
             {loyaltyDiscount > 0 && (
-              <div className="summary-row" style={{ color: '#6c63ff' }}>
+              <div className="summary-row co-row-loyalty">
                 <span>⭐ Loyalty Points ({loyaltyPointsUsed} pts)</span>
                 <span>−₹{loyaltyDiscount.toLocaleString()}</span>
               </div>
             )}
             {giftPacking.enabled && (
-              <div className="summary-row" style={{ color: '#c2185b' }}>
+              <div className="summary-row co-row-gift">
                 <span>🎁 Gift Packing ({giftPacking.size})</span>
                 <span>+₹{giftCharge}</span>
               </div>
             )}
             <div className="summary-total"><span>Total</span><span className="gradient-text">₹{total.toLocaleString()}</span></div>
-            {shipping === 0 && <div style={{ marginTop: 10, padding: '8px 12px', background: '#e8f5e9', borderRadius: 10, fontSize: 12, color: '#2e7d32', fontWeight: 600, textAlign: 'center' }}>🎉 You qualify for free shipping!</div>}
+            {shipping === 0 && <div className="co-free-shipping-banner">🎉 You qualify for free shipping!</div>}
           </div>
         </div>
       </div>
