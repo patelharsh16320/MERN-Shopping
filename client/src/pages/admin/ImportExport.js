@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import AdminLayout from './AdminLayout';
 import { dataAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
+import CleanDatabase from './CleanDatabase';
 
 function downloadBlob(content, filename, mime) {
   const blob = new Blob([typeof content === 'string' ? content : JSON.stringify(content, null, 2)], { type: mime });
@@ -178,6 +179,8 @@ export default function ImportExport() {
           </tbody>
         </table>
       </div>
+
+      <CleanDatabase />
     </AdminLayout>
   );
 }

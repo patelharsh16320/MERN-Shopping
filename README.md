@@ -178,30 +178,31 @@ Ajax - Admin/ User
 - add filter option on left side on offers page 
 
 <!--? 16-06-26  -->
+- on admin product add column filter ons status too, with also add asc, desc filter too
 
-<!-- !------ Checking-----!  -->
+-  full site live ajax run ,new product import, buy any product then got message on chat button, got adny admin messge, user buy product - admin get notification +1 like all this feature make live without page refresh for admin and user both 
 
-
-<!-- !------ Working-----!  -->
 - Need new menu for admin to check all pages speed check in desktop and mobile menu
-- remove inline css and create seprate file for it.
-
-- user - after buy the order, it redirect to order page automatic and get notify in messge box that +1 with uy 1 product 
 
 - then create log in server, to hit and all api and which user hit api store this, also per day crete new log file create. and after 7 days last file remvoe. this alllow for
   all files, after 7 days file is deleted.
 
+<!-- !------ Checking-----!  -->
+
 - full site live ajax run ,new product import, buy any product then got message on chat button, got adny admin messge, user buy product - admin get notification +1 like all this feature make live without page refresh for admin and user both 
+
+<!-- !------ Working-----!  -->
+
+- remove inline css and create seprate file for it.
+
+
+-create new feature for admin, clean db feature, where all databse admin csn see, and also delate it too. also you can merge this function into import export page, also add     
+  feature to remove duplicate data. frist move all data to draft then go to trash after week, if user not delete from trash folder.
 
 <!-- !------ Reaming-----!  -->
 
--  full site live ajax run ,new product import, buy any product then got message on chat button, got adny admin messge, user buy product - admin get notification +1 like all this feature make live without page refresh for admin and user both 
-
-- admin/user order: Receive email when order is placed
 
 init 
-
-- on admin product add column filter ons status too, with also add asc, desc filter too
 
 Site Analytics
 - Store Site Analytics data in the database.
@@ -219,7 +220,6 @@ check page speed how increse
 - Making Excessive API Requests
 - Using Unstable Keys in Lists
 - Optimizing Without Measuring
-
 
 <!-- !------ ignore-----!  -->
 

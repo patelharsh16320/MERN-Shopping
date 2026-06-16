@@ -7,6 +7,9 @@ const categorySchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
   isDefault: { type: Boolean, default: false },
   parent: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', default: null },
+  archiveStatus: { type: String, enum: ['active', 'draft', 'trash'], default: 'active' },
+  draftedAt: { type: Date, default: null },
+  trashedAt: { type: Date, default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Category', categorySchema);

@@ -18,6 +18,9 @@ const supportSchema = new mongoose.Schema({
   messages:   [messageSchema],
   adminUnread: { type: Boolean, default: true },
   userUnread:  { type: Boolean, default: false },
+  archiveStatus: { type: String, enum: ['active', 'draft', 'trash'], default: 'active' },
+  draftedAt: { type: Date, default: null },
+  trashedAt: { type: Date, default: null },
 }, { timestamps: true });
 
 // Auto-generate a short ticketId before save

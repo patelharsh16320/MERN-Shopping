@@ -30,6 +30,7 @@ const productSchema = new mongoose.Schema({
   weight: { type: String, default: '200g' },
   freshnessDays: { type: Number, default: 365 },
   status: { type: String, enum: ['published', 'draft', 'trash'], default: 'published' },
+  draftedAt: { type: Date, default: null },
   trashedAt: { type: Date, default: null },
   specialOffer: {
     enabled:     { type: Boolean, default: false },

@@ -41,6 +41,7 @@ app.use('/api/chat',         require('./routes/chat'));
 app.use('/api/loyalty',      require('./routes/loyalty'));
 app.use('/api/addresses',    require('./routes/addresses'));
 app.use('/api/page-settings', require('./routes/pageSettings'));
+app.use('/api/db-admin',     require('./routes/dbAdmin'));
 
 app.get('/api/health', (req, res) => res.json({ status: 'OK', message: 'women hubclub API Running' }));
 
@@ -50,6 +51,12 @@ app.use((err, req, res, next) => {
 });
 
 require('./socket')(io);
+
+const { promoteDraftsToTrash } = require('./controllers/dbAdminController');
+promoteDraftsToTrash().catch(err => console.error('promoteDraftsToTrash failed:', err.message));
+setInterval(() => {
+  promoteDraftsToTrash().catch(err => console.error('promoteDraftsToTrash failed:', err.message));
+}, 6 * 60 * 60 * 1000); // re-check every 6 hours
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

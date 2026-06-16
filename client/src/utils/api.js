@@ -100,6 +100,18 @@ export const dataAPI = {
   import: (bundle, duplicateAction) => API.post('/data/import', { bundle, duplicateAction }),
 };
 
+export const dbAdminAPI = {
+  overview: () => API.get('/db-admin/overview'),
+  records: (key, params) => API.get(`/db-admin/${key}/records`, { params }),
+  duplicates: (key) => API.get(`/db-admin/${key}/duplicates`),
+  removeDuplicates: (key, ids) => API.post(`/db-admin/${key}/duplicates/remove`, { ids }),
+  moveToDraft: (key, ids) => API.post(`/db-admin/${key}/draft`, { ids }),
+  moveToTrash: (key, ids) => API.post(`/db-admin/${key}/trash`, { ids }),
+  restore: (key, ids) => API.post(`/db-admin/${key}/restore`, { ids }),
+  permanentDelete: (key, ids) => API.post(`/db-admin/${key}/permanent-delete`, { ids }),
+  emptyTrash: (key) => API.post(`/db-admin/${key}/empty-trash`),
+};
+
 export const changelogAPI = {
   getAll: () => API.get('/changelog'),
   create: (data) => API.post('/changelog', data),

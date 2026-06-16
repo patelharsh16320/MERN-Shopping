@@ -10,7 +10,7 @@ const emptyForm = { name: '', slug: '', description: '', price: '', originalPric
 function autoSlug(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
-const PROD_COLS = ['Category', 'Price', 'Stock', 'Rating', 'Featured', 'Reviews'];
+const PROD_COLS = ['Status', 'Category', 'Price', 'Stock', 'Rating', 'Featured', 'Reviews'];
 const PAGE_SIZE = 10;
 const STATUS_TABS = [
   { key: 'all', label: 'All' },
@@ -367,7 +367,7 @@ export default function ManageProducts() {
               <th>#</th>
               <th>Image</th>
               <SortTh label="Name" field="name" {...sortProps} />
-              <th>Status</th>
+              {visibleCols['Status'] && <th>Status</th>}
               {visibleCols['Category'] && <SortTh label="Category" field="category" {...sortProps} />}
               {visibleCols['Price'] && <SortTh label="Price" field="price" {...sortProps} />}
               {visibleCols['Stock'] && <SortTh label="Stock" field="stock" {...sortProps} />}
@@ -426,24 +426,26 @@ export default function ManageProducts() {
                       </div>
                     )}
                   </td>
-                  <td>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                      <span style={{ display: 'inline-block', padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 700, background: STATUS_BG[status] || '#f5f5f5', color: STATUS_COLORS[status] || '#636e72', textTransform: 'capitalize', border: `1px solid ${STATUS_COLORS[status] || '#e0e0e0'}33` }}>
-                        {status}
-                      </span>
-                      {!isTrash && (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 700, color: p.isActive !== false ? '#00b894' : '#d63031' }}>
-                          <span style={{ width: 7, height: 7, borderRadius: '50%', background: p.isActive !== false ? '#00b894' : '#d63031', display: 'inline-block' }} />
-                          {p.isActive !== false ? 'Active' : 'Inactive'}
+                  {visibleCols['Status'] && (
+                    <td>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                        <span style={{ display: 'inline-block', padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 700, background: STATUS_BG[status] || '#f5f5f5', color: STATUS_COLORS[status] || '#636e72', textTransform: 'capitalize', border: `1px solid ${STATUS_COLORS[status] || '#e0e0e0'}33` }}>
+                          {status}
                         </span>
-                      )}
-                      {p.specialOffer?.enabled && (
-                        <span style={{ display: 'inline-block', padding: '2px 7px', borderRadius: 10, fontSize: 10, fontWeight: 700, background: '#fff3e0', color: '#e17055', border: '1px solid #ffe0b2' }}>
-                          🔥 On Sale
-                        </span>
-                      )}
-                    </div>
-                  </td>
+                        {!isTrash && (
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 700, color: p.isActive !== false ? '#00b894' : '#d63031' }}>
+                            <span style={{ width: 7, height: 7, borderRadius: '50%', background: p.isActive !== false ? '#00b894' : '#d63031', display: 'inline-block' }} />
+                            {p.isActive !== false ? 'Active' : 'Inactive'}
+                          </span>
+                        )}
+                        {p.specialOffer?.enabled && (
+                          <span style={{ display: 'inline-block', padding: '2px 7px', borderRadius: 10, fontSize: 10, fontWeight: 700, background: '#fff3e0', color: '#e17055', border: '1px solid #ffe0b2' }}>
+                            🔥 On Sale
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                  )}
                   {visibleCols['Category'] && (
                     <td>
                       <span className="badge badge-processing">{p.category}</span>

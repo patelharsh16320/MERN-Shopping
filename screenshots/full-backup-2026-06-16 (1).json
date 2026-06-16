@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-06-16T12:15:17.676Z",
+  "exportedAt": "2026-06-16T12:44:39.563Z",
   "version": "1.0",
   "products": [
     {
@@ -158,7 +158,7 @@
         "matte",
         "set"
       ],
-      "isActive": true,
+      "isActive": false,
       "isFeatured": true,
       "weight": "6x3.5g",
       "freshnessDays": 365,
@@ -212,7 +212,7 @@
         "eyeliner",
         "waterproof"
       ],
-      "isActive": true,
+      "isActive": false,
       "isFeatured": false,
       "weight": "2x1.2g",
       "freshnessDays": 365,
@@ -266,7 +266,7 @@
         "frizz",
         "serum"
       ],
-      "isActive": true,
+      "isActive": false,
       "isFeatured": true,
       "weight": "100ml",
       "freshnessDays": 365,
@@ -320,7 +320,7 @@
         "growth",
         "ayurvedic"
       ],
-      "isActive": true,
+      "isActive": false,
       "isFeatured": true,
       "weight": "200ml",
       "freshnessDays": 365,
@@ -401,7 +401,7 @@
         "essential oils",
         "relaxation"
       ],
-      "isActive": true,
+      "isActive": false,
       "isFeatured": true,
       "weight": "8x10ml",
       "freshnessDays": 365,
@@ -509,7 +509,7 @@
         "crystal",
         "hair"
       ],
-      "isActive": true,
+      "isActive": false,
       "isFeatured": true,
       "weight": "100g",
       "freshnessDays": 365,
@@ -590,7 +590,7 @@
         "pastel",
         "comfy"
       ],
-      "isActive": true,
+      "isActive": false,
       "isFeatured": true,
       "weight": "500g",
       "freshnessDays": 365,
@@ -644,7 +644,7 @@
         "mat",
         "non-slip"
       ],
-      "isActive": true,
+      "isActive": false,
       "isFeatured": true,
       "weight": "1.2kg",
       "freshnessDays": 365,
@@ -915,357 +915,6 @@
       "isActive": true,
       "isFeatured": true,
       "weight": "200g",
-      "freshnessDays": 365,
-      "status": "published"
-    },
-    {
-      "name": "Velvet Matte Lipstick Set (6 Shades)",
-      "description": "Pigment-rich matte lipsticks in 6 stunning shades — from nudes to bold reds. Long-lasting 10-hour formula with vitamin E.",
-      "price": 1199,
-      "originalPrice": 1599,
-      "discount": 25,
-      "category": "Makeup & Beauty",
-      "subcategory": "",
-      "images": [
-        "https://images.unsplash.com/photo-1586495777744-4e6232bf2176?w=400"
-      ],
-      "stock": 55,
-      "totalStock": 55,
-      "rating": 4.9,
-      "numReviews": 432,
-      "brand": "Women HubClub",
-      "tags": [
-        "lipstick",
-        "matte",
-        "set"
-      ],
-      "isActive": true,
-      "isFeatured": true,
-      "weight": "6x3.5g",
-      "freshnessDays": 365,
-      "status": "published"
-    },
-    {
-      "name": "Silk Hair Wrap Turban (2 Pack)",
-      "description": "Ultra-soft microfiber hair turbans that dry hair 3x faster and reduce breakage from friction. No tangles or frizz.",
-      "price": 349,
-      "originalPrice": 449,
-      "discount": 22,
-      "category": "Hair Care",
-      "subcategory": "",
-      "images": [
-        "https://images.unsplash.com/photo-1522204523234-8729aa6e3d5f?w=400"
-      ],
-      "stock": 80,
-      "totalStock": 80,
-      "rating": 4.4,
-      "numReviews": 156,
-      "brand": "Women HubClub",
-      "tags": [
-        "silk",
-        "turban",
-        "microfiber"
-      ],
-      "isActive": true,
-      "isFeatured": false,
-      "weight": "180g",
-      "freshnessDays": 365,
-      "status": "published"
-    },
-    {
-      "name": "Aromatherapy Essential Oil Set (8 Oils)",
-      "description": "Premium set of 8 therapeutic-grade essential oils including lavender, rose, peppermint, eucalyptus and more.",
-      "price": 1299,
-      "originalPrice": 1699,
-      "discount": 24,
-      "category": "Wellness",
-      "subcategory": "",
-      "images": [
-        "https://images.unsplash.com/photo-1608571423539-e951a8d56f8e?w=400"
-      ],
-      "stock": 39,
-      "totalStock": 40,
-      "rating": 4.9,
-      "numReviews": 267,
-      "brand": "Women HubClub",
-      "tags": [
-        "aromatherapy",
-        "essential oils",
-        "relaxation"
-      ],
-      "isActive": true,
-      "isFeatured": true,
-      "weight": "8x10ml",
-      "freshnessDays": 365,
-      "status": "published"
-    },
-    {
-      "name": "Gold Plated Earring Set (5 Pairs)",
-      "description": "Elegant gold-plated earring set with 5 versatile styles — hoops, studs, drops and more. Hypoallergenic and tarnish-resistant.",
-      "price": 799,
-      "originalPrice": 999,
-      "discount": 20,
-      "category": "Accessories",
-      "subcategory": "",
-      "images": [
-        "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400"
-      ],
-      "stock": 65,
-      "totalStock": 65,
-      "rating": 4.7,
-      "numReviews": 445,
-      "brand": "Women HubClub",
-      "tags": [
-        "earrings",
-        "gold",
-        "set"
-      ],
-      "isActive": true,
-      "isFeatured": true,
-      "weight": "50g",
-      "freshnessDays": 365,
-      "status": "published"
-    },
-    {
-      "name": "Silk Scrunchie Set (12 Pieces)",
-      "description": "Luxurious silk scrunchies in 12 gorgeous colours. Gentle on hair, prevents breakage and creases. Perfect for all hair types.",
-      "price": 349,
-      "originalPrice": 449,
-      "discount": 22,
-      "category": "Accessories",
-      "subcategory": "",
-      "images": [
-        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400"
-      ],
-      "stock": 100,
-      "totalStock": 100,
-      "rating": 4.5,
-      "numReviews": 678,
-      "brand": "Women HubClub",
-      "tags": [
-        "scrunchie",
-        "silk",
-        "hair"
-      ],
-      "isActive": true,
-      "isFeatured": false,
-      "weight": "150g",
-      "freshnessDays": 365,
-      "status": "published"
-    },
-    {
-      "name": "Crystal Hair Clips Set (8 Pcs)",
-      "description": "Dainty crystal-studded hair clips in assorted styles. Lightweight, strong grip and won't snag your hair. Gift-ready packaging.",
-      "price": 399,
-      "originalPrice": 549,
-      "discount": 27,
-      "category": "Accessories",
-      "subcategory": "",
-      "images": [
-        "https://images.unsplash.com/photo-1631234764568-8c9a1a55baee?w=400"
-      ],
-      "stock": 85,
-      "totalStock": 85,
-      "rating": 1,
-      "numReviews": 1,
-      "brand": "Women HubClub",
-      "tags": [
-        "clips",
-        "crystal",
-        "hair"
-      ],
-      "isActive": true,
-      "isFeatured": true,
-      "weight": "100g",
-      "freshnessDays": 365,
-      "status": "published"
-    },
-    {
-      "name": "Floral Rayon Kurti (S/M/L/XL)",
-      "description": "Breezy floral printed rayon kurti with a flattering A-line fit. Soft, lightweight fabric perfect for daily wear and festive occasions.",
-      "price": 899,
-      "originalPrice": 1199,
-      "discount": 25,
-      "category": "Fashion",
-      "subcategory": "",
-      "images": [
-        "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=400"
-      ],
-      "stock": 47,
-      "totalStock": 50,
-      "rating": 4.6,
-      "numReviews": 321,
-      "brand": "Women HubClub",
-      "tags": [
-        "kurti",
-        "floral",
-        "rayon"
-      ],
-      "isActive": true,
-      "isFeatured": true,
-      "weight": "300g",
-      "freshnessDays": 365,
-      "status": "published"
-    },
-    {
-      "name": "Resistance Band Set (5 Levels)",
-      "description": "Professional fabric resistance bands in 5 resistance levels. Non-slip, anti-roll design. Perfect for glutes, legs and full body workouts.",
-      "price": 599,
-      "originalPrice": 799,
-      "discount": 25,
-      "category": "Fitness",
-      "subcategory": "",
-      "images": [
-        "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400"
-      ],
-      "stock": 70,
-      "totalStock": 70,
-      "rating": 4.7,
-      "numReviews": 412,
-      "brand": "Women HubClub",
-      "tags": [
-        "resistance",
-        "bands",
-        "workout"
-      ],
-      "isActive": true,
-      "isFeatured": true,
-      "weight": "300g",
-      "freshnessDays": 365,
-      "status": "published"
-    },
-    {
-      "name": "Yoga Mat Anti-Slip Premium (6mm)",
-      "description": "Professional 6mm thick yoga mat with alignment lines. Eco-friendly TPE material, non-slip on both sides. Includes carry strap.",
-      "price": 1499,
-      "originalPrice": 1999,
-      "discount": 25,
-      "category": "Fitness",
-      "subcategory": "",
-      "images": [
-        "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400"
-      ],
-      "stock": 45,
-      "totalStock": 45,
-      "rating": 4.8,
-      "numReviews": 356,
-      "brand": "Women HubClub",
-      "tags": [
-        "yoga",
-        "mat",
-        "non-slip"
-      ],
-      "isActive": true,
-      "isFeatured": true,
-      "weight": "1.2kg",
-      "freshnessDays": 365,
-      "status": "published"
-    },
-    {
-      "name": "Luxury Soy Wax Candle Set (3 Pcs)",
-      "description": "Hand-poured soy wax candles in rose, jasmine and sandalwood fragrances. 40-hour burn time each, in beautiful frosted glass jars.",
-      "price": 999,
-      "originalPrice": 1299,
-      "discount": 23,
-      "category": "Books & Journals",
-      "subcategory": "Planners",
-      "images": [
-        "https://images.unsplash.com/photo-1602028915047-37269d1a73f7?w=400"
-      ],
-      "stock": 52,
-      "totalStock": 55,
-      "rating": 4.9,
-      "numReviews": 478,
-      "brand": "Women HubClub",
-      "tags": [
-        "candle",
-        "soy",
-        "fragrance"
-      ],
-      "isActive": true,
-      "isFeatured": true,
-      "weight": "3x200g",
-      "freshnessDays": 365,
-      "status": "published"
-    },
-    {
-      "name": "Velvet Cushion Cover Set (5 Pcs)",
-      "description": "Sumptuous velvet cushion covers in blush pink, dusty rose and ivory tones. Concealed zip closure, fits 40x40cm inserts.",
-      "price": 699,
-      "originalPrice": 899,
-      "discount": 22,
-      "category": "Health & Wellness",
-      "subcategory": "Fitness",
-      "images": [
-        "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400"
-      ],
-      "stock": 45,
-      "totalStock": 45,
-      "rating": 4.6,
-      "numReviews": 234,
-      "brand": "Women HubClub",
-      "tags": [
-        "cushion",
-        "velvet",
-        "decor"
-      ],
-      "isActive": true,
-      "isFeatured": false,
-      "weight": "800g",
-      "freshnessDays": 365,
-      "status": "published"
-    },
-    {
-      "name": "Inspirational Ceramic Mug (350ml)",
-      "description": "Handcrafted ceramic mug with gold foil inspirational quote. Dishwasher safe, comes in a beautiful gift box. Perfect for coffee and tea.",
-      "price": 449,
-      "originalPrice": 599,
-      "discount": 25,
-      "category": "Home & Living",
-      "subcategory": "",
-      "images": [
-        "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400"
-      ],
-      "stock": 90,
-      "totalStock": 90,
-      "rating": 4.5,
-      "numReviews": 312,
-      "brand": "Women HubClub",
-      "tags": [
-        "mug",
-        "ceramic",
-        "gift"
-      ],
-      "isActive": true,
-      "isFeatured": false,
-      "weight": "350g",
-      "freshnessDays": 365,
-      "status": "published"
-    },
-    {
-      "name": "Organic Women's Protein Powder (Vanilla)",
-      "description": "Plant-based protein powder with 22g protein per serving, iron, calcium and probiotics. Delicious vanilla flavour, no artificial sweeteners.",
-      "price": 1999,
-      "originalPrice": 2499,
-      "discount": 20,
-      "category": "Nutrition",
-      "subcategory": "",
-      "images": [
-        "https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=400"
-      ],
-      "stock": 33,
-      "totalStock": 35,
-      "rating": 5,
-      "numReviews": 1,
-      "brand": "Women HubClub",
-      "tags": [
-        "protein",
-        "plant-based",
-        "organic"
-      ],
-      "isActive": true,
-      "isFeatured": true,
-      "weight": "500g",
       "freshnessDays": 365,
       "status": "published"
     }
@@ -4053,18 +3702,18 @@
     }
   ],
   "analytics": {
-    "total": 808,
+    "total": 813,
     "daily": {
       "2026-06-11": 269,
       "2026-06-12": 251,
       "2026-06-15": 250,
-      "2026-06-16": 38
+      "2026-06-16": 43
     },
     "monthly": {
-      "2026-06": 808
+      "2026-06": 813
     },
     "yearly": {
-      "2026": 808
+      "2026": 813
     }
   },
   "contacts": [

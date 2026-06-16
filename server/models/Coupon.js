@@ -9,6 +9,9 @@ const couponSchema = new mongoose.Schema({
   usageCount:    { type: Number, default: 0 },
   expiresAt:     { type: Date, default: null },
   isActive:      { type: Boolean, default: true },
+  archiveStatus: { type: String, enum: ['active', 'draft', 'trash'], default: 'active' },
+  draftedAt:     { type: Date, default: null },
+  trashedAt:     { type: Date, default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Coupon', couponSchema);
