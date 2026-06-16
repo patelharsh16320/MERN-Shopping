@@ -1,30 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { contactAPI, orderAPI, supportAPI } from '../../utils/api';
+import { contactAPI, orderAPI, supportAPI, adminNavAPI } from '../../utils/api';
 import { initSocket } from '../../utils/socket';
 import { toast } from 'react-toastify';
 import AdminChatWidget from '../../components/AdminChatWidget';
 
 const navItems = [
-  { icon: '📊', label: 'Dashboard', path: '/admin' },
-  { icon: '🌸', label: 'Products', path: '/admin/products' },
-  { icon: '🏷️', label: 'Categories', path: '/admin/categories' },
-  { icon: '👥', label: 'Users', path: '/admin/users' },
-  { icon: '📦', label: 'Orders', path: '/admin/orders' },
-  { icon: '🧾', label: 'Invoices', path: '/admin/invoices' },
-  { icon: '📈', label: 'Analytics', path: '/admin/analytics' },
-  { icon: '💬', label: 'Messages', path: '/admin/contacts' },
-  { icon: '⭐', label: 'Reviews', path: '/admin/reviews' },
-  { icon: '🎟️', label: 'Coupons', path: '/admin/coupons' },
-  { icon: '🔐', label: 'Secure Data', path: '/admin/secure-users' },
-  { icon: '📂', label: 'Import / Export', path: '/admin/import-export' },
-  { icon: '✨', label: "What's New", path: '/admin/whats-new' },
-  { icon: '🔥', label: 'Streak Board', path: '/admin/streaks' },
-  { icon: '🎧', label: 'Support', path: '/admin/support' },
-  { icon: '🔘', label: 'Pages', path: '/admin/pages' },
-  { icon: '🧩', label: 'Dashboard Settings', path: '/admin/dashboard-settings' },
-  { icon: '⚡', label: 'Page Speed', path: '/admin/page-speed' },
+  { key: 'dashboard',         icon: '📊', label: 'Dashboard', path: '/admin' },
+  { key: 'products',          icon: '🌸', label: 'Products', path: '/admin/products' },
+  { key: 'categories',        icon: '🏷️', label: 'Categories', path: '/admin/categories' },
+  { key: 'users',             icon: '👥', label: 'Users', path: '/admin/users' },
+  { key: 'orders',            icon: '📦', label: 'Orders', path: '/admin/orders' },
+  { key: 'invoices',          icon: '🧾', label: 'Invoices', path: '/admin/invoices' },
+  { key: 'analytics',         icon: '📈', label: 'Analytics', path: '/admin/analytics' },
+  { key: 'messages',          icon: '💬', label: 'Messages', path: '/admin/contacts' },
+  { key: 'reviews',           icon: '⭐', label: 'Reviews', path: '/admin/reviews' },
+  { key: 'coupons',           icon: '🎟️', label: 'Coupons', path: '/admin/coupons' },
+  { key: 'secureData',        icon: '🔐', label: 'Secure Data', path: '/admin/secure-users' },
+  { key: 'importExport',      icon: '📂', label: 'Import / Export', path: '/admin/import-export' },
+  { key: 'whatsNew',          icon: '✨', label: "What's New", path: '/admin/whats-new' },
+  { key: 'streakBoard',       icon: '🔥', label: 'Streak Board', path: '/admin/streaks' },
+  { key: 'support',           icon: '🎧', label: 'Support', path: '/admin/support' },
+  { key: 'pages',             icon: '🔘', label: 'Pages', path: '/admin/pages' },
+  { key: 'dashboardSettings', icon: '🧩', label: 'Dashboard Settings', path: '/admin/dashboard-settings' },
+  { key: 'pageSpeed',         icon: '⚡', label: 'Page Speed', path: '/admin/page-speed' },
 ];
 
 export default function AdminLayout({ children }) {
@@ -33,7 +33,15 @@ export default function AdminLayout({ children }) {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [badges, setBadges] = useState({ messages: 0, orders: 0, support: 0 });
+  const [navVisibility, setNavVisibility] = useState(null);
   const socketRef = useRef(null);
+
+  // Fetch sidebar nav visibility once
+  useEffect(() => {
+    adminNavAPI.getAll()
+      .then(({ data }) => setNavVisibility(Object.fromEntries(data.map(n => [n.key, n.isActive]))))
+      .catch(() => setNavVisibility({}));
+  }, []);
 
   // Fetch badge counts on every route change
   useEffect(() => {
@@ -97,7 +105,7 @@ export default function AdminLayout({ children }) {
           <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12 }}>{user.email}</div>
         </div>
 
-        {navItems.map(item => {
+        {navItems.filter(item => item.key === 'dashboard' || navVisibility === null || navVisibility[item.key] !== false).map(item => {
           const badge = item.path === '/admin/contacts' ? badges.messages
                       : item.path === '/admin/orders' ? badges.orders
                       : item.path === '/admin/support' ? badges.support

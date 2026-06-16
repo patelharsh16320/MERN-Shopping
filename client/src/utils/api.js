@@ -204,6 +204,11 @@ export const dashboardWidgetAPI = {
   toggle: (key, isActive) => API.put(`/dashboard-widgets/${key}`, { isActive }),
 };
 
+export const adminNavAPI = {
+  getAll: () => API.get('/admin-nav'),
+  toggle: (key, isActive) => API.put(`/admin-nav/${key}`, { isActive }),
+};
+
 export const visitAPI = {
   record: (data) => API.post('/visits', data),
   getStats: () => API.get('/visits/stats'),

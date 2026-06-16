@@ -43,6 +43,7 @@ app.use('/api/addresses',    require('./routes/addresses'));
 app.use('/api/page-settings', require('./routes/pageSettings'));
 app.use('/api/db-admin',     require('./routes/dbAdmin'));
 app.use('/api/dashboard-widgets', require('./routes/dashboardWidgets'));
+app.use('/api/admin-nav',    require('./routes/adminNav'));
 
 app.get('/api/health', (req, res) => res.json({ status: 'OK', message: 'women hubclub API Running' }));
 
