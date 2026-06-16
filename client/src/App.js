@@ -51,6 +51,7 @@ import WhatsNew from './pages/admin/WhatsNew';
 import StreakLeaderboard from './pages/admin/StreakLeaderboard';
 import ManageSupport from './pages/admin/ManageSupport';
 import ManagePages from './pages/admin/ManagePages';
+import DashboardSettings from './pages/admin/DashboardSettings';
 import PageSpeed from './pages/admin/PageSpeed';
 import Support from './pages/Support';
 import SpecialOffers from './pages/SpecialOffers';
@@ -132,6 +133,7 @@ function App() {
               <Route path="/admin/streaks" element={<StreakLeaderboard />} />
               <Route path="/admin/support" element={<ManageSupport />} />
               <Route path="/admin/pages" element={<ManagePages />} />
+              <Route path="/admin/dashboard-settings" element={<DashboardSettings />} />
               <Route path="/admin/page-speed" element={<PageSpeed />} />
 
               {/* Auth routes */}

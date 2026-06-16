@@ -110,6 +110,7 @@ export const dbAdminAPI = {
   restore: (key, ids) => API.post(`/db-admin/${key}/restore`, { ids }),
   permanentDelete: (key, ids) => API.post(`/db-admin/${key}/permanent-delete`, { ids }),
   emptyTrash: (key) => API.post(`/db-admin/${key}/empty-trash`),
+  deleteAll: (key, confirmLabel) => API.post(`/db-admin/${key}/delete-all`, { confirmLabel }),
 };
 
 export const changelogAPI = {
@@ -196,6 +197,11 @@ export const loyaltyAPI = {
 export const pageSettingAPI = {
   getAll:  () => API.get('/page-settings'),
   toggle:  (key, isActive) => API.put(`/page-settings/${key}`, { isActive }),
+};
+
+export const dashboardWidgetAPI = {
+  getAll: () => API.get('/dashboard-widgets'),
+  toggle: (key, isActive) => API.put(`/dashboard-widgets/${key}`, { isActive }),
 };
 
 export const visitAPI = {

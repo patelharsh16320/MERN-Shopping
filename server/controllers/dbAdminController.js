@@ -103,6 +103,21 @@ const emptyTrash = async (req, res) => {
   }
 };
 
+const deleteAll = async (req, res) => {
+  try {
+    const entry = getEntry(req.params.key);
+    // Require the admin to echo back the exact collection label, as a server-side
+    // guard against this irreversible wipe being triggered by a stray/automated request.
+    if (req.body.confirmLabel !== entry.label) {
+      return res.status(400).json({ message: 'Confirmation label does not match' });
+    }
+    const result = await entry.model.deleteMany({});
+    res.json({ deleted: result.deletedCount });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message });
+  }
+};
+
 const scanDuplicates = async (req, res) => {
   try {
     const entry = getEntry(req.params.key);
@@ -161,6 +176,7 @@ module.exports = {
   restore: setStatus('active'),
   permanentDelete,
   emptyTrash,
+  deleteAll,
   scanDuplicates,
   removeDuplicates,
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from './AdminLayout';
-import { orderAPI, userAPI, productAPI, contactAPI, subscriberAPI } from '../../utils/api';
+import { orderAPI, userAPI, productAPI, contactAPI, subscriberAPI, dashboardWidgetAPI } from '../../utils/api';
 import { getSocket } from '../../utils/socket';
 import './Dashboard.css';
 
@@ -10,6 +10,7 @@ export default function Dashboard() {
   const [contacts, setContacts] = useState([]);
   const [subscribers, setSubscribers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [widgets, setWidgets] = useState(null);
 
   useEffect(() => {
     Promise.all([
@@ -26,7 +27,13 @@ export default function Dashboard() {
       setSubscribers(subs.data.subscribers || []);
       setLoading(false);
     }).catch(() => setLoading(false));
+
+    dashboardWidgetAPI.getAll()
+      .then(({ data }) => setWidgets(Object.fromEntries(data.map(w => [w.key, w.isActive]))))
+      .catch(() => setWidgets({}));
   }, []);
+
+  const showWidget = (key) => widgets === null || widgets[key] !== false;
 
   // Live socket updates — no page refresh needed
   useEffect(() => {
@@ -79,13 +86,13 @@ export default function Dashboard() {
   }, []);
 
   const cards = [
-    { label: 'Total Revenue', value: `₹${(stats.orders.revenue || 0).toLocaleString()}`, icon: '💰', gradient: 'linear-gradient(135deg,#6c63ff,#a29bfe)', bg: '#f0f0ff' },
-    { label: 'Total Orders', value: stats.orders.total || 0, icon: '📦', gradient: 'linear-gradient(135deg,#fd79a8,#fab1d3)', bg: '#fff0f5' },
-    { label: 'Total Users', value: stats.users.total || 0, icon: '👥', gradient: 'linear-gradient(135deg,#00cec9,#81ecec)', bg: '#e8ffff' },
-    { label: 'Total Products', value: stats.products || 0, icon: '🌸', gradient: 'linear-gradient(135deg,#fdcb6e,#f9ca24)', bg: '#fffae0' },
-    { label: 'Pending Orders', value: stats.orders.pending || 0, icon: '⏳', gradient: 'linear-gradient(135deg,#e17055,#fab1d3)', bg: '#fff5f0' },
-    { label: 'Delivered', value: stats.orders.delivered || 0, icon: '✅', gradient: 'linear-gradient(135deg,#00b894,#55efc4)', bg: '#e8fff5' },
-  ];
+    { key: 'revenueCard', label: 'Total Revenue', value: `₹${(stats.orders.revenue || 0).toLocaleString()}`, icon: '💰', gradient: 'linear-gradient(135deg,#6c63ff,#a29bfe)', bg: '#f0f0ff' },
+    { key: 'ordersCard', label: 'Total Orders', value: stats.orders.total || 0, icon: '📦', gradient: 'linear-gradient(135deg,#fd79a8,#fab1d3)', bg: '#fff0f5' },
+    { key: 'usersCard', label: 'Total Users', value: stats.users.total || 0, icon: '👥', gradient: 'linear-gradient(135deg,#00cec9,#81ecec)', bg: '#e8ffff' },
+    { key: 'productsCard', label: 'Total Products', value: stats.products || 0, icon: '🌸', gradient: 'linear-gradient(135deg,#fdcb6e,#f9ca24)', bg: '#fffae0' },
+    { key: 'pendingCard', label: 'Pending Orders', value: stats.orders.pending || 0, icon: '⏳', gradient: 'linear-gradient(135deg,#e17055,#fab1d3)', bg: '#fff5f0' },
+    { key: 'deliveredCard', label: 'Delivered', value: stats.orders.delivered || 0, icon: '✅', gradient: 'linear-gradient(135deg,#00b894,#55efc4)', bg: '#e8fff5' },
+  ].filter(card => showWidget(card.key));
 
   const statusColors = { Pending: 'pending', Processing: 'processing', Shipped: 'shipped', Delivered: 'delivered', Cancelled: 'cancelled' };
 
@@ -112,6 +119,7 @@ export default function Dashboard() {
       </div>
 
       {/* Recent Orders */}
+      {showWidget('recentOrders') && (
       <div className="table-container animate-fade" style={{ marginBottom: 32 }}>
         <div className="table-header">
           <h3 style={{ fontWeight: 700, fontSize: 18 }}>Recent Orders</h3>
@@ -146,11 +154,14 @@ export default function Dashboard() {
           </table>
         )}
       </div>
+      )}
 
       {/* Messages section */}
+      {(showWidget('contactMessages') || showWidget('subscribers')) && (
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))', gap: 24 }}>
 
         {/* Contact form messages */}
+        {showWidget('contactMessages') && (
         <div className="table-container animate-fade">
           <div className="table-header">
             <h3 style={{ fontWeight: 700, fontSize: 18 }}>📩 Contact Messages</h3>
@@ -195,8 +206,10 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+        )}
 
         {/* Newsletter subscribers */}
+        {showWidget('subscribers') && (
         <div className="table-container animate-fade">
           <div className="table-header">
             <h3 style={{ fontWeight: 700, fontSize: 18 }}>💌 Inner Circle Subscribers</h3>
@@ -254,7 +267,9 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+        )}
       </div>
+      )}
     </AdminLayout>
   );
 }

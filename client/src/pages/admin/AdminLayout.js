@@ -23,6 +23,7 @@ const navItems = [
   { icon: '🔥', label: 'Streak Board', path: '/admin/streaks' },
   { icon: '🎧', label: 'Support', path: '/admin/support' },
   { icon: '🔘', label: 'Pages', path: '/admin/pages' },
+  { icon: '🧩', label: 'Dashboard Settings', path: '/admin/dashboard-settings' },
   { icon: '⚡', label: 'Page Speed', path: '/admin/page-speed' },
 ];
 

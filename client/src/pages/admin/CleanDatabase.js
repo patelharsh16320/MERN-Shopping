@@ -104,6 +104,21 @@ export default function CleanDatabase() {
     } catch { toast.error('Failed to empty trash'); }
   };
 
+  const handleDeleteAll = async (key, label, total) => {
+    if (total === 0) return;
+    const typed = window.prompt(`This permanently deletes ALL ${total} record(s) in "${label}" — active, draft, and trash. This cannot be undone.\n\nType "${label}" to confirm:`);
+    if (typed !== label) {
+      if (typed !== null) toast.error('Confirmation text did not match — nothing was deleted');
+      return;
+    }
+    try {
+      const { data } = await dbAdminAPI.deleteAll(key, label);
+      toast.success(`Deleted all ${data.deleted} record(s) from ${label}`);
+      fetchOverview();
+      if (activeKey === key) setActiveKey(null);
+    } catch (err) { toast.error(err.response?.data?.message || 'Failed to delete all data'); }
+  };
+
   const openDuplicates = async (key) => {
     setActiveKey(null);
     setDupeKey(key);
@@ -160,6 +175,11 @@ export default function CleanDatabase() {
               {o.trash > 0 && (
                 <button className="btn btn-sm" style={{ background: '#fff0f0', color: '#d63031', borderRadius: 20 }} onClick={() => handleEmptyTrash(o.key, o.trash)}>
                   🗑️ Empty Trash
+                </button>
+              )}
+              {o.total > 0 && (
+                <button className="btn btn-sm" style={{ background: '#2d2d2d', color: 'white', borderRadius: 20 }} onClick={() => handleDeleteAll(o.key, o.label, o.total)}>
+                  💀 Delete All Data
                 </button>
               )}
             </div>
