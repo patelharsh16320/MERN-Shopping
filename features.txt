@@ -4,6 +4,18 @@
 ========================================
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Jun 16, 2026
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+- REQUEST LOGS NOW SHOW EMAIL & USERNAME  [ENHANCEMENT]
+  server/middleware/requestLogger.js resolves userId → { email, name }
+  via a 5-minute in-memory cache before writing each log line.
+  Log lines now read "user@example.com (Name)" instead of a raw user ID.
+  Guests still logged as "guest". Makes server/logs/YYYY-MM-DD.log
+  files human-readable for auditing.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   Jun 15, 2026
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
