@@ -4,6 +4,7 @@ import { reviewAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
 
 const PAGE_SIZE = 10;
+const REVIEW_COLS = ['Reviewer', 'Product', 'Rating', 'Comment', 'Status', 'Date'];
 const STATUS_TABS = [
   { key: 'all', label: 'All' },
   { key: 'approved', label: 'Approved' },
@@ -52,6 +53,18 @@ export default function ManageReviews() {
   const [sortDir, setSortDir] = useState('desc');
   const [page, setPage] = useState(1);
   const [selectedKeys, setSelectedKeys] = useState(new Set());
+  const [visibleCols, setVisibleCols] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('admin_cols_reviews') || '{}');
+      return Object.fromEntries(REVIEW_COLS.map(c => [c, saved[c] !== undefined ? saved[c] : true]));
+    } catch { return Object.fromEntries(REVIEW_COLS.map(c => [c, true])); }
+  });
+
+  const toggleCol = (col) => setVisibleCols(v => {
+    const next = { ...v, [col]: !v[col] };
+    localStorage.setItem('admin_cols_reviews', JSON.stringify(next));
+    return next;
+  });
 
   const fetchReviews = async () => {
     setLoading(true);
@@ -166,9 +179,18 @@ export default function ManageReviews() {
         ))}
       </div>
 
-      <div style={{ marginBottom: 16 }}>
+      <div style={{ marginBottom: 16, display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
         <input className="form-input" placeholder="Search by reviewer, product, or comment..." value={search}
           onChange={e => { setSearch(e.target.value); setPage(1); setSelectedKeys(new Set()); }} style={{ maxWidth: 380 }} />
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          <span style={{ fontSize: 13, color: '#9e9e9e', fontWeight: 600 }}>Columns:</span>
+          {REVIEW_COLS.map(col => (
+            <button key={col} onClick={() => toggleCol(col)}
+              style={{ padding: '4px 12px', borderRadius: 20, border: `2px solid ${visibleCols[col] ? '#6c63ff' : '#e0e0e0'}`, background: visibleCols[col] ? '#f0f0ff' : 'white', color: visibleCols[col] ? '#6c63ff' : '#9e9e9e', fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}>
+              {visibleCols[col] ? '✓ ' : ''}{col}
+            </button>
+          ))}
+        </div>
       </div>
 
       {selectedKeys.size > 0 && (
@@ -189,12 +211,12 @@ export default function ManageReviews() {
                   onChange={toggleSelectAll} />
               </th>
               <th>#</th>
-              <SortTh label="Reviewer" field="name" {...sortProps} />
-              <SortTh label="Product" field="productName" {...sortProps} />
-              <SortTh label="Rating" field="rating" {...sortProps} />
-              <th>Comment</th>
-              <th>Status</th>
-              <SortTh label="Date" field="createdAt" {...sortProps} />
+              {visibleCols.Reviewer && <SortTh label="Reviewer" field="name" {...sortProps} />}
+              {visibleCols.Product && <SortTh label="Product" field="productName" {...sortProps} />}
+              {visibleCols.Rating && <SortTh label="Rating" field="rating" {...sortProps} />}
+              {visibleCols.Comment && <th>Comment</th>}
+              {visibleCols.Status && <th>Status</th>}
+              {visibleCols.Date && <SortTh label="Date" field="createdAt" {...sortProps} />}
               <th>Actions</th>
             </tr>
           </thead>
@@ -210,29 +232,39 @@ export default function ManageReviews() {
                   <td><input type="checkbox" style={{ width: 16, height: 16, accentColor: '#6c63ff', cursor: 'pointer' }}
                     checked={selectedKeys.has(reviewKey(r))} onChange={() => toggleSelect(r)} /></td>
                   <td style={{ color: '#636e72' }}>{(page - 1) * PAGE_SIZE + i + 1}</td>
-                  <td style={{ fontWeight: 600 }}>{r.name}</td>
-                  <td>
-                    <span style={{ background: '#f0f0ff', color: '#6c63ff', padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600 }}>
-                      {r.productName}
-                    </span>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <span style={{ color: '#f9a825', fontSize: 14 }}>{'⭐'.repeat(r.rating)}</span>
-                      <span style={{ fontWeight: 700, fontSize: 13, color: '#424242' }}>{r.rating}/5</span>
-                    </div>
-                  </td>
-                  <td style={{ maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#636e72', fontSize: 13 }} title={r.comment}>
-                    {r.comment}
-                  </td>
-                  <td>
-                    {approved
-                      ? <span style={{ color: '#00b894', fontWeight: 700, fontSize: 12 }}>✓ Approved</span>
-                      : <span style={{ color: '#d63031', fontWeight: 700, fontSize: 12 }}>✕ Rejected</span>}
-                  </td>
-                  <td style={{ color: '#636e72', fontSize: 13, whiteSpace: 'nowrap' }}>
-                    {new Date(r.createdAt).toLocaleDateString('en-IN', { dateStyle: 'medium' })}
-                  </td>
+                  {visibleCols.Reviewer && <td style={{ fontWeight: 600 }}>{r.name}</td>}
+                  {visibleCols.Product && (
+                    <td>
+                      <span style={{ background: '#f0f0ff', color: '#6c63ff', padding: '3px 10px', borderRadius: 12, fontSize: 12, fontWeight: 600 }}>
+                        {r.productName}
+                      </span>
+                    </td>
+                  )}
+                  {visibleCols.Rating && (
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <span style={{ color: '#f9a825', fontSize: 14 }}>{'⭐'.repeat(r.rating)}</span>
+                        <span style={{ fontWeight: 700, fontSize: 13, color: '#424242' }}>{r.rating}/5</span>
+                      </div>
+                    </td>
+                  )}
+                  {visibleCols.Comment && (
+                    <td style={{ maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#636e72', fontSize: 13 }} title={r.comment}>
+                      {r.comment}
+                    </td>
+                  )}
+                  {visibleCols.Status && (
+                    <td>
+                      {approved
+                        ? <span style={{ color: '#00b894', fontWeight: 700, fontSize: 12 }}>✓ Approved</span>
+                        : <span style={{ color: '#d63031', fontWeight: 700, fontSize: 12 }}>✕ Rejected</span>}
+                    </td>
+                  )}
+                  {visibleCols.Date && (
+                    <td style={{ color: '#636e72', fontSize: 13, whiteSpace: 'nowrap' }}>
+                      {new Date(r.createdAt).toLocaleDateString('en-IN', { dateStyle: 'medium' })}
+                    </td>
+                  )}
                   <td>
                     <div style={{ display: 'flex', gap: 8 }}>
                       {approved ? (
