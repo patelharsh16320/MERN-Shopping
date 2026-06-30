@@ -35,6 +35,15 @@ export default function AdminLayout({ children }) {
   const [badges, setBadges] = useState({ messages: 0, orders: 0, support: 0 });
   const [navVisibility, setNavVisibility] = useState(null);
   const socketRef = useRef(null);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('admin_dark_mode') === 'true');
+
+  const toggleDark = () => {
+    setDarkMode(prev => {
+      const next = !prev;
+      localStorage.setItem('admin_dark_mode', next);
+      return next;
+    });
+  };
 
   // Fetch sidebar nav visibility once
   useEffect(() => {
@@ -91,7 +100,7 @@ export default function AdminLayout({ children }) {
   const closeSidebar = () => setSidebarOpen(false);
 
   return (
-    <div className="admin-layout">
+    <div className="admin-layout" data-admin-theme={darkMode ? 'dark' : 'light'}>
       {/* Sidebar overlay (mobile) */}
       <div className={`admin-sidebar-overlay ${sidebarOpen ? 'open' : ''}`} onClick={closeSidebar} />
 
@@ -133,10 +142,13 @@ export default function AdminLayout({ children }) {
       </div>
 
       <div className="admin-content">
-        {/* Mobile top bar */}
-        <div className="admin-mobile-toggle">
-          <button onClick={() => setSidebarOpen(v => !v)}>☰</button>
-          <span style={{ fontWeight: 700, fontSize: 16, color: '#c2185b' }}>🌸 Admin Panel</span>
+        {/* Top bar */}
+        <div className="admin-top-bar">
+          <button className="admin-menu-toggle" onClick={() => setSidebarOpen(v => !v)}>☰</button>
+          <span className="admin-top-brand">🌸 Admin Panel</span>
+          <button className="admin-dark-toggle" onClick={toggleDark} title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
+            {darkMode ? '☀️ Light' : '🌙 Dark'}
+          </button>
         </div>
         <div className="admin-page-content">
           {children}

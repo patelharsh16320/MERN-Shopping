@@ -195,9 +195,7 @@ Ajax - Admin/ User
 
 - remove inline css and create seprate file for it.
 
-
--create new feature for admin, clean db feature, where all databse admin csn see, and also delate it too. also you can merge this function into import export page, also add     
-  feature to remove duplicate data. frist move all data to draft then go to trash after week, if user not delete from trash folder.
+-create new feature for admin, clean db feature, where all databse admin can see, and also delate it too. also you can merge this function into import export page, also add feature to remove duplicate data. frist move all data to draft then go to trash after week, if user not delete from trash folder.
 
 <!-- !------ Reaming-----!  -->
 
