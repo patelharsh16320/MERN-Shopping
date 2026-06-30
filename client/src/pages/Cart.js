@@ -6,8 +6,10 @@ import { couponAPI, loyaltyAPI } from '../utils/api';
 import { toast } from 'react-toastify';
 import './Cart.css';
 
+const SAVED_KEY = 'cart_saved_for_later';
+
 export default function Cart() {
-  const { cartItems, removeFromCart, updateQuantity, clearCart, totalPrice, totalItems } = useCart();
+  const { cartItems, removeFromCart, updateQuantity, clearCart, addToCart, totalPrice, totalItems } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [couponCode, setCouponCode] = useState('');
@@ -18,6 +20,30 @@ export default function Cart() {
   const [loyaltyPoints, setLoyaltyPoints] = useState('');
   const [loyaltyDiscount, setLoyaltyDiscount] = useState(0);
   const [loyaltyPointsUsed, setLoyaltyPointsUsed] = useState(0);
+  const [savedItems, setSavedItems] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(SAVED_KEY) || '[]'); } catch { return []; }
+  });
+
+  const persistSaved = (items) => {
+    setSavedItems(items);
+    localStorage.setItem(SAVED_KEY, JSON.stringify(items));
+  };
+
+  const saveForLater = (item) => {
+    removeFromCart(item._id);
+    persistSaved([...savedItems.filter(s => s._id !== item._id), item]);
+    toast.info(`🔖 "${item.name}" saved for later`);
+  };
+
+  const moveToCart = (item) => {
+    addToCart(item, 1);
+    persistSaved(savedItems.filter(s => s._id !== item._id));
+    toast.success(`🛒 "${item.name}" moved to cart`);
+  };
+
+  const removeSaved = (id) => {
+    persistSaved(savedItems.filter(s => s._id !== id));
+  };
 
   useEffect(() => {
     if (user) loyaltyAPI.getMyLoyalty().then(({ data }) => setLoyaltyInfo(data)).catch(() => {});
@@ -112,6 +138,7 @@ export default function Cart() {
                     <button className="qty-btn" onClick={() => updateQuantity(item._id, item.quantity + 1)}>+</button>
                   </div>
                   <div className="cart-item-subtotal">₹{(item.price * item.quantity).toLocaleString()}</div>
+                  <button onClick={() => saveForLater(item)} style={{ background: 'none', border: 'none', color: '#6c63ff', fontSize: 12, fontWeight: 600, cursor: 'pointer', padding: '4px 0' }}>🔖 Save for later</button>
                 </div>
               </div>
             ))}
@@ -120,6 +147,27 @@ export default function Cart() {
               <div className="cart-delivery-title">🎉 {totalPrice > 999 ? 'Free delivery applied!' : `Add ₹${999 - totalPrice} more for free delivery!`}</div>
               <div className="cart-delivery-sub">Free delivery on orders above ₹999</div>
             </div>
+
+            {savedItems.length > 0 && (
+              <div style={{ marginTop: 28 }}>
+                <h3 style={{ fontWeight: 700, fontSize: 16, marginBottom: 14, color: '#6c63ff' }}>🔖 Saved for Later ({savedItems.length})</h3>
+                {savedItems.map(item => (
+                  <div key={item._id} className="cart-item" style={{ opacity: 0.85 }}>
+                    <img src={item.images?.[0] || 'https://images.unsplash.com/photo-1490750967868-88df5691cc45?w=200'} alt={item.name} className="cart-item-img"
+                      onError={e => e.target.src = 'https://images.unsplash.com/photo-1490750967868-88df5691cc45?w=200'} />
+                    <div className="cart-item-info">
+                      <div className="cart-item-name">{item.name}</div>
+                      <div className="cart-item-category">{item.category}</div>
+                      <div className="cart-item-price">₹{item.price}</div>
+                    </div>
+                    <div className="cart-item-right">
+                      <button onClick={() => removeSaved(item._id)} className="cart-item-remove-btn">✕</button>
+                      <button onClick={() => moveToCart(item)} style={{ background: 'none', border: 'none', color: '#00b894', fontSize: 12, fontWeight: 700, cursor: 'pointer', padding: '4px 0', marginTop: 6 }}>🛒 Move to cart</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="order-summary animate-right">

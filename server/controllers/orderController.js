@@ -38,9 +38,28 @@ const createOrder = async (req, res) => {
     });
     const savedOrder = await order.save();
 
-    // Update stock
+    // Update stock and check for low stock
+    const LOW_STOCK_THRESHOLD = 5;
     for (const item of orderItems) {
-      await Product.findByIdAndUpdate(item.product, { $inc: { stock: -item.quantity } });
+      const updatedProduct = await Product.findByIdAndUpdate(
+        item.product,
+        { $inc: { stock: -item.quantity } },
+        { new: true }
+      );
+      // Send low-stock alert email to admin (non-blocking)
+      if (updatedProduct && updatedProduct.stock <= LOW_STOCK_THRESHOLD) {
+        const adminUser = await User.findOne({ role: 'admin' }).lean();
+        if (adminUser) {
+          const stockMsg = updatedProduct.stock === 0
+            ? `<strong>${updatedProduct.name}</strong> is now <strong>OUT OF STOCK</strong>.`
+            : `<strong>${updatedProduct.name}</strong> has only <strong>${updatedProduct.stock} units</strong> left.`;
+          emailService.send({
+            to: adminUser.email,
+            subject: `Low Stock Alert: ${updatedProduct.name}`,
+            html: `<p>⚠️ Stock Alert: ${stockMsg} Please restock soon.</p>`,
+          });
+        }
+      }
     }
 
     // Auto-generate invoice

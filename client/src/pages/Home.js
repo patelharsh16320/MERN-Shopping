@@ -399,6 +399,28 @@ export default function Home() {
         </div>
       </div>
 
+      {/* ── Recently Viewed ── */}
+      {(() => {
+        let recentlyViewed = [];
+        try { recentlyViewed = JSON.parse(localStorage.getItem('recently_viewed') || '[]'); } catch {}
+        if (recentlyViewed.length === 0) return null;
+        return (
+          <div className="container" style={{ marginBottom: 48 }}>
+            <h2 className="section-title gradient-text" style={{ textAlign: 'center', marginBottom: 24 }}>👁️ Recently Viewed</h2>
+            <div className="products-grid">
+              {recentlyViewed.slice(0, 4).map(p => (
+                <ProductCard key={p._id} product={p} />
+              ))}
+            </div>
+            {recentlyViewed.length > 4 && (
+              <div style={{ textAlign: 'center', marginTop: 20 }}>
+                <Link to="/products" className="btn btn-secondary">View All →</Link>
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
       {/* ── Newsletter ── */}
       <div ref={newsRef} className="home-newsletter-section">
         <div className="home-newsletter-blob-1" />

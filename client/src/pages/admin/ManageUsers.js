@@ -3,7 +3,18 @@ import AdminLayout from './AdminLayout';
 import { userAPI, addressAPI } from '../../utils/api';
 import { toast } from 'react-toastify';
 
-const USER_COLS = ['Email', 'Phone', 'Role', 'Status', 'Addresses', 'Joined'];
+const USER_COLS = ['Email', 'Phone', 'Role', 'Status', 'Segment', 'Addresses', 'Joined'];
+
+function getSegment(user) {
+  const orderCount = user.orderCount || 0;
+  const daysSinceJoined = (Date.now() - new Date(user.createdAt)) / (1000 * 60 * 60 * 24);
+  const daysSinceUpdate = (Date.now() - new Date(user.updatedAt || user.createdAt)) / (1000 * 60 * 60 * 24);
+  if (orderCount > 5) return { label: 'VIP', color: '#6c63ff', bg: '#f0eeff' };
+  if (daysSinceJoined < 30 && orderCount === 0) return { label: 'New', color: '#00b894', bg: '#e8fff5' };
+  if (daysSinceUpdate > 60 && orderCount < 2) return { label: 'At Risk', color: '#e17055', bg: '#fff2ef' };
+  if (orderCount >= 2) return { label: 'Active', color: '#0984e3', bg: '#e8f4ff' };
+  return { label: 'Inactive', color: '#9e9e9e', bg: '#f5f5f5' };
+}
 const PAGE_SIZE = 10;
 
 const EMPTY_ADDR = { label: 'Home', street: '', city: '', state: '', zip: '', country: 'India', isDefault: false };
@@ -217,6 +228,7 @@ export default function ManageUsers() {
   });
   const [sortField, setSortField] = useState('');
   const [sortDir, setSortDir]     = useState('asc');
+  const [segmentFilter, setSegmentFilter] = useState('');
   // address counts keyed by userId (loaded lazily after users fetch)
   const [addrCounts, setAddrCounts] = useState({});
 
@@ -233,10 +245,16 @@ export default function ManageUsers() {
   };
 
   const filteredUsers = useMemo(() => {
-    if (!search.trim()) return users;
-    const q = search.toLowerCase();
-    return users.filter(u => u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q));
-  }, [users, search]);
+    let list = users;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(u => u.name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q));
+    }
+    if (segmentFilter) {
+      list = list.filter(u => getSegment(u).label === segmentFilter);
+    }
+    return list;
+  }, [users, search, segmentFilter]);
 
   const sortedUsers = useMemo(() => {
     if (!sortField) return filteredUsers;
@@ -320,7 +338,7 @@ export default function ManageUsers() {
   };
 
   const sortProps = { sortField, sortDir, onSort: handleSort };
-  const visibleCount = 4 + Object.values(visibleCols).filter(Boolean).length;
+  const visibleCount = 4 + Object.values(visibleCols).filter(Boolean).length; // 4 = checkbox, #, Name, Actions
 
   return (
     <AdminLayout>
@@ -344,7 +362,13 @@ export default function ManageUsers() {
       <div style={{ marginBottom: 16, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
         <input className="form-input" placeholder="Search by name or email..." value={search}
           onChange={e => { setSearch(e.target.value); setPage(1); setSelectedIds(new Set()); }}
-          style={{ maxWidth: 320 }} />
+          style={{ maxWidth: 280 }} />
+        <select className="form-select" value={segmentFilter}
+          onChange={e => { setSegmentFilter(e.target.value); setPage(1); }}
+          style={{ maxWidth: 160 }}>
+          <option value="">All Segments</option>
+          {['VIP', 'Active', 'New', 'At Risk', 'Inactive'].map(s => <option key={s} value={s}>{s}</option>)}
+        </select>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
           <span style={{ fontSize: 13, color: '#9e9e9e', fontWeight: 600 }}>Columns:</span>
           {USER_COLS.map(col => (
@@ -371,6 +395,7 @@ export default function ManageUsers() {
               {visibleCols['Phone']     && <SortTh label="Phone"     field="phone"     {...sortProps} />}
               {visibleCols['Role']      && <SortTh label="Role"      field="role"      {...sortProps} />}
               {visibleCols['Status']    && <SortTh label="Status"    field="isActive"  {...sortProps} />}
+              {visibleCols['Segment']   && <th>Segment</th>}
               {visibleCols['Addresses'] && <th>Addresses</th>}
               {visibleCols['Joined']    && <SortTh label="Joined"    field="createdAt" {...sortProps} />}
               <th>Actions</th>
@@ -402,6 +427,7 @@ export default function ManageUsers() {
                 {visibleCols['Phone']  && <td style={{ color: '#636e72' }}>{user.phone || '—'}</td>}
                 {visibleCols['Role']   && <td><span className={`badge badge-${user.role}`}>{user.role}</span></td>}
                 {visibleCols['Status'] && <td><span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: user.isActive ? '#00b894' : '#d63031', marginRight: 6 }} />{user.isActive ? 'Active' : 'Inactive'}</td>}
+                {visibleCols['Segment'] && (() => { const seg = getSegment(user); return <td><span style={{ background: seg.bg, color: seg.color, fontWeight: 700, fontSize: 11, padding: '3px 10px', borderRadius: 20 }}>{seg.label}</span></td>; })()}
                 {visibleCols['Addresses'] && (
                   <td>
                     <button

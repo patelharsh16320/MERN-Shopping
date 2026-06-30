@@ -4,9 +4,24 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import './Navbar.css';
 
+function useCompareCount() {
+  const [count, setCount] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('compare_list') || '[]').length; } catch { return 0; }
+  });
+  useEffect(() => {
+    const update = () => {
+      try { setCount(JSON.parse(localStorage.getItem('compare_list') || '[]').length); } catch {}
+    };
+    window.addEventListener('compare_updated', update);
+    return () => window.removeEventListener('compare_updated', update);
+  }, []);
+  return count;
+}
+
 export default function Navbar() {
   const { user, logout } = useAuth();
   const { totalItems } = useCart();
+  const compareCount = useCompareCount();
   const navigate = useNavigate();
   const location = useLocation();
   const [search, setSearch] = useState('');
@@ -48,8 +63,20 @@ export default function Navbar() {
     if (search.trim()) { navigate(`/products?search=${encodeURIComponent(search)}`); setMobileOpen(false); }
   };
 
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
   const isActive = (path) => location.pathname === path ? 'active' : '';
   const close = () => { setMobileOpen(false); setDropOpen(false); };
+
+  const handleLogout = () => {
+    close();
+    setShowLogoutConfirm(true);
+  };
+  const confirmLogout = () => {
+    setShowLogoutConfirm(false);
+    logout();
+    navigate('/');
+  };
 
   return (
     <>
@@ -88,7 +115,7 @@ export default function Navbar() {
                       <Link to="/invoices" className="dropdown-item" onClick={close}>🧾 My Invoices</Link>
                       <Link to="/wishlist" className="dropdown-item" onClick={close}>🤍 Wishlist</Link>
                       <Link to="/profile" className="dropdown-item" onClick={close}>👤 Profile</Link>
-                      <div className="dropdown-item dropdown-item-danger" onClick={() => { logout(); close(); navigate('/'); }}>🚪 Logout</div>
+                      <div className="dropdown-item dropdown-item-danger" onClick={handleLogout}>🚪 Logout</div>
                     </div>
                   )}
                 </li>
@@ -103,6 +130,11 @@ export default function Navbar() {
 
           {/* Mobile right side */}
           <div className="mobile-right">
+            {compareCount > 0 && (
+              <Link to="/compare" className="nav-link nav-cart-link">
+                <span className="cart-badge">⚖️<span className="cart-count">{compareCount}</span></span>
+              </Link>
+            )}
             <Link to="/cart" className="nav-link nav-cart-link">
               <span className="cart-badge">
                 🛒
@@ -118,6 +150,29 @@ export default function Navbar() {
 
       {/* Mobile overlay */}
       <div className={`mobile-overlay ${mobileOpen ? 'open' : ''}`} onClick={() => setMobileOpen(false)} />
+
+      {/* Logout confirmation modal */}
+      {showLogoutConfirm && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          onClick={() => setShowLogoutConfirm(false)}>
+          <div style={{ background: 'white', borderRadius: 16, padding: '32px 28px', maxWidth: 360, width: '90%', textAlign: 'center', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}
+            onClick={e => e.stopPropagation()}>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>🚪</div>
+            <h3 style={{ fontWeight: 800, fontSize: 20, marginBottom: 8, color: '#333' }}>Logout?</h3>
+            <p style={{ color: '#636e72', marginBottom: 24, fontSize: 14 }}>Are you sure you want to logout from your account?</p>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+              <button onClick={() => setShowLogoutConfirm(false)}
+                style={{ padding: '10px 24px', borderRadius: 20, border: '2px solid #dfe6e9', background: 'white', color: '#636e72', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+                Cancel
+              </button>
+              <button onClick={confirmLogout}
+                style={{ padding: '10px 24px', borderRadius: 20, border: 'none', background: 'linear-gradient(135deg,#d63031,#e17055)', color: 'white', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+                Yes, Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Mobile nav drawer */}
       <div className={`mobile-nav ${mobileOpen ? 'open' : ''}`}>
@@ -138,7 +193,7 @@ export default function Navbar() {
             <Link to="/support" className="nav-link" onClick={close}>🎧 Support</Link>
             <Link to="/profile" className="nav-link" onClick={close}>👤 Profile ({user.name.split(' ')[0]})</Link>
             {user.role === 'admin' && <Link to="/admin" className="nav-link" onClick={close}>⚙️ Admin Panel</Link>}
-            <div className="nav-link nav-link-danger" onClick={() => { logout(); close(); navigate('/'); }}>🚪 Logout</div>
+            <div className="nav-link nav-link-danger" onClick={handleLogout}>🚪 Logout</div>
           </>
         ) : (
           <>

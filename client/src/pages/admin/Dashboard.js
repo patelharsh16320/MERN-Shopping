@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from './AdminLayout';
 import { orderAPI, userAPI, productAPI, contactAPI, subscriberAPI, dashboardWidgetAPI } from '../../utils/api';
+import { Link } from 'react-router-dom';
 import { getSocket } from '../../utils/socket';
 import './Dashboard.css';
 
@@ -11,8 +12,10 @@ export default function Dashboard() {
   const [subscribers, setSubscribers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [widgets, setWidgets] = useState(null);
+  const [lowStock, setLowStock] = useState({ lowStock: [], outOfStock: [] });
 
   useEffect(() => {
+    productAPI.getLowStock(5).then(({ data }) => setLowStock(data)).catch(() => {});
     Promise.all([
       orderAPI.getStats(),
       userAPI.getStats(),
@@ -104,6 +107,29 @@ export default function Dashboard() {
         </h1>
         <p style={{ color: '#636e72' }}>Welcome back! Here's what's happening with your store.</p>
       </div>
+
+      {/* Low stock alert banner */}
+      {(lowStock.outOfStock.length > 0 || lowStock.lowStock.length > 0) && (
+        <div style={{ background: '#fff8f0', border: '2px solid #ffe0b2', borderRadius: 16, padding: '14px 20px', marginBottom: 24, display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+          <span style={{ fontSize: 24, flexShrink: 0 }}>⚠️</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 700, color: '#e65100', marginBottom: 4 }}>Stock Alert</div>
+            {lowStock.outOfStock.length > 0 && (
+              <div style={{ fontSize: 13, color: '#d32f2f', marginBottom: 4 }}>
+                <strong>{lowStock.outOfStock.length} product{lowStock.outOfStock.length > 1 ? 's' : ''} out of stock:</strong>{' '}
+                {lowStock.outOfStock.slice(0, 3).map(p => p.name).join(', ')}{lowStock.outOfStock.length > 3 ? ` +${lowStock.outOfStock.length - 3} more` : ''}
+              </div>
+            )}
+            {lowStock.lowStock.length > 0 && (
+              <div style={{ fontSize: 13, color: '#e65100' }}>
+                <strong>{lowStock.lowStock.length} product{lowStock.lowStock.length > 1 ? 's' : ''} running low:</strong>{' '}
+                {lowStock.lowStock.slice(0, 3).map(p => `${p.name} (${p.stock} left)`).join(', ')}{lowStock.lowStock.length > 3 ? ` +${lowStock.lowStock.length - 3} more` : ''}
+              </div>
+            )}
+          </div>
+          <Link to="/admin/products" style={{ color: '#e65100', fontSize: 13, fontWeight: 700, textDecoration: 'none', whiteSpace: 'nowrap' }}>View Products →</Link>
+        </div>
+      )}
 
       {/* Stat cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 20, marginBottom: 32 }}>

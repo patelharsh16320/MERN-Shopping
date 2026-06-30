@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -6,11 +6,36 @@ import { authAPI } from '../utils/api';
 import { toast } from 'react-toastify';
 import './ProductCard.css';
 
+const COMPARE_KEY = 'compare_list';
+const MAX_COMPARE = 3;
+
+function getCompareList() {
+  try { return JSON.parse(localStorage.getItem(COMPARE_KEY) || '[]'); } catch { return []; }
+}
+function setCompareList(list) {
+  localStorage.setItem(COMPARE_KEY, JSON.stringify(list));
+  window.dispatchEvent(new Event('compare_updated'));
+}
+
 export default function ProductCard({ product, wishlistIds = [], onWishlistToggle }) {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { user } = useAuth();
   const isWishlisted = wishlistIds.includes(product._id);
+
+  const handleCompare = (e) => {
+    e.stopPropagation();
+    const list = getCompareList();
+    if (list.find(p => p._id === product._id)) {
+      setCompareList(list.filter(p => p._id !== product._id));
+      toast.info('Removed from compare', { autoClose: 1500 });
+    } else if (list.length >= MAX_COMPARE) {
+      toast.warning(`Max ${MAX_COMPARE} products can be compared`, { autoClose: 2000 });
+    } else {
+      setCompareList([...list, { _id: product._id, name: product.name, price: product.price, images: product.images, category: product.category, rating: product.rating, numReviews: product.numReviews, stock: product.stock, discount: product.discount, originalPrice: product.originalPrice, slug: product.slug }]);
+      toast.success('Added to compare!', { autoClose: 1500 });
+    }
+  };
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
@@ -71,6 +96,9 @@ export default function ProductCard({ product, wishlistIds = [], onWishlistToggl
           <button className="btn btn-primary btn-add-cart" onClick={handleAddToCart}
             disabled={product.stock === 0}>
             {product.stock === 0 ? '❌ Out of Stock' : '🛒 Add to Cart'}
+          </button>
+          <button onClick={handleCompare} style={{ background: 'none', border: '1.5px solid #e0e0e0', borderRadius: 20, padding: '5px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer', color: '#636e72', marginTop: 6, width: '100%' }}>
+            ⚖️ Compare
           </button>
         </div>
         {product.stock < 10 && product.stock > 0 && (

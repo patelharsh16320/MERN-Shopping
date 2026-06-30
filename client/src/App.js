@@ -55,6 +55,7 @@ import DashboardSettings from './pages/admin/DashboardSettings';
 import PageSpeed from './pages/admin/PageSpeed';
 import Support from './pages/Support';
 import SpecialOffers from './pages/SpecialOffers';
+import Compare from './pages/Compare';
 
 function VisitTracker() {
   const location = useLocation();
@@ -79,7 +80,22 @@ function MainLayout({ children }) {
 
 // Wraps a page with MainLayout + guards it by pageKey
 function GuardedPage({ pageKey, children }) {
-  const { settings, loaded } = usePageSettings();
+  const { settings, meta, loaded } = usePageSettings();
+
+  // Inject meta title + description whenever this page is active
+  useEffect(() => {
+    if (!loaded) return;
+    const m = meta[pageKey];
+    if (m?.metaTitle) document.title = m.metaTitle;
+    // Update or create the meta description tag
+    let tag = document.querySelector('meta[name="description"]');
+    if (!tag) {
+      tag = document.createElement('meta');
+      tag.name = 'description';
+      document.head.appendChild(tag);
+    }
+    if (m?.metaDescription) tag.content = m.metaDescription;
+  }, [loaded, meta, pageKey]);
 
   if (!loaded) return null; // wait silently — settings load fast
 
@@ -161,6 +177,7 @@ function App() {
               <Route path="/terms" element={<MainLayout><TermsConditions /></MainLayout>} />
               <Route path="/support" element={<GuardedPage pageKey="support"><Support /></GuardedPage>} />
               <Route path="/offers" element={<GuardedPage pageKey="offers"><SpecialOffers /></GuardedPage>} />
+              <Route path="/compare" element={<MainLayout><Compare /></MainLayout>} />
             </Routes>
 
             <ScrollButtons />

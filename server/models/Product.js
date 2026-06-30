@@ -36,6 +36,7 @@ const productSchema = new mongoose.Schema({
     enabled:     { type: Boolean, default: false },
     label:       { type: String, default: '' },
     salePrice:   { type: Number, default: 0 },
+    startsAt:    { type: Date, default: null },
     endsAt:      { type: Date, default: null },
   },
 }, { timestamps: true });

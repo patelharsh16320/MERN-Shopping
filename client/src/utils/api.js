@@ -46,6 +46,10 @@ export const productAPI = {
   updateReview: (id, data) => API.put(`/products/${id}/reviews`, data),
   exportAll: (format = 'json') => API.get('/products/admin/export', { params: { format }, responseType: format === 'csv' ? 'text' : 'json' }),
   importAll: (items, duplicateAction) => API.post('/products/admin/import', { items, duplicateAction }),
+  getLowStock: (threshold) => API.get('/products/admin/low-stock', { params: { threshold } }),
+  joinWaitlist: (id, email) => API.post(`/products/${id}/waitlist/join`, { email }),
+  leaveWaitlist: (id, email) => API.post(`/products/${id}/waitlist/leave`, { email }),
+  getWaitlist: (id) => API.get(`/products/${id}/waitlist`),
 };
 
 export const orderAPI = {
@@ -195,8 +199,9 @@ export const loyaltyAPI = {
 };
 
 export const pageSettingAPI = {
-  getAll:  () => API.get('/page-settings'),
-  toggle:  (key, isActive) => API.put(`/page-settings/${key}`, { isActive }),
+  getAll:     () => API.get('/page-settings'),
+  toggle:     (key, isActive) => API.put(`/page-settings/${key}`, { isActive }),
+  updateMeta: (key, metaTitle, metaDescription) => API.put(`/page-settings/${key}`, { metaTitle, metaDescription }),
 };
 
 export const dashboardWidgetAPI = {

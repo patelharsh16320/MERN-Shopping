@@ -1,4 +1,21 @@
 const Product = require('../models/Product');
+const Waitlist = require('../models/Waitlist');
+const emailService = require('../utils/emailService');
+
+const LOW_STOCK_THRESHOLD = 5;
+
+// Apply scheduled flash-sale enable/disable based on startsAt / endsAt
+function applyOfferSchedule(product) {
+  const offer = product.specialOffer;
+  if (!offer) return product;
+  const now = new Date();
+  if (offer.startsAt && new Date(offer.startsAt) > now) {
+    product.specialOffer = { ...offer, enabled: false };
+  } else if (offer.endsAt && new Date(offer.endsAt) < now) {
+    product.specialOffer = { ...offer, enabled: false };
+  }
+  return product;
+}
 
 const getProducts = async (req, res) => {
   try {
@@ -21,7 +38,8 @@ const getProducts = async (req, res) => {
     else if (req.query.sort === 'newest') sort = { createdAt: -1 };
     else sort = { isFeatured: -1, createdAt: -1 };
     const total = await Product.countDocuments(query);
-    const products = await Product.find(query).sort(sort).skip(skip).limit(limit);
+    const rawProducts = await Product.find(query).sort(sort).skip(skip).limit(limit);
+    const products = rawProducts.map(p => applyOfferSchedule(p.toObject()));
     res.json({ products, total, page, pages: Math.ceil(total / limit) });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -37,7 +55,7 @@ const getProductById = async (req, res) => {
       product = await Product.findOne({ slug: req.params.id }).populate('reviews.user', 'name avatar');
     }
     if (!product) return res.status(404).json({ message: 'Product not found' });
-    const obj = product.toObject();
+    const obj = applyOfferSchedule(product.toObject());
     obj.reviews = obj.reviews.filter(r => r.isApproved !== false);
     res.json(obj);
   } catch (err) {
@@ -67,6 +85,7 @@ const updateProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
+    const prevStock = product.stock;
     const body = { ...req.body };
     if (body.status === 'trash' && product.status !== 'trash') {
       body.trashedAt = new Date();
@@ -80,6 +99,22 @@ const updateProduct = async (req, res) => {
     if (!product.totalStock) product.totalStock = product.stock;
     const saved = await product.save();
     emitProductsUpdated(req, 'updated');
+
+    // Notify waitlist if product was out of stock and now has stock
+    if (prevStock === 0 && saved.stock > 0) {
+      const waitlist = await Waitlist.find({ product: saved._id, notified: false });
+      if (waitlist.length > 0) {
+        for (const entry of waitlist) {
+          emailService.send({
+            to: entry.email,
+            subject: `${saved.name} is back in stock!`,
+            html: `<p>Great news! <strong>${saved.name}</strong> is back in stock. <a href="${process.env.SITE_URL || 'http://localhost:3000'}/products/${saved.slug || saved._id}">Shop now</a> before it sells out again.</p>`,
+          });
+        }
+        await Waitlist.updateMany({ product: saved._id, notified: false }, { notified: true });
+      }
+    }
+
     res.json(saved);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -296,4 +331,58 @@ const deleteReviewAdmin = async (req, res) => {
   }
 };
 
-module.exports = { getProducts, getAdminProducts, getProductById, createProduct, updateProduct, deleteProduct, addReview, updateReview, getFeatured, getCategories, exportProducts, importProducts, getAllReviews, updateReviewAdmin, deleteReviewAdmin };
+const getLowStockProducts = async (req, res) => {
+  try {
+    const threshold = parseInt(req.query.threshold) || LOW_STOCK_THRESHOLD;
+    const products = await Product.find({ stock: { $lte: threshold, $gt: 0 }, status: { $ne: 'trash' } })
+      .select('name stock images category')
+      .sort({ stock: 1 })
+      .limit(50);
+    const outOfStock = await Product.find({ stock: 0, status: { $ne: 'trash' }, isActive: true })
+      .select('name stock images category')
+      .limit(50);
+    res.json({ lowStock: products, outOfStock, threshold });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const joinWaitlist = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+    const email = req.body.email || req.user?.email;
+    if (!email) return res.status(400).json({ message: 'Email required' });
+    await Waitlist.findOneAndUpdate(
+      { product: req.params.id, email },
+      { product: req.params.id, email, userId: req.user?._id || null, notified: false },
+      { upsert: true, new: true }
+    );
+    res.json({ message: 'Added to waitlist' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const leaveWaitlist = async (req, res) => {
+  try {
+    const email = req.body.email || req.user?.email;
+    await Waitlist.deleteOne({ product: req.params.id, email });
+    res.json({ message: 'Removed from waitlist' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const getWaitlist = async (req, res) => {
+  try {
+    const entries = await Waitlist.find({ product: req.params.id })
+      .populate('userId', 'name email')
+      .sort({ createdAt: -1 });
+    res.json(entries);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = { getProducts, getAdminProducts, getProductById, createProduct, updateProduct, deleteProduct, addReview, updateReview, getFeatured, getCategories, exportProducts, importProducts, getAllReviews, updateReviewAdmin, deleteReviewAdmin, getLowStockProducts, joinWaitlist, leaveWaitlist, getWaitlist };

@@ -12,9 +12,17 @@ const getAllUsers = async (req, res) => {
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
     const search = req.query.search || '';
-    const query = search ? { $or: [{ name: new RegExp(search, 'i') }, { email: new RegExp(search, 'i') }] } : {};
-    const total = await User.countDocuments(query);
-    const users = await User.find(query).select('-password').skip(skip).limit(limit).sort({ createdAt: -1 });
+    const matchStage = search ? { $or: [{ name: new RegExp(search, 'i') }, { email: new RegExp(search, 'i') }] } : {};
+    const total = await User.countDocuments(matchStage);
+    const users = await User.aggregate([
+      { $match: matchStage },
+      { $lookup: { from: 'orders', localField: '_id', foreignField: 'user', as: 'orders' } },
+      { $addFields: { orderCount: { $size: '$orders' } } },
+      { $project: { password: 0, orders: 0 } },
+      { $sort: { createdAt: -1 } },
+      { $skip: skip },
+      { $limit: limit },
+    ]);
     res.json({ users, total, page, pages: Math.ceil(total / limit) });
   } catch (err) {
     res.status(500).json({ message: err.message });

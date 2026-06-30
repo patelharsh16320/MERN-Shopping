@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { getSocket } from '../../utils/socket';
 import './ManageProducts.css';
 
-const emptyForm = { name: '', slug: '', description: '', price: '', originalPrice: '', discount: 0, category: '', subcategory: '', images: [''], stock: '', totalStock: '', rating: 0, numReviews: 0, isFeatured: false, isActive: true, freshnessDays: 365, weight: '200g', brand: 'Women HubClub', tags: '', status: 'published', specialOffer: { enabled: false, label: '', salePrice: '', endsAt: '' } };
+const emptyForm = { name: '', slug: '', description: '', price: '', originalPrice: '', discount: 0, category: '', subcategory: '', images: [''], stock: '', totalStock: '', rating: 0, numReviews: 0, isFeatured: false, isActive: true, freshnessDays: 365, weight: '200g', brand: 'Women HubClub', tags: '', status: 'published', specialOffer: { enabled: false, label: '', salePrice: '', startsAt: '', endsAt: '' } };
 
 function autoSlug(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -293,34 +293,37 @@ export default function ManageProducts() {
         </div>
       </div>
 
-      {/* Status tabs */}
-      <div className="manage-products-tabs-row">
-        <span className="manage-products-tabs-label">Status:</span>
-        {STATUS_TABS.map(tab => (
-          <button key={tab.key} onClick={() => { setStatusFilter(tab.key); setPage(1); setSelectedIds(new Set()); }}
-            className={`manage-products-tab-btn ${statusFilter === tab.key ? 'manage-products-tab-btn-active' : ''}`}>
-            {tab.label}
-            <span className={`manage-products-tab-count ${statusFilter === tab.key ? 'manage-products-tab-count-active' : ''}`}>
-              {tabCounts[tab.key] ?? 0}
-            </span>
-          </button>
-        ))}
-        <span className="manage-products-divider" />
-        <span className="manage-products-tabs-label">Visibility:</span>
-        {[
-          { key: 'all',      label: 'All',      color: '#636e72', bg: '#f5f5f5' },
-          { key: 'active',   label: '🟢 Active',   color: '#2e7d32', bg: '#e8f5e9' },
-          { key: 'inactive', label: '🔴 Inactive', color: '#d63031', bg: '#fff0f0' },
-        ].map(f => (
-          <button key={f.key} onClick={() => { setActiveFilter(f.key); setPage(1); setSelectedIds(new Set()); }}
-            className="manage-products-tab-btn"
-            style={{ border: `2px solid ${activeFilter === f.key ? f.color : '#e0e0e0'}`, background: activeFilter === f.key ? f.bg : 'white', color: activeFilter === f.key ? f.color : '#636e72' }}>
-            {f.label}
-            <span className="manage-products-tab-count" style={{ background: activeFilter === f.key ? f.color : '#f0f0f0', color: activeFilter === f.key ? 'white' : '#9e9e9e' }}>
-              {f.key === 'all' ? tabCounts.all : (tabCounts[f.key] ?? 0)}
-            </span>
-          </button>
-        ))}
+      {/* Status + Visibility filter rows */}
+      <div className="manage-products-filters-wrap">
+        <div className="manage-products-tabs-row">
+          <span className="manage-products-tabs-label">Status:</span>
+          {STATUS_TABS.map(tab => (
+            <button key={tab.key} onClick={() => { setStatusFilter(tab.key); setPage(1); setSelectedIds(new Set()); }}
+              className={`manage-products-tab-btn ${statusFilter === tab.key ? 'manage-products-tab-btn-active' : ''}`}>
+              {tab.label}
+              <span className={`manage-products-tab-count ${statusFilter === tab.key ? 'manage-products-tab-count-active' : ''}`}>
+                {tabCounts[tab.key] ?? 0}
+              </span>
+            </button>
+          ))}
+        </div>
+        <div className="manage-products-tabs-row">
+          <span className="manage-products-tabs-label">Visibility:</span>
+          {[
+            { key: 'all',      label: 'All',        color: '#636e72', bg: '#f5f5f5' },
+            { key: 'active',   label: '🟢 Active',   color: '#2e7d32', bg: '#e8f5e9' },
+            { key: 'inactive', label: '🔴 Inactive', color: '#d63031', bg: '#fff0f0' },
+          ].map(f => (
+            <button key={f.key} onClick={() => { setActiveFilter(f.key); setPage(1); setSelectedIds(new Set()); }}
+              className="manage-products-tab-btn"
+              style={{ border: `2px solid ${activeFilter === f.key ? f.color : '#e0e0e0'}`, background: activeFilter === f.key ? f.bg : 'white', color: activeFilter === f.key ? f.color : '#636e72' }}>
+              {f.label}
+              <span className="manage-products-tab-count" style={{ background: activeFilter === f.key ? f.color : '#f0f0f0', color: activeFilter === f.key ? 'white' : '#9e9e9e' }}>
+                {f.key === 'all' ? tabCounts.all : (tabCounts[f.key] ?? 0)}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="manage-products-toolbar-row">
@@ -751,7 +754,12 @@ export default function ManageProducts() {
                       <input className="form-input" type="number" min="0" placeholder="Sale price"
                         value={form.specialOffer?.salePrice || ''} onChange={e => setForm(f => ({ ...f, specialOffer: { ...f.specialOffer, salePrice: e.target.value } }))} />
                     </div>
-                    <div className="form-group" style={{ marginBottom: 0, gridColumn: '1 / -1' }}>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
+                      <label className="form-label">Offer Starts At (optional)</label>
+                      <input className="form-input" type="datetime-local"
+                        value={form.specialOffer?.startsAt || ''} onChange={e => setForm(f => ({ ...f, specialOffer: { ...f.specialOffer, startsAt: e.target.value } }))} />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: 0 }}>
                       <label className="form-label">Offer Ends At (optional)</label>
                       <input className="form-input" type="datetime-local"
                         value={form.specialOffer?.endsAt || ''} onChange={e => setForm(f => ({ ...f, specialOffer: { ...f.specialOffer, endsAt: e.target.value } }))} />

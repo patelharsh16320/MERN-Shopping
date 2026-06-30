@@ -8,6 +8,18 @@ import Loader from '../components/Loader';
 import ProductCard from '../components/ProductCard';
 import './ProductDetail.css';
 
+const RECENTLY_VIEWED_KEY = 'recently_viewed';
+const MAX_RECENTLY_VIEWED = 8;
+
+function trackRecentlyViewed(product) {
+  try {
+    const stored = JSON.parse(localStorage.getItem(RECENTLY_VIEWED_KEY) || '[]');
+    const filtered = stored.filter(p => p._id !== product._id);
+    const updated = [{ _id: product._id, name: product.name, price: product.price, images: product.images, category: product.category, rating: product.rating, numReviews: product.numReviews, slug: product.slug, stock: product.stock, discount: product.discount, originalPrice: product.originalPrice, isFeatured: product.isFeatured }, ...filtered].slice(0, MAX_RECENTLY_VIEWED);
+    localStorage.setItem(RECENTLY_VIEWED_KEY, JSON.stringify(updated));
+  } catch {}
+}
+
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -24,13 +36,18 @@ export default function ProductDetail() {
   const [wishlisted, setWishlisted] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [related, setRelated] = useState([]);
+  const [onWaitlist, setOnWaitlist] = useState(false);
+  const [waitlistEmail, setWaitlistEmail] = useState('');
+  const [waitlistLoading, setWaitlistLoading] = useState(false);
 
   useEffect(() => {
     productAPI.getById(id)
       .then(r => {
         setProduct(r.data);
         setLoading(false);
+        trackRecentlyViewed(r.data);
         if (user) {
+          setWaitlistEmail(user.email || '');
           // pre-fill review form if user already reviewed
           const existing = r.data.reviews?.find(rev => (rev.user?._id || rev.user)?.toString() === user._id?.toString());
           if (existing) { setRating(existing.rating); setComment(existing.comment); }
@@ -57,6 +74,23 @@ export default function ProductDetail() {
   const handleBuyNow = () => {
     addToCart(product, qty);
     navigate('/cart');
+  };
+
+  const handleWaitlist = async (join) => {
+    if (!waitlistEmail) return toast.warning('Enter your email');
+    setWaitlistLoading(true);
+    try {
+      if (join) {
+        await productAPI.joinWaitlist(product._id, waitlistEmail);
+        setOnWaitlist(true);
+        toast.success('🔔 We\'ll notify you when it\'s back in stock!');
+      } else {
+        await productAPI.leaveWaitlist(product._id, waitlistEmail);
+        setOnWaitlist(false);
+        toast.info('Removed from waitlist');
+      }
+    } catch { toast.error('Failed. Try again.'); }
+    setWaitlistLoading(false);
   };
 
   const handleWishlist = async () => {
@@ -174,6 +208,25 @@ export default function ProductDetail() {
               <button className="btn btn-primary btn-lg pd-action-btn" onClick={handleAddToCart} disabled={product.stock === 0}>🛒 Add to Cart</button>
               <button className="btn btn-secondary btn-lg pd-action-btn" onClick={handleBuyNow} disabled={product.stock === 0}>⚡ Buy Now</button>
             </div>
+
+            {product.stock === 0 && (
+              <div style={{ background: '#fff8f0', border: '2px solid #ffe0b2', borderRadius: 14, padding: '16px 18px', marginTop: 12 }}>
+                <div style={{ fontWeight: 700, color: '#e65100', marginBottom: 8 }}>🔔 Get notified when back in stock</div>
+                {onWaitlist ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ color: '#00b894', fontWeight: 600, fontSize: 14 }}>✅ You're on the waitlist!</span>
+                    <button onClick={() => handleWaitlist(false)} disabled={waitlistLoading} style={{ background: 'none', border: 'none', color: '#9e9e9e', fontSize: 12, cursor: 'pointer' }}>Remove</button>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input type="email" value={waitlistEmail} onChange={e => setWaitlistEmail(e.target.value)} placeholder="Your email" className="form-input" style={{ flex: 1, padding: '8px 12px' }} />
+                    <button onClick={() => handleWaitlist(true)} disabled={waitlistLoading} className="btn btn-primary" style={{ whiteSpace: 'nowrap' }}>
+                      {waitlistLoading ? '...' : 'Notify Me'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
             <button
               onClick={handleWishlist}
